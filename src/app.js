@@ -256,6 +256,7 @@ function renderRecord(island) {
   }
   if (island.ruler) rows.push(["Dirigeant", island.ruler]);
   if (island.affiliation) rows.push(["Affiliation", island.affiliation]);
+  if (island.people?.length) rows.push(["Figures", island.people.join(", ")]);
   rows.push([
     "Coordonnées",
     `${Math.abs(island.lat).toFixed(1)}° ${island.lat >= 0 ? "N" : "S"} · ${Math.abs(island.lng).toFixed(1)}° ${island.lng >= 0 ? "E" : "O"}`,
@@ -341,21 +342,37 @@ function setupSearch() {
     const q = fold(input.value.trim());
     if (q.length < 1) return close();
 
-    const hits = state.islands
-      .filter(
-        (i) =>
-          fold(i.name).includes(q) ||
-          (i.nameRomaji && fold(i.nameRomaji).includes(q)) ||
-          fold(i.sea).includes(q),
-      )
-      .slice(0, 8);
+    // Un nom trouvé par son alias est affiché avec l'alias, sinon on ne
+    // comprend pas pourquoi « wano » renvoie « Pays des Wa ».
+    const hits = [];
+    for (const island of state.islands) {
+      if (fold(island.name).includes(q)) {
+        hits.push({ island, via: null, rank: 0 });
+        continue;
+      }
+      const alias = (island.aliases ?? []).find((a) => fold(a).includes(q));
+      if (alias) {
+        hits.push({ island, via: alias, rank: 1 });
+        continue;
+      }
+      const person = (island.people ?? []).find((p) => fold(p).includes(q));
+      if (person) {
+        hits.push({ island, via: person, rank: 2 });
+        continue;
+      }
+      if (fold(island.sea).includes(q)) {
+        hits.push({ island, via: island.sea, rank: 3 });
+      }
+    }
+    hits.sort((a, b) => a.rank - b.rank || a.island.name.localeCompare(b.island.name, "fr"));
 
     list.innerHTML = hits
+      .slice(0, 8)
       .map(
-        (i) =>
-          `<li role="option"><button type="button" data-id="${escape(i.id)}">
-            <span>${escape(i.name)}</span>
-            <span class="result-sea">${escape(i.sea)}</span>
+        ({ island, via }) =>
+          `<li role="option"><button type="button" data-id="${escape(island.id)}">
+            <span>${escape(island.name)}</span>
+            <span class="result-sea">${escape(via ?? island.sea)}</span>
           </button></li>`,
       )
       .join("");

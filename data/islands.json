@@ -78,6 +78,16 @@
   {
    "id": "village-de-fuchsia",
    "name": "Village de Fuchsia",
+   "aliases": [
+    "Foosha Village",
+    "Fūsha-mura",
+    "フーシャ村"
+   ],
+   "people": [
+    "Luffy",
+    "Shanks",
+    "Makino"
+   ],
    "nameJp": "フーシャ村",
    "nameRomaji": "Fūsha-mura",
    "lat": 49.2,
@@ -99,6 +109,12 @@
   {
    "id": "dawn-island",
    "name": "Dawn Island",
+   "aliases": [
+    "Île de Dawn",
+    "Dōn-tō",
+    ">ドーン島"
+   ],
+   "people": [],
    "nameJp": ">ドーン島",
    "nameRomaji": "Dōn-tō",
    "lat": 51.808,
@@ -120,6 +136,11 @@
   {
    "id": "shells-town",
    "name": "Shells Town",
+   "aliases": [
+    "Sheruzu Taun",
+    "シェルズタウン"
+   ],
+   "people": [],
    "nameJp": "シェルズタウン",
    "nameRomaji": "Sheruzu Taun",
    "lat": 54.8,
@@ -141,6 +162,11 @@
   {
    "id": "orange-town",
    "name": "Orange Town",
+   "aliases": [
+    "Orenji no Machi",
+    "オレンジの町"
+   ],
+   "people": [],
    "nameJp": "オレンジの町",
    "nameRomaji": "Orenji no Machi",
    "lat": 35.296,
@@ -162,6 +188,17 @@
   {
    "id": "village-de-syrup",
    "name": "Village de Syrup",
+   "aliases": [
+    "Syrup Village",
+    "Village de Sirop",
+    "Shiroppu-mura",
+    "シロップ村"
+   ],
+   "people": [
+    "Usopp",
+    "Kaya",
+    "Merry"
+   ],
    "nameJp": "シロップ村",
    "nameRomaji": "Shiroppu-mura",
    "lat": 30.144,
@@ -183,6 +220,11 @@
   {
    "id": "baratie",
    "name": "Baratie",
+   "aliases": [],
+   "people": [
+    "Sanji",
+    "Zeff"
+   ],
    "nameJp": null,
    "nameRomaji": null,
    "lat": 23.2,
@@ -204,6 +246,13 @@
   {
    "id": "arlong-park",
    "name": "Arlong Park",
+   "aliases": [
+    "Āron Pāku",
+    "アーロンパーク"
+   ],
+   "people": [
+    "Arlong"
+   ],
    "nameJp": "アーロンパーク",
    "nameRomaji": "Āron Pāku",
    "lat": 49.496,
@@ -225,6 +274,18 @@
   {
    "id": "village-de-cocoyashi",
    "name": "Village de Cocoyashi",
+   "aliases": [
+    "Cocoyasi Village",
+    "Village de Kokoyashi",
+    "Kokoyashi-mura",
+    "ココヤシ村"
+   ],
+   "people": [
+    "Nami",
+    "Bellemère",
+    "Nojiko",
+    "Arlong"
+   ],
    "nameJp": "ココヤシ村",
    "nameRomaji": "Kokoyashi-mura",
    "lat": 50.08,
@@ -246,6 +307,16 @@
   {
    "id": "loguetown",
    "name": "Loguetown",
+   "aliases": [
+    "Logue Town",
+    "Rōgutaun",
+    "ローグタウン"
+   ],
+   "people": [
+    "Gol D. Roger",
+    "Smoker",
+    "Tashigi"
+   ],
    "nameJp": "ローグタウン",
    "nameRomaji": "Rōgutaun",
    "lat": 14.048,
@@ -267,6 +338,11 @@
   {
    "id": "reverse-mountain",
    "name": "Reverse Mountain",
+   "aliases": [
+    "Rivāsu Maunten",
+    "リヴァース・マウンテン"
+   ],
+   "people": [],
    "nameJp": "リヴァース・マウンテン",
    "nameRomaji": "Rivāsu Maunten",
    "lat": 8.96,
@@ -288,6 +364,15 @@
   {
    "id": "cap-des-jumeaux",
    "name": "Cap des Jumeaux",
+   "aliases": [
+    "Twin Capes",
+    "Futago Misaki",
+    "双子岬"
+   ],
+   "people": [
+    "Crocus",
+    "Laboon"
+   ],
    "nameJp": "双子岬",
    "nameRomaji": "Futago Misaki",
    "lat": 3.152,
@@ -309,6 +394,12 @@
   {
    "id": "whisky-peak",
    "name": "Whisky Peak",
+   "aliases": [
+    "Whiskey Peak",
+    "Uisukī Pīku",
+    "ウイスキーピーク"
+   ],
+   "people": [],
    "nameJp": "ウイスキーピーク",
    "nameRomaji": "Uisukī Pīku",
    "lat": 0.176,
@@ -330,6 +421,15 @@
   {
    "id": "little-garden",
    "name": "Little Garden",
+   "aliases": [
+    "Giant Island Little Garden",
+    "Ritoru Gāden",
+    "リトルガーデン"
+   ],
+   "people": [
+    "Dorry",
+    "Brogy"
+   ],
    "nameJp": "リトルガーデン",
    "nameRomaji": "Ritoru Gāden",
    "lat": 2.624,
@@ -351,6 +451,20 @@
   {
    "id": "drum-royaume-de-sakura",
    "name": "Drum / Royaume de Sakura",
+   "aliases": [
+    "Sakura Kingdom",
+    "Drum Island",
+    "Sakura",
+    "Royaume des Cerisiers",
+    "Sakura Ōkoku",
+    "サクラ王国"
+   ],
+   "people": [
+    "Chopper",
+    "Kureha",
+    "Hiluluk",
+    "Wapol"
+   ],
    "nameJp": "サクラ王国",
    "nameRomaji": "Sakura Ōkoku",
    "lat": -1.536,
@@ -372,6 +486,20 @@
   {
    "id": "alabasta",
    "name": "Alabasta",
+   "aliases": [
+    "Sandy Island",
+    "Arabasta",
+    "Alubarna",
+    "Royaume d'Alabasta",
+    "Arabasuta-Ōkoku'",
+    "アラバスタオウコク"
+   ],
+   "people": [
+    "Vivi",
+    "Crocodile",
+    "Cobra",
+    "Pell"
+   ],
    "nameJp": "アラバスタオウコク",
    "nameRomaji": "Arabasuta-Ōkoku'",
    "lat": 4.48,
@@ -393,6 +521,11 @@
   {
    "id": "jaya",
    "name": "Jaya",
+   "aliases": [
+    "Jaya Island",
+    "ジャヤ"
+   ],
+   "people": [],
    "nameJp": "ジャヤ",
    "nameRomaji": "Jaya",
    "lat": 2.864,
@@ -414,6 +547,14 @@
   {
    "id": "mock-town",
    "name": "Mock Town",
+   "aliases": [
+    "Mokku Taun",
+    "モックタウン"
+   ],
+   "people": [
+    "Bellamy",
+    "Montblanc Cricket"
+   ],
    "nameJp": "モックタウン",
    "nameRomaji": "Mokku Taun",
    "lat": 1.024,
@@ -435,6 +576,18 @@
   {
    "id": "skypiea",
    "name": "Skypiea",
+   "aliases": [
+    "Godland Skypiea",
+    "Skypia",
+    "Ile du ciel",
+    "Sukaipia",
+    "スカイピア"
+   ],
+   "people": [
+    "Ener",
+    "Gan Fall",
+    "Wiper"
+   ],
    "nameJp": "スカイピア",
    "nameRomaji": "Sukaipia",
    "lat": 10.272,
@@ -456,6 +609,11 @@
   {
    "id": "long-ring-long-land",
    "name": "Long Ring Long Land",
+   "aliases": [
+    "Ronguringu Rongurando",
+    "ロングリングロングランド"
+   ],
+   "people": [],
    "nameJp": "ロングリングロングランド",
    "nameRomaji": "Ronguringu Rongurando",
    "lat": 2.72,
@@ -477,6 +635,19 @@
   {
    "id": "water-seven",
    "name": "Water Seven",
+   "aliases": [
+    "Shipbuilding Island",
+    "Water 7",
+    "Cite sur l'Eau",
+    "Wōtā Sebun",
+    "ウォーターセブン"
+   ],
+   "people": [
+    "Franky",
+    "Iceburg",
+    "Tom",
+    "Paulie"
+   ],
    "nameJp": "ウォーターセブン",
    "nameRomaji": "Wōtā Sebun",
    "lat": 4.512,
@@ -498,6 +669,15 @@
   {
    "id": "enies-lobby",
    "name": "Enies Lobby",
+   "aliases": [
+    "Eniesu Robī",
+    "エニエスロビー"
+   ],
+   "people": [
+    "Rob Lucci",
+    "Spandam",
+    "CP9"
+   ],
    "nameJp": "エニエスロビー",
    "nameRomaji": "Eniesu Robī",
    "lat": -0.624,
@@ -519,6 +699,12 @@
   {
    "id": "thriller-bark",
    "name": "Thriller Bark",
+   "aliases": [],
+   "people": [
+    "Brook",
+    "Gecko Moria",
+    "Perona"
+   ],
    "nameJp": null,
    "nameRomaji": null,
    "lat": 0.2,
@@ -540,6 +726,17 @@
   {
    "id": "archipel-sabaody",
    "name": "Archipel Sabaody",
+   "aliases": [
+    "Sabaody Archipelago",
+    "Archipel des Sabaody",
+    "Shabondi Shotō",
+    "シャボンディ諸島"
+   ],
+   "people": [
+    "Rayleigh",
+    "Kuma",
+    "Kizaru"
+   ],
    "nameJp": "シャボンディ諸島",
    "nameRomaji": "Shabondi Shotō",
    "lat": 2.336,
@@ -561,6 +758,15 @@
   {
    "id": "amazon-lily",
    "name": "Amazon Lily",
+   "aliases": [
+    "Amazon Lily Empire",
+    "Amazon Rirī",
+    "アマゾン・リリー"
+   ],
+   "people": [
+    "Boa Hancock",
+    "Elder Nyon"
+   ],
    "nameJp": "アマゾン・リリー",
    "nameRomaji": "Amazon Rirī",
    "lat": -8.48,
@@ -582,6 +788,15 @@
   {
    "id": "impel-down",
    "name": "Impel Down",
+   "aliases": [
+    "Inperu Daun",
+    "インペル･ダウン"
+   ],
+   "people": [
+    "Magellan",
+    "Ivankov",
+    "Bon Clay"
+   ],
    "nameJp": "インペル･ダウン",
    "nameRomaji": "Inperu Daun",
    "lat": -8.304,
@@ -603,6 +818,18 @@
   {
    "id": "marine-ford",
    "name": "Marine Ford",
+   "aliases": [
+    "Marineford",
+    "Quartiers Généraux de la Marine/Marine Ford",
+    "Marinfōdo",
+    "マリンフォード"
+   ],
+   "people": [
+    "Ace",
+    "Barbe Blanche",
+    "Akainu",
+    "Garp"
+   ],
    "nameJp": "マリンフォード",
    "nameRomaji": "Marinfōdo",
    "lat": -4.08,
@@ -624,6 +851,14 @@
   {
    "id": "rusukaina",
    "name": "Rusukaina",
+   "aliases": [
+    "Ruskaina",
+    "ルスカイナ"
+   ],
+   "people": [
+    "Rayleigh",
+    "Luffy"
+   ],
    "nameJp": "ルスカイナ",
    "nameRomaji": "Rusukaina",
    "lat": -7.12,
@@ -645,6 +880,19 @@
   {
    "id": "ile-des-hommes-poissons",
    "name": "Île des Hommes-Poissons",
+   "aliases": [
+    "Fish-Man Island",
+    "Fishman Island",
+    "Ile des Hommes Poissons",
+    "Gyojin-tō",
+    "魚人島"
+   ],
+   "people": [
+    "Shirahoshi",
+    "Neptune",
+    "Hody Jones",
+    "Jinbei"
+   ],
    "nameJp": "魚人島",
    "nameRomaji": "Gyojin-tō",
    "lat": -5.84,
@@ -666,6 +914,11 @@
   {
    "id": "royaume-de-ryugu",
    "name": "Royaume de Ryugu",
+   "aliases": [
+    "Ryugu Kingdom",
+    "Ryugu"
+   ],
+   "people": [],
    "nameJp": null,
    "nameRomaji": null,
    "lat": -6.336,
@@ -687,6 +940,16 @@
   {
    "id": "punk-hazard",
    "name": "Punk Hazard",
+   "aliases": [
+    "Punk Hazard Island",
+    "Panku Hazādo-tō",
+    "パンクハザード島"
+   ],
+   "people": [
+    "Law",
+    "Caesar Clown",
+    "Smoker"
+   ],
    "nameJp": "パンクハザード島",
    "nameRomaji": "Panku Hazādo-tō",
    "lat": 4.24,
@@ -708,6 +971,17 @@
   {
    "id": "dressrosa",
    "name": "Dressrosa",
+   "aliases": [
+    "Dress Rosa",
+    "Doresurōza",
+    "ドレスローザ"
+   ],
+   "people": [
+    "Doflamingo",
+    "Rebecca",
+    "Kyros",
+    "Riku Doldo III"
+   ],
    "nameJp": "ドレスローザ",
    "nameRomaji": "Doresurōza",
    "lat": 1.776,
@@ -729,6 +1003,14 @@
   {
    "id": "green-bit",
    "name": "Green Bit",
+   "aliases": [
+    "Gurīn Bitto",
+    "グリーンビット"
+   ],
+   "people": [
+    "Tontatta",
+    "Leo"
+   ],
    "nameJp": "グリーンビット",
    "nameRomaji": "Gurīn Bitto",
    "lat": 4.064,
@@ -750,6 +1032,16 @@
   {
    "id": "zou",
    "name": "Zou",
+   "aliases": [
+    "Zō",
+    "ゾウ"
+   ],
+   "people": [
+    "Raizo",
+    "Inuarashi",
+    "Nekomamushi",
+    "Momonosuke"
+   ],
    "nameJp": "ゾウ",
    "nameRomaji": "Zō",
    "lat": 2.64,
@@ -771,6 +1063,16 @@
   {
    "id": "whole-cake-island",
    "name": "Whole Cake Island",
+   "aliases": [
+    "Hōru Kēki Airando",
+    "ホールケーキアイランド"
+   ],
+   "people": [
+    "Big Mom",
+    "Katakuri",
+    "Pudding",
+    "Sanji"
+   ],
    "nameJp": "ホールケーキアイランド",
    "nameRomaji": "Hōru Kēki Airando",
    "lat": -1.824,
@@ -792,6 +1094,12 @@
   {
    "id": "ile-cacao",
    "name": "Île Cacao",
+   "aliases": [
+    "Cacao Island",
+    "Kakao-tō",
+    "カカオ島"
+   ],
+   "people": [],
    "nameJp": "カカオ島",
    "nameRomaji": "Kakao-tō",
    "lat": -3.24,
@@ -813,6 +1121,20 @@
   {
    "id": "pays-des-wa",
    "name": "Pays des Wa",
+   "aliases": [
+    "Wano Country",
+    "Wano",
+    "Wano Kuni",
+    "Wa no Kuni",
+    "ワノ国"
+   ],
+   "people": [
+    "Kaido",
+    "Oden",
+    "Orochi",
+    "Momonosuke",
+    "Yamato"
+   ],
    "nameJp": "ワノ国",
    "nameRomaji": "Wa no Kuni",
    "lat": 6.62,
@@ -834,6 +1156,15 @@
   {
    "id": "onigashima",
    "name": "Onigashima",
+   "aliases": [
+    "鬼ヶ島"
+   ],
+   "people": [
+    "Kaido",
+    "King",
+    "Queen",
+    "Yamato"
+   ],
    "nameJp": "鬼ヶ島",
    "nameRomaji": "Onigashima",
    "lat": 6.344,
@@ -855,6 +1186,17 @@
   {
    "id": "egghead",
    "name": "Egghead",
+   "aliases": [
+    "Future Island Egghead",
+    "Île d'Egg Head",
+    "Egguheddo",
+    "エッグヘッド"
+   ],
+   "people": [
+    "Vegapunk",
+    "Bonney",
+    "York"
+   ],
    "nameJp": "エッグヘッド",
    "nameRomaji": "Egguheddo",
    "lat": 0.232,
@@ -876,6 +1218,19 @@
   {
    "id": "elbaf",
    "name": "Elbaf",
+   "aliases": [
+    "Elbaph Island",
+    "Elbaph",
+    "Erbaf",
+    "Warland",
+    "Erubafu",
+    "エルバフ"
+   ],
+   "people": [
+    "Dorry",
+    "Brogy",
+    "Loki"
+   ],
    "nameJp": "エルバフ",
    "nameRomaji": "Erubafu",
    "lat": 5.92,
@@ -897,6 +1252,18 @@
   {
    "id": "laugh-tale",
    "name": "Laugh Tale",
+   "aliases": [
+    "Raftel",
+    "Rafte",
+    "One Piece",
+    "Rafuteru",
+    "ラフテル"
+   ],
+   "people": [
+    "Gol D. Roger",
+    "Rayleigh",
+    "Oden"
+   ],
    "nameJp": "ラフテル",
    "nameRomaji": "Rafuteru",
    "lat": 0.6,
@@ -918,6 +1285,11 @@
   {
    "id": "archipel-boin",
    "name": "Archipel Boin",
+   "aliases": [
+    "Boin Island Chain",
+    "Archipel de Boing"
+   ],
+   "people": [],
    "nameJp": null,
    "nameRomaji": null,
    "lat": 9.2,
@@ -939,6 +1311,14 @@
   {
    "id": "baltigo",
    "name": "Baltigo",
+   "aliases": [
+    "Barutigo",
+    "バルティゴ"
+   ],
+   "people": [
+    "Monkey D. Dragon",
+    "Sabo"
+   ],
    "nameJp": "バルティゴ",
    "nameRomaji": "Barutigo",
    "lat": -5.48,
@@ -960,6 +1340,16 @@
   {
    "id": "banaro",
    "name": "Banaro",
+   "aliases": [
+    "Banaro Island",
+    "Île de Banaro",
+    "Banaro-tō",
+    "バナロ島"
+   ],
+   "people": [
+    "Ace",
+    "Barbe Noire"
+   ],
    "nameJp": "バナロ島",
    "nameRomaji": "Banaro-tō",
    "lat": -2.744,
@@ -981,6 +1371,15 @@
   {
    "id": "baterilla",
    "name": "Baterilla",
+   "aliases": [
+    "Baterira",
+    "バテリラ"
+   ],
+   "people": [
+    "Portgas D. Rouge",
+    "Ace",
+    "Roger"
+   ],
    "nameJp": "バテリラ",
    "nameRomaji": "Baterira",
    "lat": -22.976,
@@ -1002,6 +1401,11 @@
   {
    "id": "calm-belt",
    "name": "Calm Belt",
+   "aliases": [
+    "Kāmu Beruto",
+    "凪の帯 (カームベルト)"
+   ],
+   "people": [],
    "nameJp": "凪の帯 (カームベルト)",
    "nameRomaji": "Kāmu Beruto",
    "lat": 9.28,
@@ -1023,6 +1427,13 @@
   {
    "id": "duche-de-mokomo",
    "name": "Duché de Mokomo",
+   "aliases": [
+    "Mokomo Dukedom",
+    "Principauté de Mokomo",
+    "Mokomo Kōkoku",
+    "モコモ公国"
+   ],
+   "people": [],
    "nameJp": "モコモ公国",
    "nameRomaji": "Mokomo Kōkoku",
    "lat": 1.952,
@@ -1044,6 +1455,14 @@
   {
    "id": "flevance",
    "name": "Flevance",
+   "aliases": [
+    "Furebansu",
+    "フレバンス"
+   ],
+   "people": [
+    "Law",
+    "Trafalgar"
+   ],
    "nameJp": "フレバンス",
    "nameRomaji": "Furebansu",
    "lat": 37.408,
@@ -1065,6 +1484,11 @@
   {
    "id": "foodvalten",
    "name": "Foodvalten",
+   "aliases": [
+    "Fūdovaruten-tō",
+    "フードヴァルテン島"
+   ],
+   "people": [],
    "nameJp": "フードヴァルテン島",
    "nameRomaji": "Fūdovaruten-tō",
    "lat": -0.288,
@@ -1086,6 +1510,15 @@
   {
    "id": "germa-66",
    "name": "Germa 66",
+   "aliases": [
+    "Germa Empire"
+   ],
+   "people": [
+    "Sanji",
+    "Judge",
+    "Reiju",
+    "Vinsmoke"
+   ],
    "nameJp": null,
    "nameRomaji": null,
    "lat": 46.176,
@@ -1107,6 +1540,15 @@
   {
    "id": "god-valley",
    "name": "God Valley",
+   "aliases": [
+    "Goddo Barē",
+    "ゴッドバレー"
+   ],
+   "people": [
+    "Rocks D. Xebec",
+    "Roger",
+    "Garp"
+   ],
    "nameJp": "ゴッドバレー",
    "nameRomaji": "Goddo Barē",
    "lat": -29.248,
@@ -1128,6 +1570,18 @@
   {
    "id": "hachinosu",
    "name": "Hachinosu",
+   "aliases": [
+    "Pirate Island Hachinosu",
+    "Ile de Ruche",
+    "Pirate Island",
+    "Barbe Noire",
+    "Île de Ruche",
+    "ハチノス"
+   ],
+   "people": [
+    "Barbe Noire",
+    "Marshall D. Teach"
+   ],
    "nameJp": "ハチノス",
    "nameRomaji": "Hachinosu",
    "lat": -4.616,
@@ -1149,6 +1603,17 @@
   {
    "id": "ile-minion",
    "name": "Île Minion",
+   "aliases": [
+    "Minion Island",
+    "Île de Minion",
+    "Minion-tō",
+    "ミニオン島"
+   ],
+   "people": [
+    "Corazon",
+    "Law",
+    "Doflamingo"
+   ],
    "nameJp": "ミニオン島",
    "nameRomaji": "Minion-tō",
    "lat": 59.976,
@@ -1170,6 +1635,19 @@
   {
    "id": "ile-momoiro",
    "name": "Île Momoiro",
+   "aliases": [
+    "Momoiro Island",
+    "Kamabakka",
+    "Royaume de Kamabakka",
+    "Rose Island",
+    "Kedétrav",
+    "Momoiro Airando",
+    "モモイロ島"
+   ],
+   "people": [
+    "Ivankov",
+    "Sanji"
+   ],
    "nameJp": "モモイロ島",
    "nameRomaji": "Momoiro Airando",
    "lat": 7.104,
@@ -1191,6 +1669,13 @@
   {
    "id": "ile-raijin",
    "name": "Île Raijin",
+   "aliases": [
+    "Raijin Island",
+    "Raijin"
+   ],
+   "people": [
+    "Barbe Noire"
+   ],
    "nameJp": null,
    "nameRomaji": null,
    "lat": 2.688,
@@ -1212,6 +1697,20 @@
   {
    "id": "karai-bari",
    "name": "Karai Bari",
+   "aliases": [
+    "Kari Bari-Island",
+    "Kalai Bali",
+    "Lacrahn-Ri",
+    "Armee Revolutionnaire",
+    "Île de Kalai Bali",
+    "Karai Bari-Shima",
+    "カライ•バリ島"
+   ],
+   "people": [
+    "Sabo",
+    "Dragon",
+    "Ivankov"
+   ],
    "nameJp": "カライ•バリ島",
    "nameRomaji": "Karai Bari-Shima",
    "lat": 7.624,
@@ -1233,6 +1732,16 @@
   {
    "id": "karakuri",
    "name": "Karakuri",
+   "aliases": [
+    "Karakuri Island",
+    "Baldimore",
+    "Barujimoa",
+    "バルジモア"
+   ],
+   "people": [
+    "Franky",
+    "Vegapunk"
+   ],
    "nameJp": "バルジモア",
    "nameRomaji": "Barujimoa",
    "lat": -2.628,
@@ -1254,6 +1763,20 @@
   {
    "id": "kuraigana",
    "name": "Kuraigana",
+   "aliases": [
+    "Kuraigana Island",
+    "Obscuria",
+    "Ile Obscuria",
+    "Mihawk",
+    "Île Obscuria",
+    "Kuraigana-tō",
+    "クライガナ島"
+   ],
+   "people": [
+    "Mihawk",
+    "Perona",
+    "Zoro"
+   ],
    "nameJp": "クライガナ島",
    "nameRomaji": "Kuraigana-tō",
    "lat": -5.4,
@@ -1275,6 +1798,13 @@
   {
    "id": "lodestar",
    "name": "Lodestar",
+   "aliases": [
+    "Lode Star Island",
+    "Île de Road Star",
+    "Rōdosutā-tō",
+    "ロードスター島"
+   ],
+   "people": [],
    "nameJp": "ロードスター島",
    "nameRomaji": "Rōdosutā-tō",
    "lat": 2.552,
@@ -1296,6 +1826,19 @@
   {
    "id": "marie-joie",
    "name": "Marie-Joie",
+   "aliases": [
+    "Holyland Mary Geoise",
+    "Mariejois",
+    "Mary Geoise",
+    "Terre Sainte",
+    "Seichi Marījoa",
+    "せいちマリージョア"
+   ],
+   "people": [
+    "Imu",
+    "Doflamingo",
+    "Dragons Célestes"
+   ],
    "nameJp": "せいちマリージョア",
    "nameRomaji": "Seichi Marījoa",
    "lat": 1.664,
@@ -1317,6 +1860,13 @@
   {
    "id": "mer-blanche",
    "name": "Mer Blanche",
+   "aliases": [
+    "Sky Sea",
+    "Mer de Nuages",
+    "Umigumo",
+    "海雲"
+   ],
+   "people": [],
    "nameJp": "海雲",
    "nameRomaji": "Umigumo",
    "lat": 11.424,
@@ -1338,6 +1888,12 @@
   {
    "id": "namakura",
    "name": "Namakura",
+   "aliases": [
+    "Île de Namakura",
+    "Namakura-tō",
+    "ナマクラ島"
+   ],
+   "people": [],
    "nameJp": "ナマクラ島",
    "nameRomaji": "Namakura-tō",
    "lat": -5.976,
@@ -1359,6 +1915,13 @@
   {
    "id": "nouveau-marine-ford",
    "name": "Nouveau Marine Ford",
+   "aliases": [
+    "New Marineford",
+    "Quartiers Généraux de la Marine/Marine Ford",
+    "Marinfōdo",
+    "マリンフォード"
+   ],
+   "people": [],
    "nameJp": "マリンフォード",
    "nameRomaji": "Marinfōdo",
    "lat": 0.136,
@@ -1380,6 +1943,14 @@
   {
    "id": "ohara",
    "name": "Ohara",
+   "aliases": [
+    "オハラ"
+   ],
+   "people": [
+    "Nico Robin",
+    "Olvia",
+    "Clover"
+   ],
    "nameJp": "オハラ",
    "nameRomaji": "Ohara",
    "lat": -37.344,
@@ -1401,6 +1972,15 @@
   {
    "id": "pays-de-kano",
    "name": "Pays de Kano",
+   "aliases": [
+    "Kano Country",
+    "Pays des Fleurs",
+    "Ka no Kuni",
+    "花ノ国"
+   ],
+   "people": [
+    "Wapol"
+   ],
    "nameJp": "花ノ国",
    "nameRomaji": "Ka no Kuni",
    "lat": -15.68,
@@ -1422,6 +2002,11 @@
   {
    "id": "qg-de-la-marine",
    "name": "QG de la Marine",
+   "aliases": [
+    "Marine HQ",
+    "Marine"
+   ],
+   "people": [],
    "nameJp": null,
    "nameRomaji": null,
    "lat": -1.504,
@@ -1443,6 +2028,12 @@
   {
    "id": "red-port",
    "name": "Red Port",
+   "aliases": [
+    "Red Port (W)",
+    "Reddo Pōto",
+    "レッドポート"
+   ],
+   "people": [],
    "nameJp": "レッドポート",
    "nameRomaji": "Reddo Pōto",
    "lat": -1.248,
@@ -1464,6 +2055,16 @@
   {
    "id": "royaume-de-goa",
    "name": "Royaume de Goa",
+   "aliases": [
+    "Goa Kingdom",
+    "Goa",
+    "ゴア"
+   ],
+   "people": [
+    "Sabo",
+    "Ace",
+    "Dadan"
+   ],
    "nameJp": "ゴア",
    "nameRomaji": "Goa",
    "lat": 50.64,
@@ -1485,6 +2086,14 @@
   {
    "id": "royaume-de-lulusia",
    "name": "Royaume de Lulusia",
+   "aliases": [
+    "Lulusia Kingdom",
+    "Rurushia Ōkoku",
+    "ルルシア王国"
+   ],
+   "people": [
+    "Imu"
+   ],
    "nameJp": "ルルシア王国",
    "nameRomaji": "Rurushia Ōkoku",
    "lat": 7.328,
@@ -1506,6 +2115,15 @@
   {
    "id": "royaume-de-lvneel",
    "name": "Royaume de Lvneel",
+   "aliases": [
+    "Lvneel Kingdom",
+    "Royaume de Luvneel",
+    "Rubunīru Ōkoku",
+    "ルブニール王国"
+   ],
+   "people": [
+    "Montblanc Noland"
+   ],
    "nameJp": "ルブニール王国",
    "nameRomaji": "Rubunīru Ōkoku",
    "lat": 27.584,
@@ -1527,6 +2145,13 @@
   {
    "id": "royaume-de-mogaro",
    "name": "Royaume de Mogaro",
+   "aliases": [
+    "Mogaro Kingdom",
+    "Royaume de Mogalo",
+    "Mogaro Ōkoku",
+    "モガロ王国"
+   ],
+   "people": [],
    "nameJp": "モガロ王国",
    "nameRomaji": "Mogaro Ōkoku",
    "lat": -3.04,
@@ -1548,6 +2173,12 @@
   {
    "id": "royaume-de-prodence",
    "name": "Royaume de Prodence",
+   "aliases": [
+    "Prodence Kingdom",
+    "Purodensu Ōkoku",
+    "プロデンス王国"
+   ],
+   "people": [],
    "nameJp": "プロデンス王国",
    "nameRomaji": "Purodensu Ōkoku",
    "lat": -3.36,
@@ -1569,6 +2200,15 @@
   {
    "id": "royaume-de-sorbet",
    "name": "Royaume de Sorbet",
+   "aliases": [
+    "Sorbet Kingdom",
+    "Sorube Ōkoku",
+    "ソルベ王国"
+   ],
+   "people": [
+    "Kuma",
+    "Jewelry Bonney"
+   ],
    "nameJp": "ソルベ王国",
    "nameRomaji": "Sorube Ōkoku",
    "lat": -62.208,
@@ -1590,6 +2230,12 @@
   {
    "id": "royaume-de-standing",
    "name": "Royaume de Standing",
+   "aliases": [
+    "Standing Kingdom",
+    "Sutandingu Ōkoku",
+    "スタンディング王国"
+   ],
+   "people": [],
    "nameJp": "スタンディング王国",
    "nameRomaji": "Sutandingu Ōkoku",
    "lat": 7.2,
@@ -1611,6 +2257,13 @@
   {
    "id": "royaume-de-torino",
    "name": "Royaume de Torino",
+   "aliases": [
+    "Torino Kingdom",
+    "Royaume Dézoizo",
+    "Torino Ōkoku",
+    "トリノ王国"
+   ],
+   "people": [],
    "nameJp": "トリノ王国",
    "nameRomaji": "Torino Ōkoku",
    "lat": -21.92,
@@ -1632,6 +2285,13 @@
   {
    "id": "royaume-tontatta",
    "name": "Royaume Tontatta",
+   "aliases": [
+    "Tontatta Kingdom",
+    "Royaume de Tontatta",
+    "Tontatta Ōkoku",
+    "トンタッタ王国"
+   ],
+   "people": [],
    "nameJp": "トンタッタ王国",
    "nameRomaji": "Tontatta Ōkoku",
    "lat": 3.408,
@@ -1653,6 +2313,11 @@
   {
    "id": "san-faldo",
    "name": "San Faldo",
+   "aliases": [
+    "San Farudo",
+    "サン・ファルド"
+   ],
+   "people": [],
    "nameJp": "サン・ファルド",
    "nameRomaji": "San Farudo",
    "lat": -1.72,
@@ -1674,6 +2339,11 @@
   {
    "id": "sphinx",
    "name": "Sphinx",
+   "aliases": [],
+   "people": [
+    "Marco",
+    "Barbe Blanche"
+   ],
    "nameJp": null,
    "nameRomaji": null,
    "lat": 1.96,
@@ -1695,6 +2365,12 @@
   {
    "id": "st-poplar",
    "name": "St. Poplar",
+   "aliases": [
+    "Saint Poplar",
+    "Sento Popura",
+    "セント・ポプラ"
+   ],
+   "people": [],
    "nameJp": "セント・ポプラ",
    "nameRomaji": "Sento Popura",
    "lat": -2.52,
@@ -1716,6 +2392,12 @@
   {
    "id": "totto-land",
    "name": "Totto Land",
+   "aliases": [
+    "Archipel Totto Land",
+    "Tottorando",
+    "トットランド"
+   ],
+   "people": [],
    "nameJp": "トットランド",
    "nameRomaji": "Tottorando",
    "lat": 1.856,
@@ -1737,6 +2419,12 @@
   {
    "id": "triangle-de-florian",
    "name": "Triangle de Florian",
+   "aliases": [
+    "Florian Triangle",
+    "Ma no Sankaku Chitai (Furorian Toraianguru)",
+    "魔の三角地帯 [フロリアン･トライアングル]"
+   ],
+   "people": [],
    "nameJp": "魔の三角地帯 [フロリアン･トライアングル]",
    "nameRomaji": "Ma no Sankaku Chitai (Furorian Toraianguru)",
    "lat": 2.144,
@@ -1758,6 +2446,16 @@
   {
    "id": "village-de-shimotsuki",
    "name": "Village de Shimotsuki",
+   "aliases": [
+    "Shimotsuki Village",
+    "Shimotsuki Mura",
+    "シモツキ村"
+   ],
+   "people": [
+    "Zoro",
+    "Kuina",
+    "Koshiro"
+   ],
    "nameJp": "シモツキ村",
    "nameRomaji": "Shimotsuki Mura",
    "lat": 79.248,
@@ -1779,6 +2477,11 @@
   {
    "id": "vira",
    "name": "Vira",
+   "aliases": [
+    "Vila",
+    "ヴィラ"
+   ],
+   "people": [],
    "nameJp": "ヴィラ",
    "nameRomaji": "Vira",
    "lat": 7.904,
@@ -1800,6 +2503,14 @@
   {
    "id": "weatheria",
    "name": "Weatheria",
+   "aliases": [
+    "Wezaria",
+    "ウェザリア"
+   ],
+   "people": [
+    "Nami",
+    "Haredas"
+   ],
    "nameJp": "ウェザリア",
    "nameRomaji": "Wezaria",
    "lat": 8.48,

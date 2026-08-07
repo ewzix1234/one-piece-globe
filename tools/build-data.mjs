@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { PLACES, SAGAS } from "./curation.mjs";
+import { PLACES, SAGAS, PEOPLE } from "./curation.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const read = (p) => JSON.parse(readFileSync(p, "utf8"));
@@ -60,6 +60,19 @@ for (const place of PLACES) {
   }
 
   const w = wiki[place.wiki] ?? null;
+
+  // Les noms se cherchent dans les deux langues : « Wano » doit trouver
+  // « Pays des Wa », « Fishman » doit trouver « Île des Hommes-Poissons ».
+  const aliases = [
+    place.src,
+    ...(place.alias ?? []),
+    w?.title,
+    w?.nameRomaji,
+    w?.nameJp,
+  ]
+    .filter(Boolean)
+    .map((s) => s.replace(/\s+/g, " ").trim())
+    .filter((s) => s.toLowerCase() !== place.fr.toLowerCase());
   // `ownNoteOnly` : la page du wiki est partagée avec un autre lieu, ou
   // ne parle pas vraiment de celui-ci. On ne garde alors que notre note.
   const summary = place.ownNoteOnly ? null : (w?.summary ?? null);
@@ -72,6 +85,8 @@ for (const place of PLACES) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, ""),
     name: place.fr,
+    aliases: [...new Set(aliases)],
+    people: PEOPLE[place.fr] ?? [],
     nameJp: w?.nameJp ?? null,
     nameRomaji: w?.nameRomaji ?? null,
     lat: Number(lat.toFixed(4)),

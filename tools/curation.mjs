@@ -49,18 +49,18 @@ export const PLACES = [
   { src: "Twin Capes", fr: "Cap des Jumeaux", wiki: "Cap_des_Jumeaux", saga: "alabasta", step: 11, tag: "crew", note: "Crocus y veille sur Laboon depuis cinquante ans." },
   { src: "Whisky Peak", fr: "Whisky Peak", wiki: "Whisky_Peak", saga: "alabasta", step: 12, tag: "crew", note: "Ville de chasseurs de primes au service de Baroque Works." },
   { src: "Giant Island Little Garden", fr: "Little Garden", wiki: "Little_Garden", saga: "alabasta", step: 13, tag: "crew", note: "Île préhistorique. Duel sans fin de Dorry et Brogy." },
-  { src: "Sakura Kingdom", fr: "Drum / Royaume de Sakura", wiki: "Drum", saga: "alabasta", step: 14, tag: "crew", note: "Île de Chopper et du docteur Kureha." },
-  { src: "Sandy Island", fr: "Alabasta", wiki: "Alabasta", saga: "alabasta", step: 15, tag: "crew", note: "Royaume de Vivi, déstabilisé par Crocodile." },
+  { src: "Sakura Kingdom", fr: "Drum / Royaume de Sakura", wiki: "Drum", alias: ["Drum Island", "Sakura"], saga: "alabasta", step: 14, tag: "crew", note: "Île de Chopper et du docteur Kureha." },
+  { src: "Sandy Island", fr: "Alabasta", wiki: "Alabasta", alias: ["Arabasta", "Alubarna"], saga: "alabasta", step: 15, tag: "crew", note: "Royaume de Vivi, déstabilisé par Crocodile." },
 
   // ── Skypiea ──────────────────────────────────────────────────────────
   { src: "Jaya Island", fr: "Jaya", wiki: "Jaya", saga: "skypiea", step: 16, tag: "crew" },
   { src: "Mock Town", fr: "Mock Town", wiki: "Mock_Town", saga: "skypiea", step: 17, tag: "crew", note: "Bellamy y humilie Montblanc Cricket." },
-  { src: "Godland Skypiea", fr: "Skypiea", wiki: "Skypiea", saga: "skypiea", step: 18, tag: "crew", note: "Île céleste. Ener s'y proclame dieu." },
+  { src: "Godland Skypiea", fr: "Skypiea", wiki: "Skypiea", alias: ["Skypia", "Ile du ciel"], saga: "skypiea", step: 18, tag: "crew", note: "Île céleste. Ener s'y proclame dieu." },
   { src: "Sky Sea", fr: "Mer Blanche", wiki: "Mer_Blanche", saga: "skypiea", step: null, tag: "story" },
   { src: "Long Ring Long Land", fr: "Long Ring Long Land", wiki: "Long_Ring_Long_Land", saga: "skypiea", step: 19, tag: "crew", note: "Davy Back Fight contre Foxy. Aokiji y apparaît." },
 
   // ── Water Seven ──────────────────────────────────────────────────────
-  { src: "Shipbuilding Island", fr: "Water Seven", wiki: "Water_Seven", saga: "water-seven", step: 20, tag: "crew", note: "Cité des charpentiers navals. Franky y rejoint l'équipage." },
+  { src: "Shipbuilding Island", fr: "Water Seven", wiki: "Water_Seven", alias: ["Water 7", "Cite sur l'Eau"], saga: "water-seven", step: 20, tag: "crew", note: "Cité des charpentiers navals. Franky y rejoint l'équipage." },
   { src: "Enies Lobby", fr: "Enies Lobby", wiki: "Enies_Lobby", saga: "water-seven", step: 21, tag: "crew", note: "Île judiciaire. L'équipage déclare la guerre au Gouvernement Mondial." },
   { src: "St. Poplar", fr: "St. Poplar", wiki: "St._Poplar", saga: "water-seven", step: null, tag: "story" },
   { src: "San Faldo", fr: "San Faldo", wiki: "San_Faldo", saga: "water-seven", step: null, tag: "story" },
@@ -76,11 +76,11 @@ export const PLACES = [
   { src: "Impel Down", fr: "Impel Down", wiki: "Impel_Down", saga: "summit-war", step: 25, tag: "crew", note: "Prison sous-marine à six niveaux." },
   { src: "Marineford", fr: "Marine Ford", wiki: "Marine_Ford", saga: "summit-war", step: 26, tag: "crew", note: "Ace y meurt. Barbe Blanche y tombe." },
   { src: "Rusukaina", fr: "Rusukaina", wiki: "Rusukaina", saga: "summit-war", step: 27, tag: "crew", note: "Luffy s'y entraîne deux ans avec Rayleigh." },
-  { src: "Kuraigana Island", fr: "Kuraigana", wiki: "Kuraigana", saga: "summit-war", step: null, tag: "crew", note: "Zoro s'y entraîne sous Mihawk. Perona y réside." },
+  { src: "Kuraigana Island", fr: "Kuraigana", wiki: "Kuraigana", alias: ["Obscuria", "Ile Obscuria", "Mihawk"], saga: "summit-war", step: null, tag: "crew", note: "Zoro s'y entraîne sous Mihawk. Perona y réside." },
   { src: "Boin Island Chain", fr: "Archipel Boin", wiki: "Archipel_Boin", saga: "summit-war", step: null, tag: "crew", note: "Usopp y devient plus fort en mangeant les plantes de l'île." },
   // Le wiki francophone ne fait qu'une page de Momoiro et du Royaume de
   // Kamabakka qu'elle abrite : on ne garde qu'un marqueur.
-  { src: "Momoiro Island", fr: "Île Momoiro", wiki: "Momoiro", saga: "summit-war", step: null, tag: "crew", note: "Royaume de Kamabakka, fief d'Emporio Ivankov. Sanji y apprend le Poing du Diable." },
+  { src: "Momoiro Island", fr: "Île Momoiro", wiki: "Momoiro", alias: ["Kamabakka", "Royaume de Kamabakka", "Rose Island"], saga: "summit-war", step: null, tag: "crew", note: "Royaume de Kamabakka, fief d'Emporio Ivankov. Sanji y apprend le Poing du Diable." },
   { src: "Karakuri Island", fr: "Karakuri", wiki: "Karakuri", saga: "summit-war", step: null, tag: "crew", note: "Île natale de Franky et de Vegapunk." },
   { src: "Weatheria", fr: "Weatheria", wiki: "Weatheria", saga: "summit-war", step: null, tag: "crew", note: "Île du ciel où Nami étudie la météo." },
   { src: "Torino Kingdom", fr: "Royaume de Torino", wiki: "Torino", saga: "summit-war", step: null, tag: "crew", note: "Chopper y perfectionne sa médecine." },
@@ -89,9 +89,9 @@ export const PLACES = [
   { src: "Baltigo", fr: "Baltigo", wiki: "Baltigo", saga: "summit-war", step: null, tag: "character", note: "Ancien quartier général de l'Armée Révolutionnaire de Dragon." },
 
   // ── Île des Hommes-Poissons ──────────────────────────────────────────
-  { src: "Fish-Man Island", fr: "Île des Hommes-Poissons", wiki: "Île_des_Hommes-Poissons", saga: "fishman", step: 28, tag: "crew", note: "Dix mille mètres sous la surface, sous la Red Line." },
+  { src: "Fish-Man Island", fr: "Île des Hommes-Poissons", wiki: "Île_des_Hommes-Poissons", alias: ["Fishman Island", "Ile des Hommes Poissons"], saga: "fishman", step: 28, tag: "crew", note: "Dix mille mètres sous la surface, sous la Red Line." },
   { src: "Ryugu Kingdom", fr: "Royaume de Ryugu", wiki: "Ryugu", saga: "fishman", step: 29, tag: "crew", note: "Palais de Neptune et de la princesse Shirahoshi." },
-  { src: "Holyland Mary Geoise", fr: "Marie-Joie", wiki: "Marie-Joie", saga: "fishman", step: null, tag: "story", note: "Capitale du Gouvernement Mondial, siège des Dragons Célestes et d'Imu." },
+  { src: "Holyland Mary Geoise", fr: "Marie-Joie", wiki: "Marie-Joie", alias: ["Mariejois", "Mary Geoise", "Terre Sainte"], saga: "fishman", step: null, tag: "story", note: "Capitale du Gouvernement Mondial, siège des Dragons Célestes et d'Imu." },
 
   // ── Dressrosa ────────────────────────────────────────────────────────
   { src: "Punk Hazard Island", fr: "Punk Hazard", wiki: "Punk_Hazard", saga: "dressrosa", step: 30, tag: "crew", note: "Île coupée en deux, feu et glace. Alliance avec Law." },
@@ -106,17 +106,17 @@ export const PLACES = [
   { src: "Cacao Island", fr: "Île Cacao", wiki: "Île_Cacao", saga: "whole-cake", step: 35, tag: "crew" },
 
   // ── Wano ─────────────────────────────────────────────────────────────
-  { src: "Wano Country", fr: "Pays des Wa", wiki: "Pays_des_Wa", saga: "wano", step: 36, tag: "crew", note: "Pays fermé, sous la domination de Kaido et Orochi." },
+  { src: "Wano Country", fr: "Pays des Wa", wiki: "Pays_des_Wa", alias: ["Wano", "Wano Kuni", "Wa no Kuni"], saga: "wano", step: 36, tag: "crew", note: "Pays fermé, sous la domination de Kaido et Orochi." },
   { src: "Onigashima", fr: "Onigashima", wiki: "Onigashima", saga: "wano", step: 37, tag: "crew", note: "Repaire de l'Équipage aux Cent Bêtes." },
 
   // ── Saga finale ──────────────────────────────────────────────────────
   { src: "Future Island Egghead", fr: "Egghead", wiki: "Egghead", saga: "final", step: 38, tag: "crew", note: "Île du futur, laboratoire de Vegapunk." },
-  { src: "Elbaph Island", fr: "Elbaf", wiki: "Elbaf", saga: "final", step: 39, tag: "crew", note: "Terre des géants, patrie de Dorry et Brogy. Le Royaume de Warland s'y trouve." },
+  { src: "Elbaph Island", fr: "Elbaf", wiki: "Elbaf", alias: ["Elbaph", "Erbaf", "Warland"], saga: "final", step: 39, tag: "crew", note: "Terre des géants, patrie de Dorry et Brogy. Le Royaume de Warland s'y trouve." },
   { src: "Lulusia Kingdom", fr: "Royaume de Lulusia", wiki: "Lulusia", saga: "final", step: null, tag: "story", note: "Effacé de la carte par Imu depuis Marie-Joie." },
   { src: "Lode Star Island", fr: "Lodestar", wiki: "Lodestar", saga: "final", step: null, tag: "story", note: "Dernière île avant Laugh Tale que désigne le Log Pose." },
-  { src: "Pirate Island Hachinosu", fr: "Hachinosu", wiki: "Hachinosu", saga: "final", step: null, tag: "character", note: "Île de la Ruche, repaire de Barbe Noire." },
+  { src: "Pirate Island Hachinosu", fr: "Hachinosu", wiki: "Hachinosu", alias: ["Ile de Ruche", "Pirate Island", "Barbe Noire"], saga: "final", step: null, tag: "character", note: "Île de la Ruche, repaire de Barbe Noire." },
   { src: "Sphinx", fr: "Sphinx", wiki: "Sphinx", saga: "final", step: null, tag: "character", note: "Village natal de Barbe Blanche, protégé par Marco." },
-  { src: "Kari Bari-Island", fr: "Karai Bari", wiki: "Karai_Bari", saga: "final", step: null, tag: "character", note: "Quartier général actuel de l'Armée Révolutionnaire." },
+  { src: "Kari Bari-Island", fr: "Karai Bari", wiki: "Karai_Bari", alias: ["Kalai Bali", "Lacrahn-Ri", "Armee Revolutionnaire"], saga: "final", step: null, tag: "character", note: "Quartier général actuel de l'Armée Révolutionnaire." },
   // Partage la page du wiki avec l'ancien Marine Ford : on n'affiche que la note.
   { src: "New Marineford", fr: "Nouveau Marine Ford", wiki: "Marine_Ford", ownNoteOnly: true, saga: "final", step: null, tag: "story", note: "Après la guerre au sommet, la Marine abandonne Marine Ford et réinstalle son quartier général dans le Nouveau Monde, à l'emplacement de l'ancien G-1." },
 
@@ -148,6 +148,7 @@ export const PLACES = [
   {
     src: null,
     fr: "Laugh Tale",
+    alias: ["Raftel", "Rafte", "One Piece"],
     wiki: "Laugh_Tale",
     saga: "final",
     step: 40,
@@ -159,6 +160,71 @@ export const PLACES = [
     location: "New World",
   },
 ];
+
+/**
+ * Personnages attachés à un lieu, indexés pour la recherche.
+ *
+ * Un lecteur cherche autant « zoro » que « Shimotsuki » : la table permet
+ * de retrouver une île par qui l'habite, y est né ou y est mort. On s'en
+ * tient à ceux dont le lien avec le lieu est un fait de l'histoire, pas à
+ * la liste de tous les personnages qui y sont passés.
+ */
+export const PEOPLE = {
+  "Village de Fuchsia": ["Luffy", "Shanks", "Makino"],
+  "Royaume de Goa": ["Sabo", "Ace", "Dadan"],
+  "Village de Shimotsuki": ["Zoro", "Kuina", "Koshiro"],
+  "Village de Syrup": ["Usopp", "Kaya", "Merry"],
+  Baratie: ["Sanji", "Zeff"],
+  "Village de Cocoyashi": ["Nami", "Bellemère", "Nojiko", "Arlong"],
+  "Arlong Park": ["Arlong"],
+  Loguetown: ["Gol D. Roger", "Smoker", "Tashigi"],
+  "Cap des Jumeaux": ["Crocus", "Laboon"],
+  "Little Garden": ["Dorry", "Brogy"],
+  "Drum / Royaume de Sakura": ["Chopper", "Kureha", "Hiluluk", "Wapol"],
+  Alabasta: ["Vivi", "Crocodile", "Cobra", "Pell"],
+  "Mock Town": ["Bellamy", "Montblanc Cricket"],
+  Skypiea: ["Ener", "Gan Fall", "Wiper"],
+  "Water Seven": ["Franky", "Iceburg", "Tom", "Paulie"],
+  "Enies Lobby": ["Rob Lucci", "Spandam", "CP9"],
+  Ohara: ["Nico Robin", "Olvia", "Clover"],
+  "Thriller Bark": ["Brook", "Gecko Moria", "Perona"],
+  "Archipel Sabaody": ["Rayleigh", "Kuma", "Kizaru"],
+  "Amazon Lily": ["Boa Hancock", "Elder Nyon"],
+  "Impel Down": ["Magellan", "Ivankov", "Bon Clay"],
+  "Marine Ford": ["Ace", "Barbe Blanche", "Akainu", "Garp"],
+  Rusukaina: ["Rayleigh", "Luffy"],
+  Kuraigana: ["Mihawk", "Perona", "Zoro"],
+  "Île Momoiro": ["Ivankov", "Sanji"],
+  Karakuri: ["Franky", "Vegapunk"],
+  Weatheria: ["Nami", "Haredas"],
+  Baltigo: ["Monkey D. Dragon", "Sabo"],
+  Banaro: ["Ace", "Barbe Noire"],
+  "Île des Hommes-Poissons": ["Shirahoshi", "Neptune", "Hody Jones", "Jinbei"],
+  "Marie-Joie": ["Imu", "Doflamingo", "Dragons Célestes"],
+  "Punk Hazard": ["Law", "Caesar Clown", "Smoker"],
+  Dressrosa: ["Doflamingo", "Rebecca", "Kyros", "Riku Doldo III"],
+  "Green Bit": ["Tontatta", "Leo"],
+  Zou: ["Raizo", "Inuarashi", "Nekomamushi", "Momonosuke"],
+  "Whole Cake Island": ["Big Mom", "Katakuri", "Pudding", "Sanji"],
+  "Pays des Wa": ["Kaido", "Oden", "Orochi", "Momonosuke", "Yamato"],
+  Onigashima: ["Kaido", "King", "Queen", "Yamato"],
+  Egghead: ["Vegapunk", "Bonney", "York"],
+  Elbaf: ["Dorry", "Brogy", "Loki"],
+  Hachinosu: ["Barbe Noire", "Marshall D. Teach"],
+  Sphinx: ["Marco", "Barbe Blanche"],
+  "Karai Bari": ["Sabo", "Dragon", "Ivankov"],
+  "God Valley": ["Rocks D. Xebec", "Roger", "Garp"],
+  Flevance: ["Law", "Trafalgar"],
+  "Île Minion": ["Corazon", "Law", "Doflamingo"],
+  "Germa 66": ["Sanji", "Judge", "Reiju", "Vinsmoke"],
+  Baterilla: ["Portgas D. Rouge", "Ace", "Roger"],
+  "Royaume de Sorbet": ["Kuma", "Jewelry Bonney"],
+  "Royaume de Lvneel": ["Montblanc Noland"],
+  "Pays de Kano": ["Wapol"],
+  "Laugh Tale": ["Gol D. Roger", "Rayleigh", "Oden"],
+  "Royaume de Lulusia": ["Imu"],
+  "Île Raijin": ["Barbe Noire"],
+};
 
 /** Table src → entrée, pour le croisement avec positions.json. */
 export const BY_SOURCE = new Map(

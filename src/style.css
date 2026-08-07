@@ -1,0 +1,740 @@
+/* ==========================================================================
+   Deux matières : la mer à gauche, le papier à droite.
+   ========================================================================== */
+
+:root {
+  /* Mer */
+  --abyss: #04202f;
+  --deep: #06283d;
+  --sea: #0d4f6c;
+  --current: #1b7f9c;
+  --foam: #d8e7ea;
+  --foam-dim: #8fa9b4;
+
+  /* Papier */
+  --paper: #e8dcc0;
+  --paper-shade: #d9c9a5;
+  --ink: #3a2c1e;
+  --ink-soft: #6b5940;
+
+  /* Accents, tirés de l'œuvre */
+  --straw: #f2b544; /* le chapeau de paille : sélection */
+  --vermilion: #d94f30; /* la route de l'équipage */
+  --jade: #2fa88b;
+
+  --display: Futura, "Avenir Next", "Century Gothic", "Trebuchet MS", sans-serif;
+  --data: "Avenir Next Condensed", "Roboto Condensed", "Helvetica Neue", sans-serif;
+  --prose: Palatino, "Palatino Linotype", "Iowan Old Style", Georgia, serif;
+
+  --panel-width: 26rem;
+  --edge: 1.25rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--abyss);
+  color: var(--foam);
+  font-family: var(--display);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--straw);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Infobulle au survol d'un marqueur, rendue par globe.gl. */
+.scene-tooltip .tip {
+  font-family: var(--data);
+  font-size: 0.85rem;
+  line-height: 1.35;
+  padding: 0.3rem 0.55rem;
+  background: rgba(4, 32, 47, 0.92);
+  border: 1px solid rgba(242, 181, 68, 0.45);
+  border-radius: 2px;
+  color: var(--foam);
+}
+
+.scene-tooltip .tip span {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--foam-dim);
+}
+
+/* --- Scène ---------------------------------------------------------------- */
+
+#scene {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 42% 38%, #0b3a52 0%, var(--abyss) 62%, #021520 100%);
+}
+
+#scene canvas {
+  display: block;
+}
+
+/* --- Chargement ----------------------------------------------------------- */
+
+#loader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  background: var(--abyss);
+  z-index: 50;
+  transition: opacity 0.5s ease;
+}
+
+#loader[hidden] {
+  display: none;
+}
+
+#loader.done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader-mark {
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  color: var(--straw);
+}
+
+.loader-note {
+  font-family: var(--data);
+  font-size: 0.8rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--foam-dim);
+}
+
+/* --- En-tête -------------------------------------------------------------- */
+
+.masthead {
+  position: fixed;
+  top: var(--edge);
+  left: var(--edge);
+  z-index: 20;
+  max-width: min(22rem, calc(100vw - 2 * var(--edge)));
+}
+
+.masthead h1 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.masthead h1 em {
+  display: block;
+  font-style: normal;
+  font-size: 0.44em;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  color: var(--straw);
+  margin-top: 0.5em;
+}
+
+/* --- Recherche ------------------------------------------------------------ */
+
+.search {
+  position: relative;
+  margin-top: 1rem;
+}
+
+.search input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font-family: var(--data);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--foam);
+  background: rgba(4, 32, 47, 0.72);
+  border: 1px solid rgba(216, 231, 234, 0.28);
+  border-radius: 2px;
+  backdrop-filter: blur(6px);
+}
+
+.search input::placeholder {
+  color: var(--foam-dim);
+}
+
+.search input:focus {
+  outline: none;
+  border-color: var(--straw);
+}
+
+.results {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  max-height: 15rem;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: rgba(4, 32, 47, 0.94);
+  border: 1px solid rgba(216, 231, 234, 0.22);
+  border-radius: 2px;
+  backdrop-filter: blur(8px);
+}
+
+.results:empty {
+  display: none;
+}
+
+.results li button {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  text-align: left;
+  font-family: var(--data);
+  font-size: 0.88rem;
+  border-bottom: 1px solid rgba(216, 231, 234, 0.08);
+}
+
+.results li button:hover,
+.results li button:focus-visible {
+  background: rgba(242, 181, 68, 0.16);
+}
+
+.results .result-sea {
+  color: var(--foam-dim);
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+/* --- Filtres -------------------------------------------------------------- */
+
+.filters {
+  position: fixed;
+  top: var(--edge);
+  right: var(--edge);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  transition: right 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.panel-open .filters {
+  right: calc(var(--panel-width) + var(--edge));
+}
+
+.filters-title {
+  font-family: var(--data);
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--foam-dim);
+  margin-bottom: 0.15rem;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  font-family: var(--data);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--foam-dim);
+  background: rgba(4, 32, 47, 0.68);
+  border: 1px solid transparent;
+  border-radius: 2px;
+  backdrop-filter: blur(6px);
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.chip:hover {
+  color: var(--foam);
+}
+
+.chip[aria-pressed="true"] {
+  color: var(--foam);
+  border-color: rgba(216, 231, 234, 0.35);
+}
+
+.chip-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+  transition: opacity 0.18s ease;
+}
+
+.chip[aria-pressed="true"] .chip-dot {
+  opacity: 1;
+}
+
+.chip-count {
+  font-size: 0.72rem;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Log Pose : l'élément signature --------------------------------------- */
+
+.logpose {
+  position: fixed;
+  left: var(--edge);
+  bottom: var(--edge);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.logpose-dial {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  flex: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.16), transparent 58%),
+    radial-gradient(circle at 50% 50%, #0a3648 0%, #051d2a 74%);
+  border: 2px solid rgba(242, 181, 68, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(4, 32, 47, 0.9),
+    0 8px 22px rgba(0, 0, 0, 0.55);
+}
+
+/* Graduations : quatre points cardinaux, gravés plutôt qu'écrits. */
+.logpose-dial::before,
+.logpose-dial::after {
+  content: "";
+  position: absolute;
+  inset: 0.55rem;
+  border-radius: 50%;
+  border: 1px solid rgba(216, 231, 234, 0.16);
+}
+
+.logpose-dial::after {
+  inset: 1.15rem;
+  border-style: dashed;
+  border-color: rgba(216, 231, 234, 0.1);
+}
+
+.logpose-needle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 38%;
+  margin-left: -1px;
+  transform-origin: 50% 100%;
+  transform: translateY(-100%) rotate(0deg);
+  background: linear-gradient(to top, var(--vermilion), var(--straw));
+  border-radius: 1px;
+  transition: transform 0.9s cubic-bezier(0.34, 1.3, 0.5, 1);
+}
+
+.logpose-needle::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: var(--straw);
+  box-shadow: 0 0 8px rgba(242, 181, 68, 0.8);
+}
+
+.logpose-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--ink-soft);
+}
+
+.logpose-readout {
+  font-family: var(--data);
+  line-height: 1.3;
+  max-width: 13rem;
+}
+
+.logpose-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--foam-dim);
+}
+
+/* L'île de départ passe en second plan : c'est la destination qui compte. */
+.logpose-from {
+  font-size: 0.74rem;
+  color: var(--foam-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logpose-from[hidden] {
+  display: none;
+}
+
+.logpose-target {
+  font-size: 1rem;
+  color: var(--foam);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logpose-bearing {
+  font-size: 0.78rem;
+  color: var(--straw);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Fiche : la matière papier -------------------------------------------- */
+
+.record {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--panel-width);
+  max-width: 100vw;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--paper);
+  /* Grain d'impression : deux trames fines suffisent à donner du papier. */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(58, 44, 30, 0.035) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(
+      ellipse at 78% 12%,
+      rgba(160, 130, 84, 0.24) 0%,
+      transparent 58%
+    );
+  color: var(--ink);
+  box-shadow: -14px 0 40px rgba(0, 0, 0, 0.45);
+  transform: translateX(100%);
+  transition: transform 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+body.panel-open .record {
+  transform: translateX(0);
+}
+
+.record-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--ink-soft);
+  border-radius: 50%;
+}
+
+.record-close:hover {
+  color: var(--ink);
+  background: rgba(58, 44, 30, 0.08);
+}
+
+.record-scroll {
+  overflow-y: auto;
+  padding: 2.1rem var(--edge) 2.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.record-eyebrow {
+  font-family: var(--data);
+  font-size: 0.7rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.record h2 {
+  margin: 0.35rem 0 0;
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.12;
+}
+
+.record-jp {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin-top: 0.3rem;
+  letter-spacing: 0.08em;
+}
+
+.record-rule {
+  height: 2px;
+  margin: 1.1rem 0;
+  background: var(--ink);
+  opacity: 0.75;
+}
+
+/* Métadonnées : un tableau de bord d'imprimeur, aligné et tabulaire. */
+.record-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  font-family: var(--data);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.record-meta dt {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding-top: 0.12rem;
+}
+
+.record-meta dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.record-note {
+  margin: 1.2rem 0 0;
+  padding-left: 0.85rem;
+  border-left: 3px solid var(--straw);
+  font-family: var(--prose);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-style: italic;
+}
+
+.record-summary {
+  margin: 1.2rem 0 0;
+  font-family: var(--prose);
+  font-size: 1rem;
+  line-height: 1.62;
+}
+
+.record-source {
+  margin-top: 1.6rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(58, 44, 30, 0.22);
+  font-family: var(--data);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.record-source a {
+  color: var(--ink);
+}
+
+/* --- Bandeau du voyage ---------------------------------------------------- */
+
+.voyage {
+  position: fixed;
+  right: var(--edge);
+  bottom: var(--edge);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: right 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.panel-open .voyage {
+  right: calc(var(--panel-width) + var(--edge));
+}
+
+.voyage-step {
+  font-family: var(--data);
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foam-dim);
+  white-space: nowrap;
+}
+
+.voyage-nav {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.voyage-nav button {
+  width: 2.1rem;
+  height: 2.1rem;
+  font-size: 0.95rem;
+  color: var(--foam-dim);
+  background: rgba(4, 32, 47, 0.68);
+  border: 1px solid rgba(216, 231, 234, 0.22);
+  border-radius: 2px;
+  backdrop-filter: blur(6px);
+}
+
+.voyage-nav button:hover:not(:disabled) {
+  color: var(--straw);
+  border-color: var(--straw);
+}
+
+.voyage-nav button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* --- Crédits -------------------------------------------------------------- */
+
+/* Calée entre le Log Pose à gauche et le bandeau de route à droite,
+   pour qu'aucun des trois ne se recouvre quand le panneau s'ouvre. */
+.credits {
+  position: fixed;
+  /* Le Log Pose occupe ~19rem à gauche (cadran + relevé), le bandeau de
+     route ~14rem à droite : les crédits tiennent entre les deux. */
+  left: 20rem;
+  right: 15rem;
+  bottom: 0.55rem;
+  z-index: 15;
+  margin: 0;
+  font-family: var(--data);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  color: rgba(143, 169, 180, 0.72);
+  text-align: center;
+  line-height: 1.5;
+  transition: right 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.panel-open .credits {
+  right: calc(var(--panel-width) + 15rem);
+}
+
+.credits a {
+  color: rgba(216, 231, 234, 0.9);
+  text-underline-offset: 2px;
+}
+
+/* --- Adaptation mobile ---------------------------------------------------- */
+
+@media (max-width: 760px) {
+  :root {
+    --panel-width: 100vw;
+    --edge: 0.85rem;
+  }
+
+  .masthead {
+    max-width: calc(100vw - 2 * var(--edge));
+  }
+
+  .filters {
+    top: auto;
+    bottom: calc(var(--edge) + 6.4rem);
+    right: var(--edge);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: calc(100vw - 2 * var(--edge));
+  }
+
+  body.panel-open .filters,
+  body.panel-open .voyage {
+    right: var(--edge);
+  }
+
+  .filters-title {
+    display: none;
+  }
+
+  .chip-count {
+    display: none;
+  }
+
+  .logpose-dial {
+    width: 4.2rem;
+    height: 4.2rem;
+  }
+
+  .logpose-readout {
+    max-width: 8.5rem;
+  }
+
+  .voyage {
+    bottom: calc(var(--edge) + 0.2rem);
+  }
+
+  .voyage-step {
+    display: none;
+  }
+
+  .credits {
+    display: none;
+  }
+
+  .record {
+    top: auto;
+    height: 78vh;
+    border-radius: 10px 10px 0 0;
+    transform: translateY(100%);
+  }
+
+  body.panel-open .record {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

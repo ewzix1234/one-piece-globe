@@ -1,0 +1,20 @@
+{
+  "name": "Blue Star — le monde de One Piece",
+  "short_name": "Blue Star",
+  "description": "Globe interactif du monde de One Piece : 83 îles situées sur la sphère, de Fuchsia à Elbaf.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#04202f",
+  "theme_color": "#04202f",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

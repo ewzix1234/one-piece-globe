@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+
+# Jeu de données de The Library of Ohara : non redistribué.
+# Retéléchargé à la demande par tools/extract-positions.mjs.
+tools/_source-map-data.js
+
+# Cache de l'aspiration wiki : reconstructible par tools/fetch-wiki.mjs.
+tools/_wiki-cache.json

@@ -6,6 +6,10 @@ position canon, de Fuchsia à Elbaf.
 Tourne à la souris, zoome à la molette, clique une île pour ouvrir sa fiche.
 Le Log Pose en bas à gauche donne le cap d'une escale vers la suivante.
 
+Chaque île porte une image de paysage, sa fiche, ses personnages et sa
+position exacte. Le globe distingue Paradise du Nouveau Monde de part et
+d'autre de la Red Line, et fait ressortir les Calm Belts.
+
 Site statique, fonctionne hors-ligne, aucun appel réseau à l'exécution.
 
 ## Lancer en local
@@ -18,12 +22,13 @@ Puis ouvrir http://localhost:8000.
 
 ## Reconstruire les données
 
-Trois étapes, à lancer dans l'ordre. Rien n'est nécessaire pour simplement
+Quatre étapes, à lancer dans l'ordre. Rien n'est nécessaire pour simplement
 consulter le site : `data/islands.json` est livré prêt à l'emploi.
 
 ```sh
 node tools/extract-positions.mjs   # carte source → data/positions.json
 node tools/fetch-wiki.mjs          # wiki Fandom → tools/_wiki-cache.json
+node tools/fetch-images.mjs        # paysages    → data/img/*.webp
 node tools/build-data.mjs          # croisement  → data/islands.json
 ```
 
@@ -76,8 +81,9 @@ vendor/
 - **Positions** — [The Library of Ohara — One Piece World Map](https://thelibraryofohara.com/one-piece-world-map/),
   par Artur & Ririjuro. Seules les positions sont reprises, converties en
   coordonnées sphériques. Ni leurs textes ni leurs images.
-- **Fiches** — [One Piece Encyclopédie](https://onepiece.fandom.com/fr), CC BY-SA 3.0,
-  attribuée par fiche avec lien vers la page d'origine.
+- **Fiches et images** — [One Piece Encyclopédie](https://onepiece.fandom.com/fr).
+  Les textes sont sous CC BY-SA 3.0. Les images d'infobox illustrent l'œuvre
+  d'Eiichiro Oda et de la Toei : usage personnel uniquement.
 - **Rendu** — [globe.gl](https://github.com/vasturiano/globe.gl) 2.46.1 (three.js inclus).
 
 Projet de fan, sans lien avec Eiichiro Oda ni Shueisha.

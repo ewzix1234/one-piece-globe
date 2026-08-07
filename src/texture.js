@@ -11,12 +11,32 @@ export const RED_LINE_LNG = [-3.5, 176.5];
 export const GRAND_LINE_HALF_WIDTH = 3.2; // degrés de latitude
 export const CALM_BELT_OUTER = 9.5;
 
+/**
+ * Zones du monde, pour les étiquettes posées sur la sphère.
+ *
+ * Les longitudes des deux moitiés de Grand Line sont les milieux des arcs
+ * délimités par les méridiens de la Red Line ; celles des quatre Blues
+ * viennent de la position moyenne de leurs îles.
+ */
+export const ZONES = [
+  { label: "PARADISE", lat: 0, lng: 86.5, size: 3.4, kind: "route" },
+  { label: "NOUVEAU MONDE", lat: 0, lng: -93.5, size: 3.4, kind: "route" },
+  { label: "CALM BELT", lat: 6.6, lng: 130, size: 2.2, kind: "belt" },
+  { label: "CALM BELT", lat: -6.6, lng: -50, size: 2.2, kind: "belt" },
+  { label: "RED LINE", lat: 46, lng: -3.5, size: 2.6, kind: "land" },
+  { label: "EAST BLUE", lat: 38, lng: 92, size: 3.2, kind: "blue" },
+  { label: "SOUTH BLUE", lat: -40, lng: 74, size: 3.2, kind: "blue" },
+  { label: "NORTH BLUE", lat: 46, lng: -107, size: 3.2, kind: "blue" },
+  { label: "WEST BLUE", lat: -38, lng: -109, size: 3.2, kind: "blue" },
+];
+
 const PALETTE = {
   deep: "#04202f",
   ocean: "#0a3d55",
   shallow: "#12607f",
-  grandLine: "#1b7f9c",
-  calmBelt: "#0b3346",
+  paradise: "#1e8fae", // première moitié de Grand Line, plus claire
+  newWorld: "#155f80", // seconde moitié, plus profonde
+  calmBelt: "#08293a", // ni vent ni courant : un aplat mat
   redLine: "#8c4a35",
   redLineHigh: "#b4674c",
   land: "#3f7a4f",
@@ -75,28 +95,66 @@ function paintOcean(ctx, w, h) {
   ctx.globalAlpha = 1;
 }
 
-/** Trace les deux Calm Belts et le courant de Grand Line. */
+/**
+ * Trace les Calm Belts et Grand Line.
+ *
+ * Trois faits canon à rendre lisibles :
+ *   — Grand Line est coupée en deux par la Red Line. La première moitié
+ *     est Paradise, la seconde le Nouveau Monde. Les deux reçoivent des
+ *     teintes distinctes.
+ *   — Les Calm Belts bordent Grand Line. Sans vent ni courant, elles ne
+ *     portent aucun moutonnement : c'est ce qui les rend reconnaissables.
+ *   — Le courant de Grand Line file au centre exact de la bande.
+ */
 function paintGrandLine(ctx, w, h) {
-  const band = (latFrom, latTo, fill, alpha) => {
-    const y1 = latToY(latTo, h);
-    const y2 = latToY(latFrom, h);
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = fill;
-    ctx.fillRect(0, y1, w, y2 - y1);
-    ctx.globalAlpha = 1;
+  const yOf = (lat) => latToY(lat, h);
+  const belt = (latFrom, latTo) => {
+    const y1 = yOf(Math.max(latFrom, latTo));
+    const y2 = yOf(Math.min(latFrom, latTo));
+    return [y1, y2 - y1];
   };
 
-  band(GRAND_LINE_HALF_WIDTH, CALM_BELT_OUTER, PALETTE.calmBelt, 0.75);
-  band(-CALM_BELT_OUTER, -GRAND_LINE_HALF_WIDTH, PALETTE.calmBelt, 0.75);
-  band(-GRAND_LINE_HALF_WIDTH, GRAND_LINE_HALF_WIDTH, PALETTE.grandLine, 0.85);
+  // Calm Belts : aplat mat, sans relief, bordé d'un liseré net.
+  for (const [from, to] of [
+    [GRAND_LINE_HALF_WIDTH, CALM_BELT_OUTER],
+    [-CALM_BELT_OUTER, -GRAND_LINE_HALF_WIDTH],
+  ]) {
+    const [y, height] = belt(from, to);
+    // Aplat opaque : aucun moutonnement ne doit transparaître.
+    ctx.fillStyle = PALETTE.calmBelt;
+    ctx.fillRect(0, y, w, height);
+    ctx.globalAlpha = 0.34;
+    ctx.strokeStyle = "#1d5570";
+    ctx.lineWidth = Math.max(1, h / 1100);
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.moveTo(0, y + height);
+    ctx.lineTo(w, y + height);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  // Grand Line, teintée par moitié. Les deux méridiens de la Red Line
+  // découpent la bande : entre eux c'est Paradise, au-delà le Nouveau Monde.
+  const [gy, gh] = belt(-GRAND_LINE_HALF_WIDTH, GRAND_LINE_HALF_WIDTH);
+  const xA = lngToX(RED_LINE_LNG[0], w);
+  const xB = lngToX(RED_LINE_LNG[1], w);
+
+  ctx.globalAlpha = 0.88;
+  ctx.fillStyle = PALETTE.newWorld;
+  ctx.fillRect(0, gy, w, gh);
+  ctx.fillStyle = PALETTE.paradise;
+  ctx.fillRect(xA, gy, xB - xA, gh);
+  ctx.globalAlpha = 1;
 
   // Fil de courant au centre exact de Grand Line.
-  ctx.globalAlpha = 0.5;
-  ctx.strokeStyle = "#5fc7dd";
-  ctx.lineWidth = Math.max(1, h / 900);
+  ctx.globalAlpha = 0.55;
+  ctx.strokeStyle = "#7fe0f2";
+  ctx.lineWidth = Math.max(1, h / 850);
   ctx.beginPath();
-  ctx.moveTo(0, latToY(0, h));
-  ctx.lineTo(w, latToY(0, h));
+  ctx.moveTo(0, yOf(0));
+  ctx.lineTo(w, yOf(0));
   ctx.stroke();
   ctx.globalAlpha = 1;
 }

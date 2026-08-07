@@ -1,4 +1,9 @@
-import { drawWorldTexture, drawBumpTexture, RED_LINE_LNG } from "./texture.js";
+import {
+  drawWorldTexture,
+  drawBumpTexture,
+  RED_LINE_LNG,
+  ZONES,
+} from "./texture.js";
 
 const GLOBE_RADIUS = 100; // unité interne de globe.gl
 const $ = (id) => document.getElementById(id);
@@ -87,9 +92,18 @@ function grandLineRing(alt) {
   return points;
 }
 
+/**
+ * Le téléphone n'a ni la mémoire graphique ni la bande passante d'un
+ * ordinateur : on divise la texture par deux et on plafonne la densité
+ * de pixels, sans quoi Safari abandonne le contexte WebGL.
+ */
+const isHandheld = () =>
+  window.matchMedia("(max-width: 760px), (pointer: coarse)").matches;
+
 function buildGlobe() {
-  const world = drawWorldTexture(state.islands, 4096);
-  const bump = drawBumpTexture(state.islands, 2048);
+  const small = isHandheld();
+  const world = drawWorldTexture(state.islands, small ? 2048 : 4096);
+  const bump = drawBumpTexture(state.islands, small ? 1024 : 2048);
 
   globe = new Globe($("scene"), { animateIn: true })
     .globeImageUrl(null)
@@ -164,6 +178,28 @@ function buildGlobe() {
     })
     .pointsTransitionDuration(260);
 
+  // Étiquettes de zone : elles nomment Paradise, le Nouveau Monde, les
+  // Calm Belts et les quatre Blues directement sur la sphère. Posées en
+  // filigrane, comme sur une carte marine : elles nomment le fond sans
+  // masquer ce qui s'y trouve.
+  const ZONE_COLOR = {
+    route: "rgba(198,238,248,0.42)",
+    belt: "rgba(128,166,186,0.45)",
+    land: "rgba(232,176,146,0.5)",
+    blue: "rgba(168,202,216,0.4)",
+  };
+  globe
+    .labelsData(ZONES)
+    .labelLat("lat")
+    .labelLng("lng")
+    .labelText("label")
+    .labelColor((z) => ZONE_COLOR[z.kind])
+    .labelSize((z) => z.size * (small ? 1.25 : 1))
+    .labelDotRadius(0)
+    .labelResolution(3)
+    .labelAltitude(0.011)
+    .labelIncludeDot(false);
+
   // Anneau de sélection.
   globe
     .ringsData([])
@@ -185,11 +221,23 @@ function buildGlobe() {
     controls.autoRotate = false;
   });
 
-  globe.pointOfView({ lat: 12, lng: 60, altitude: 2.6 }, 0);
+  // Poignée de mise au point : permet de piloter la caméra depuis la
+  // console ou depuis les tests de bout en bout.
+  window.blueStar = { globe, state };
 
-  window.addEventListener("resize", () => {
-    globe.width(window.innerWidth).height(window.innerHeight);
-  });
+  // Sur un écran étroit, la sphère déborde en largeur : on recule.
+  globe.pointOfView({ lat: 12, lng: 60, altitude: small ? 3.7 : 2.6 }, 0);
+
+  // Sur mobile, la densité de pixels native fait tripler le nombre de
+  // fragments à calculer pour un gain invisible. On la plafonne à 2.
+  const renderer = globe.renderer?.();
+  if (renderer?.setPixelRatio) {
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.75 : 2));
+  }
+
+  const resize = () => globe.width(window.innerWidth).height(window.innerHeight);
+  window.addEventListener("resize", resize);
+  window.addEventListener("orientationchange", () => setTimeout(resize, 150));
 }
 
 /* ── Sélection ────────────────────────────────────────────────────────── */
@@ -262,23 +310,24 @@ function renderRecord(island) {
     `${Math.abs(island.lat).toFixed(1)}° ${island.lat >= 0 ? "N" : "S"} · ${Math.abs(island.lng).toFixed(1)}° ${island.lng >= 0 ? "E" : "O"}`,
   ]);
 
-  const wikiUrl = island.wikiTitle
-    ? `https://onepiece.fandom.com/${island.wikiLang === "en" ? "" : "fr/"}wiki/${encodeURIComponent(island.wikiTitle.replace(/ /g, "_"))}`
-    : null;
-
   host.innerHTML = `
-    <p class="record-eyebrow">${escape(tagLabel)}</p>
-    <h2>${escape(island.name)}</h2>
-    ${island.nameJp ? `<p class="record-jp">${escape(island.nameJp)}${island.nameRomaji ? ` · ${escape(island.nameRomaji)}` : ""}</p>` : ""}
-    <div class="record-rule"></div>
-    <dl class="record-meta">
-      ${rows.map(([k, v]) => `<dt>${escape(k)}</dt><dd>${escape(v)}</dd>`).join("")}
-    </dl>
-    ${island.note ? `<p class="record-note">${escape(island.note)}</p>` : ""}
-    ${island.summary ? `<p class="record-summary">${escape(island.summary)}</p>` : ""}
-    <p class="record-source">
-      ${wikiUrl ? `Fiche d'après <a href="${wikiUrl}" target="_blank" rel="noopener">${escape(island.wikiTitle)}</a> sur One Piece Encyclopédie, CC BY-SA 3.0.` : "Fiche rédigée pour ce projet."}
-    </p>
+    ${
+      island.image
+        ? `<figure class="record-hero">
+             <img src="${escape(island.image)}" alt="${escape(island.name)}" loading="lazy" decoding="async" width="720" height="400" />
+           </figure>`
+        : ""
+    }
+    <div class="record-body">
+      <p class="record-eyebrow">${escape(tagLabel)}</p>
+      <h2>${escape(island.name)}</h2>
+      ${island.nameJp ? `<p class="record-jp">${escape(island.nameJp)}${island.nameRomaji ? ` · ${escape(island.nameRomaji)}` : ""}</p>` : ""}
+      <dl class="record-meta">
+        ${rows.map(([k, v]) => `<dt>${escape(k)}</dt><dd>${escape(v)}</dd>`).join("")}
+      </dl>
+      ${island.note ? `<p class="record-note">${escape(island.note)}</p>` : ""}
+      ${island.summary ? `<p class="record-summary">${escape(island.summary)}</p>` : ""}
+    </div>
   `;
   host.scrollTop = 0;
   document.body.classList.add("panel-open");
@@ -473,6 +522,79 @@ function stepBy(delta) {
   select(island, { fly: true });
 }
 
+/* ── Sources ──────────────────────────────────────────────────────────── */
+
+function setupAbout() {
+  const toggle = $("about-toggle");
+  const panel = $("about");
+  const close = () => {
+    panel.hidden = true;
+    toggle.setAttribute("aria-expanded", "false");
+  };
+  toggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    panel.hidden = !panel.hidden;
+    toggle.setAttribute("aria-expanded", String(!panel.hidden));
+  });
+  document.addEventListener("click", (event) => {
+    if (!panel.hidden && !event.target.closest(".about, .about-toggle")) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") close();
+  });
+}
+
+/* ── Feuille glissante (mobile) ───────────────────────────────────────── */
+
+/**
+ * Sur téléphone, la fiche est une feuille qui monte du bas. On doit
+ * pouvoir la refermer d'un geste vers le bas, comme partout ailleurs.
+ * Le glissement ne démarre que depuis la poignée ou en haut du contenu,
+ * sinon on empêcherait le défilement de la fiche.
+ */
+function setupSheetDrag() {
+  const sheet = $("record");
+  const scroll = $("record-scroll");
+  let startY = null;
+  let delta = 0;
+
+  const canDrag = (event) =>
+    event.target.closest(".record-grip") !== null || scroll.scrollTop <= 0;
+
+  sheet.addEventListener(
+    "touchstart",
+    (event) => {
+      if (!isHandheld() || event.touches.length !== 1 || !canDrag(event)) return;
+      startY = event.touches[0].clientY;
+      delta = 0;
+      sheet.style.transition = "none";
+    },
+    { passive: true },
+  );
+
+  sheet.addEventListener(
+    "touchmove",
+    (event) => {
+      if (startY === null) return;
+      delta = Math.max(0, event.touches[0].clientY - startY);
+      sheet.style.transform = `translateY(${delta}px)`;
+    },
+    { passive: true },
+  );
+
+  const end = () => {
+    if (startY === null) return;
+    sheet.style.transition = "";
+    sheet.style.transform = "";
+    // Au-delà du quart de la hauteur, le geste vaut fermeture.
+    if (delta > sheet.offsetHeight * 0.25) select(null);
+    startY = null;
+    delta = 0;
+  };
+  sheet.addEventListener("touchend", end, { passive: true });
+  sheet.addEventListener("touchcancel", end, { passive: true });
+}
+
 /* ── Démarrage ────────────────────────────────────────────────────────── */
 
 async function start() {
@@ -490,6 +612,8 @@ async function start() {
     $("record-close").addEventListener("click", () => select(null));
     $("voyage-prev").addEventListener("click", () => stepBy(-1));
     $("voyage-next").addEventListener("click", () => stepBy(1));
+    setupAbout();
+    setupSheetDrag();
     document.addEventListener("keydown", (event) => {
       if (event.target.matches("input")) return;
       if (event.key === "Escape") select(null);

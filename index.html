@@ -58,6 +58,7 @@
     </div>
 
     <div class="voyage" id="voyage">
+      <button class="about-toggle" id="about-toggle" type="button" aria-label="Sources" aria-expanded="false">ⓘ</button>
       <span class="voyage-step" id="voyage-step">Route de l'équipage</span>
       <div class="voyage-nav">
         <button id="voyage-prev" type="button" title="Escale précédente" aria-label="Escale précédente">←</button>
@@ -66,20 +67,26 @@
     </div>
 
     <aside class="record" id="record" aria-live="polite">
+      <div class="record-grip" aria-hidden="true"></div>
       <button class="record-close" id="record-close" type="button" aria-label="Fermer la fiche">✕</button>
       <div class="record-scroll" id="record-scroll"></div>
     </aside>
 
-    <p class="credits">
-      Positions des îles d'après la
-      <a href="https://thelibraryofohara.com/one-piece-world-map/" target="_blank" rel="noopener"
-        >carte du monde de The Library of Ohara</a
-      >
-      (Artur &amp; Ririjuro). Fiches tirées de
-      <a href="https://onepiece.fandom.com/fr" target="_blank" rel="noopener"
-        >One Piece Encyclopédie</a
-      >, CC BY-SA 3.0. Projet de fan, sans lien avec Eiichiro Oda ni Shueisha.
-    </p>
+    <div class="about" id="about" hidden>
+      <p>
+        Positions des îles d'après la
+        <a href="https://thelibraryofohara.com/one-piece-world-map/" target="_blank" rel="noopener"
+          >carte du monde de The Library of Ohara</a
+        >, par Artur &amp; Ririjuro.
+      </p>
+      <p>
+        Fiches et images tirées de
+        <a href="https://onepiece.fandom.com/fr" target="_blank" rel="noopener"
+          >One Piece Encyclopédie</a
+        >, textes sous licence CC BY-SA 3.0.
+      </p>
+      <p>Projet de fan, sans lien avec Eiichiro Oda ni Shueisha.</p>
+    </div>
 
     <script src="vendor/globe.gl.min.js"></script>
     <script type="module" src="src/app.js"></script>

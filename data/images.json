@@ -1,0 +1,412 @@
+{
+ "Fuchsia": {
+  "file": "village-de-fuchsia.webp",
+  "source": "Village de Fushsia Anime Infobox.png",
+  "kb": 53
+ },
+ "Dawn": {
+  "file": "dawn-island.webp",
+  "source": "Royaume de Goa Anime Infobox.png",
+  "kb": 87
+ },
+ "Goa": {
+  "file": "royaume-de-goa.webp",
+  "source": "Goa Anime Infobox.png",
+  "kb": 75
+ },
+ "Shells_Town": {
+  "file": "shells-town.webp",
+  "source": "Shells Town Base.png",
+  "kb": 8
+ },
+ "Orange_Town": {
+  "file": "orange-town.webp",
+  "source": "Orange Town Anime Infobox.png",
+  "kb": 61
+ },
+ "Syrup": {
+  "file": "village-de-syrup.webp",
+  "source": "Village de Sirop Infobox.png",
+  "kb": 54
+ },
+ "Arlong_Park": {
+  "file": "arlong-park.webp",
+  "source": "Arlong Park Anime Infobox.png",
+  "kb": 77
+ },
+ "Cocoyashi": {
+  "file": "village-de-cocoyashi.webp",
+  "source": "Kokoyashi Anime Infobox.png",
+  "kb": 35
+ },
+ "Loguetown": {
+  "file": "loguetown.webp",
+  "source": "Loguetown Anime Infobox.png",
+  "kb": 82
+ },
+ "Shimotsuki_(village)": {
+  "file": "village-de-shimotsuki.webp",
+  "source": "Village de Shimotsuki Infobox.png",
+  "kb": 48
+ },
+ "Reverse_Mountain": {
+  "file": "reverse-mountain.webp",
+  "source": "Reverse Mountain Infobox.png",
+  "kb": 35
+ },
+ "Cap_des_Jumeaux": {
+  "file": "cap-des-jumeaux.webp",
+  "source": "Cap des Jumeaux Anime Infobox.png",
+  "kb": 20
+ },
+ "Whisky_Peak": {
+  "file": "whisky-peak.webp",
+  "source": "Whiskey Peak Infobox.png",
+  "kb": 27
+ },
+ "Little_Garden": {
+  "file": "little-garden.webp",
+  "source": "Little Garden Infobox.png",
+  "kb": 64
+ },
+ "Drum": {
+  "file": "drum-royaume-de-sakura.webp",
+  "source": "Drapeau de Chopper.png",
+  "kb": 15
+ },
+ "Alabasta": {
+  "file": "alabasta.webp",
+  "source": "Alabasta Anime Infobox.png",
+  "kb": 53
+ },
+ "Jaya": {
+  "file": "jaya.webp",
+  "source": "Jaya Post Knock-Up Stream Infobox.png",
+  "kb": 26
+ },
+ "Mock_Town": {
+  "file": "mock-town.webp",
+  "source": "Mock Town Infobox.png",
+  "kb": 69
+ },
+ "Skypiea": {
+  "file": "skypiea.webp",
+  "source": "Skypiea Anime Infobox.png",
+  "kb": 85
+ },
+ "Mer_Blanche": {
+  "file": "mer-blanche.webp",
+  "source": "Mer des nuages.png",
+  "kb": 18
+ },
+ "Long_Ring_Long_Land": {
+  "file": "long-ring-long-land.webp",
+  "source": "Long Ring Long Land Anime Infobox.png",
+  "kb": 73
+ },
+ "Water_Seven": {
+  "file": "water-seven.webp",
+  "source": "Water Seven Anime Infobox.png",
+  "kb": 50
+ },
+ "Enies_Lobby": {
+  "file": "enies-lobby.webp",
+  "source": "Enies Lobby Anime Infobox.png",
+  "kb": 32
+ },
+ "St._Poplar": {
+  "file": "st-poplar.webp",
+  "source": "Saint poplar.png",
+  "kb": 32
+ },
+ "San_Faldo": {
+  "file": "san-faldo.webp",
+  "source": "Image_Non_Disponible.png",
+  "kb": 4
+ },
+ "Ohara": {
+  "file": "ohara.webp",
+  "source": "Arbre de la Cognition Anime Infobox.png",
+  "kb": 32
+ },
+ "Triangle_Florian": {
+  "file": "triangle-de-florian.webp",
+  "source": "Triangle de Florian Anime Infobox.png",
+  "kb": 10
+ },
+ "Archipel_Sabaody": {
+  "file": "archipel-sabaody.webp",
+  "source": "Archipel des Sabaody Anime Infobox.png",
+  "kb": 48
+ },
+ "Amazon_Lily": {
+  "file": "amazon-lily.webp",
+  "source": "Amazon Lily.png",
+  "kb": 23
+ },
+ "Impel_Down": {
+  "file": "impel-down.webp",
+  "source": "Impel Down Anime Infobox.png",
+  "kb": 24
+ },
+ "Marine_Ford": {
+  "file": "nouveau-marine-ford.webp",
+  "source": "Marine Ford Anime Infobox.png",
+  "kb": 70
+ },
+ "Rusukaina": {
+  "file": "rusukaina.webp",
+  "source": "Rusukaina Infobox.png",
+  "kb": 41
+ },
+ "Kuraigana": {
+  "file": "kuraigana.webp",
+  "source": "Ile Obscuria Infobox.png",
+  "kb": 26
+ },
+ "Momoiro": {
+  "file": "ile-momoiro.webp",
+  "source": "Kedétrav Anime Infobox.png",
+  "kb": 41
+ },
+ "Karakuri": {
+  "file": "karakuri.webp",
+  "source": "Île Karakuri.png",
+  "kb": 17
+ },
+ "Weatheria": {
+  "file": "weatheria.webp",
+  "source": "Weatheria Anime Infobox.png",
+  "kb": 39
+ },
+ "Torino": {
+  "file": "royaume-de-torino.webp",
+  "source": "Royaume Torino Anime Infobox.png",
+  "kb": 36
+ },
+ "Namakura": {
+  "file": "namakura.webp",
+  "source": "Île de Nakamura Anime Infobox.png",
+  "kb": 33
+ },
+ "Banaro": {
+  "file": "banaro.webp",
+  "source": "Île_de_Banaro_Anime_Infobox.png",
+  "kb": 27
+ },
+ "Baltigo": {
+  "file": "baltigo.webp",
+  "source": "Baltigo Anime Infobox.png",
+  "kb": 53
+ },
+ "Île_des_Hommes-Poissons": {
+  "file": "ile-des-hommes-poissons.webp",
+  "source": "Île des Hommes-Poissons Infobox.png",
+  "kb": 39
+ },
+ "Marie-Joie": {
+  "file": "marie-joie.webp",
+  "source": "Mary Geoise Anime Infobox.png",
+  "kb": 55
+ },
+ "Punk_Hazard": {
+  "file": "punk-hazard.webp",
+  "source": "Punk Hazard Anime Infobox.png",
+  "kb": 112
+ },
+ "Dressrosa": {
+  "file": "dressrosa.webp",
+  "source": "Dressrosa Anime Infobox.png",
+  "kb": 29
+ },
+ "Green_Bit": {
+  "file": "green-bit.webp",
+  "source": "Green Bit Anime Infobox.png",
+  "kb": 63
+ },
+ "Zou": {
+  "file": "zou.webp",
+  "source": "Zou Anime Infobox.png",
+  "kb": 49
+ },
+ "Mokomo": {
+  "file": "duche-de-mokomo.webp",
+  "source": "Principauté_Mokomo_Infobox.png",
+  "kb": 40
+ },
+ "Whole_Cake_Island": {
+  "file": "whole-cake-island.webp",
+  "source": "Whole Cake Island Anime Infobox.png",
+  "kb": 31
+ },
+ "Totto_Land": {
+  "file": "totto-land.webp",
+  "source": "Totto Land Anime Infobox.png",
+  "kb": 29
+ },
+ "Île_Cacao": {
+  "file": "ile-cacao.webp",
+  "source": "Île Cacao Anime Infobox.png",
+  "kb": 26
+ },
+ "Pays_des_Wa": {
+  "file": "pays-des-wa.webp",
+  "source": "Pays des Wa Anime Infobox.png",
+  "kb": 75
+ },
+ "Onigashima": {
+  "file": "onigashima.webp",
+  "source": "Île Onigashima Anime Infobox.png",
+  "kb": 41
+ },
+ "Egghead": {
+  "file": "egghead.webp",
+  "source": "Egg Head Anime Infobox.png",
+  "kb": 62
+ },
+ "Elbaf": {
+  "file": "elbaf.webp",
+  "source": "Erbaf Anime Infobox.png",
+  "kb": 50
+ },
+ "Lulusia": {
+  "file": "royaume-de-lulusia.webp",
+  "source": "Royaume de Lulushia Anime Infobox.png",
+  "kb": 25
+ },
+ "Lodestar": {
+  "file": "lodestar.webp",
+  "source": "Ile de Road Star Anime Infobox.png",
+  "kb": 31
+ },
+ "Hachinosu": {
+  "file": "hachinosu.webp",
+  "source": "Ile des Pirates Anime Infobox.png",
+  "kb": 57
+ },
+ "Karai_Bari": {
+  "file": "karai-bari.webp",
+  "source": "Île_de_Kalai_Bali_Anime Infobox.png",
+  "kb": 56
+ },
+ "God_Valley": {
+  "file": "god-valley.webp",
+  "source": "God Valley Anime Infobox.png",
+  "kb": 56
+ },
+ "Flevance": {
+  "file": "flevance.webp",
+  "source": "Flevance Anime Infobox.png",
+  "kb": 50
+ },
+ "Minion": {
+  "file": "ile-minion.webp",
+  "source": "Ile de Minion Anime Infobox.png",
+  "kb": 58
+ },
+ "Baterilla": {
+  "file": "baterilla.webp",
+  "source": "Baterilla_Infobox.png",
+  "kb": 30
+ },
+ "Sorbet": {
+  "file": "royaume-de-sorbet.webp",
+  "source": "Royaume de Sorbet Anime Infobox.png",
+  "kb": 78
+ },
+ "Lvneel": {
+  "file": "royaume-de-lvneel.webp",
+  "source": "Luvneel anime.png",
+  "kb": 33
+ },
+ "Kano": {
+  "file": "pays-de-kano.webp",
+  "source": "Pays des Fleurs Anime Infobox.png",
+  "kb": 52
+ },
+ "Vira": {
+  "file": "vira.webp",
+  "source": "Image non Disponible.png",
+  "kb": 4
+ },
+ "Foodvalten": {
+  "file": "foodvalten.webp",
+  "source": "Foodvalten Anime Infobox.png",
+  "kb": 33
+ },
+ "Prodence": {
+  "file": "royaume-de-prodence.webp",
+  "source": "Royaume_de_Prodence_Anime_Infobox.png",
+  "kb": 42
+ },
+ "Mogaro": {
+  "file": "royaume-de-mogaro.webp",
+  "source": "Image non Disponible.png",
+  "kb": 4
+ },
+ "Standing": {
+  "file": "royaume-de-standing.webp",
+  "source": "Royaume_de_Standing_Infobox.png",
+  "kb": 100
+ },
+ "Tontatta": {
+  "file": "royaume-tontatta.webp",
+  "source": "Royaume de Tontatta.png",
+  "kb": 63
+ },
+ "Red_Port": {
+  "file": "red-port.webp",
+  "source": "Red Port Anime Infobox.png",
+  "kb": 51
+ },
+ "Calm_Belt": {
+  "file": "calm-belt.webp",
+  "source": "Calm Belt Infobox.png",
+  "kb": 31
+ },
+ "Laugh_Tale": {
+  "file": "laugh-tale.webp",
+  "source": "Laugh Tale Anime Infobox.png",
+  "kb": 9
+ },
+ "Baratie": {
+  "file": "baratie.webp",
+  "source": "Baratie Anime Post Ellipse Infobox.png",
+  "kb": 69
+ },
+ "Thriller_Bark": {
+  "file": "thriller-bark.webp",
+  "source": "Thriller Bark Anime Infobox.png",
+  "kb": 107
+ },
+ "Archipel_Boin": {
+  "file": "archipel-boin.webp",
+  "source": "Archipel de Boing Anime Infobox.png",
+  "kb": 16
+ },
+ "Ryugu": {
+  "file": "royaume-de-ryugu.webp",
+  "source": "Ryugu Anime Infobox.png",
+  "kb": 56
+ },
+ "Sphinx": {
+  "file": "sphinx.webp",
+  "source": "Sphinx Anime Infobox.png",
+  "kb": 42
+ },
+ "Germa_66": {
+  "file": "germa-66.webp",
+  "source": "Germa 66 Anime Infobox.png",
+  "kb": 14
+ },
+ "Raijin": {
+  "file": "ile-raijin.webp",
+  "source": "Raijin Anime Infobox.png",
+  "kb": 37
+ },
+ "Marine": {
+  "file": "qg-de-la-marine.webp",
+  "source": "Marine Infobox.png",
+  "kb": 28
+ }
+}

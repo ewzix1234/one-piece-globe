@@ -2,7 +2,7 @@
  * Service worker : le globe doit rester consultable sans réseau.
  * Tout est pré-chargé à l'installation ; aucune ressource n'est distante.
  */
-const CACHE = "blue-star-v2";
+const CACHE = "blue-star-v4";
 
 const ASSETS = [
   ".",
@@ -13,6 +13,7 @@ const ASSETS = [
   "src/texture.js",
   "vendor/globe.gl.min.js",
   "data/islands.json",
+  "icon.svg",
 ];
 
 self.addEventListener("install", (event) => {

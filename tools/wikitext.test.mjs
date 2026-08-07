@@ -58,6 +58,24 @@ test("toPlainText retire liens, gras et modèles de référence", () => {
   assert.equal(toPlainText("Texte{{Qref|nom=x|texte=note}} suite"), "Texte suite");
 });
 
+test("toPlainText sépare les entrées listées avec <br>", () => {
+  // Le champ « affiliation » du Pays des Wa énumère quatre entités séparées
+  // par des <br>. Sans séparateur explicite elles se collaient entre elles.
+  const raw =
+    "[[Famille Kozuki]]<br>[[Équipage de Chapeau de paille]]<br>" +
+    "[[Équipage aux Cent Bêtes]] <small>(anciennement)</small>";
+  assert.equal(
+    toPlainText(raw, { separator: " · " }),
+    "Famille Kozuki · Équipage de Chapeau de paille · Équipage aux Cent Bêtes (anciennement)",
+  );
+  // Sans option, l'espace reste le comportement par défaut des paragraphes.
+  assert.equal(toPlainText("un<br>deux"), "un deux");
+});
+
+test("toPlainText ne laisse pas de séparateur en bordure", () => {
+  assert.equal(toPlainText("<br>seul<br><br>", { separator: " · " }), "seul");
+});
+
 test("toPlainText survit à un wikitexte vide ou nul", () => {
   assert.equal(toPlainText(""), "");
   assert.equal(toPlainText(null), "");

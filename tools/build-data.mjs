@@ -19,6 +19,8 @@ if (!existsSync(cachePath)) {
   process.exit(1);
 }
 const wiki = read(cachePath);
+const imagesPath = join(HERE, "..", "data", "images.json");
+const images = existsSync(imagesPath) ? read(imagesPath) : {};
 const byName = new Map(positions.map((p) => [p.name, p]));
 
 /** Normalise la mer d'appartenance en une poignée de valeurs affichables. */
@@ -102,6 +104,7 @@ for (const place of PLACES) {
     affiliation: w?.affiliation ?? null,
     note: place.note ?? null,
     summary,
+    image: images[place.wiki] ? `data/img/${images[place.wiki].file}` : null,
     wikiTitle: w?.title ?? null,
     wikiLang: w?.wikiId ?? null,
   });

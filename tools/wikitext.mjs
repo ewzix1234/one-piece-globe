@@ -71,8 +71,14 @@ export function parseTemplate(body) {
   return out;
 }
 
-/** Réduit du wikitexte à du texte lisible. */
-export function toPlainText(wikitext) {
+/**
+ * Réduit du wikitexte à du texte lisible.
+ *
+ * `separator` remplace les retours à la ligne HTML. Dans un paragraphe une
+ * espace suffit ; dans un champ d'infobox qui énumère des affiliations, il
+ * faut un vrai séparateur, sinon les entrées se collent les unes aux autres.
+ */
+export function toPlainText(wikitext, { separator = " " } = {}) {
   if (!wikitext) return "";
   let s = wikitext;
 
@@ -102,15 +108,24 @@ export function toPlainText(wikitext) {
   // Balises HTML résiduelles.
   s = s.replace(/<ref[^>]*\/>/gi, "");
   s = s.replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, "");
-  s = s.replace(/<br\s*\/?>/gi, " ");
+  // Le retour à la ligne est marqué, puis rétabli après l'écrasement des
+  // espaces, qui l'effacerait sinon.
+  const BREAK = "\u0001";
+  s = s.replace(/<br\s*\/?>/gi, BREAK);
   s = s.replace(/<[^>]+>/g, "");
   // Gras et italique.
   s = s.replace(/'''''|'''|''/g, "");
-  // Espaces.
-  s = s.replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  // Espaces, marqueur préservé.
+  s = s.replace(/&nbsp;/g, " ").replace(/[ \t\r\n\f\v]+/g, " ").trim();
   // Ponctuation orpheline laissée par les suppressions.
-  s = s.replace(/\s+([,.;:!?])/g, "$1").replace(/\(\s*\)/g, "");
-  return s.trim();
+  s = s.replace(/ +([,.;:!?])/g, "$1").replace(/\(\s*\)/g, "");
+  // Marqueurs doublés ou en bordure : un séparateur unique, jamais aux bouts.
+  return s
+    .split(BREAK)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(separator)
+    .trim();
 }
 
 /** Récupère les numéros de chapitre et d'épisode d'une première apparition. */

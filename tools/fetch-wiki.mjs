@@ -104,6 +104,9 @@ async function searchTitle(endpoint, term) {
   return query.search?.[0]?.title ?? null;
 }
 
+/** Champ d'infobox qui énumère : les <br> deviennent de vrais séparateurs. */
+const list = (raw) => toPlainText(raw ?? "", { separator: " · " });
+
 /** Réduit une page brute aux champs qui nous intéressent. */
 function readPage(page, infoboxPattern, wikiId) {
   const text = page?.revisions?.[0]?.slots?.main?.content;
@@ -120,9 +123,9 @@ function readPage(page, infoboxPattern, wikiId) {
     title: page.title,
     nameJp: toPlainText(box.nomj ?? box.jname ?? "") || null,
     nameRomaji: toPlainText(box.nomr ?? box.rname ?? "") || null,
-    region: toPlainText(box["région"] ?? box.region ?? "") || null,
-    ruler: toPlainText(box.dirigeant ?? box.ruler ?? box["chef de l'île"] ?? "") || null,
-    affiliation: toPlainText(box.affiliation ?? "") || null,
+    region: list(box["région"] ?? box.region) || null,
+    ruler: list(box.dirigeant ?? box.ruler ?? box["chef de l'île"]) || null,
+    affiliation: list(box.affiliation) || null,
     chapter,
     episode,
     summary: extractIntro(text),

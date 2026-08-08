@@ -73,6 +73,8 @@ const TERRAIN = {
   sky: { low: "#cfe3ea", high: "#f0f9fd", shore: "#b3ccd8", mark: "#a8c3d1" },
   // Punk Hazard : la moitié brûlée. L'autre moitié emprunte la neige.
   ember: { low: "#7d4132", high: "#a85a3c", shore: "#8c6552", mark: "#4d2620" },
+  // Le massif de Reverse Mountain : la matière de la Red Line, en plus clair.
+  mountain: { low: "#a05a41", high: "#c37f5e", shore: "#8c4a35", mark: "#6f3826" },
 };
 
 /**
@@ -450,6 +452,70 @@ function paintIsland(ctx, x, y, radius, island) {
   }
 }
 
+/**
+ * Reverse Mountain : un massif à cheval sur la Red Line, pas une île.
+ *
+ * La montagne appartient au continent-barrière et le déborde de part et
+ * d'autre du croisement avec Grand Line. Les quatre courants qui la
+ * gravissent — un par Blue — se rejoignent au bassin du sommet, d'où le
+ * cinquième redescend dans Grand Line. C'est cette forme-là qu'on peint,
+ * dans la matière de la Red Line, et non un pictogramme posé dessus.
+ */
+function paintReverseMountain(ctx, x, y, radius) {
+  const paint = TERRAIN.mountain;
+  const seed = 5150;
+
+  // Le pied du massif : plus large que la bande de la Red Line.
+  ctx.fillStyle = paint.shore;
+  traceCoast(ctx, x, y, radius * 1.16, 17, makeRandom(seed), 1.05);
+  ctx.fill();
+  ctx.fillStyle = paint.low;
+  traceCoast(ctx, x, y, radius, 17, makeRandom(seed), 1.05);
+  ctx.fill();
+
+  ctx.save();
+  traceCoast(ctx, x, y, radius, 15, makeRandom(seed), 1);
+  ctx.clip();
+
+  // Les versants éclairés, en couronne autour du sommet.
+  ctx.globalAlpha = 0.55;
+  ctx.fillStyle = paint.high;
+  traceCoast(ctx, x - radius * 0.1, y - radius * 0.12, radius * 0.64, 13, makeRandom(seed + 7), 1);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Les quatre courants. Ils serpentent : un tracé droit donnerait une
+  // croix géométrique là où l'œuvre montre des rivières.
+  ctx.strokeStyle = "rgba(206,234,244,0.6)";
+  ctx.lineWidth = Math.max(1, radius * 0.062);
+  ctx.lineCap = "round";
+  for (let i = 0; i < 4; i++) {
+    const angle = Math.PI / 4 + (i * Math.PI) / 2;
+    const nx = -Math.sin(angle);
+    const ny = Math.cos(angle);
+    const bend = radius * 0.3;
+    ctx.beginPath();
+    ctx.moveTo(x + Math.cos(angle) * radius * 1.1, y + Math.sin(angle) * radius * 1.1);
+    ctx.bezierCurveTo(
+      x + Math.cos(angle) * radius * 0.72 + nx * bend,
+      y + Math.sin(angle) * radius * 0.72 + ny * bend,
+      x + Math.cos(angle) * radius * 0.3 - nx * bend * 0.7,
+      y + Math.sin(angle) * radius * 0.3 - ny * bend * 0.7,
+      x,
+      y,
+    );
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Le bassin du sommet, où les quatre courants se rencontrent avant que le
+  // cinquième ne redescende dans Grand Line.
+  ctx.fillStyle = "rgba(222,242,249,0.8)";
+  ctx.beginPath();
+  ctx.arc(x, y, Math.max(1.5, radius * 0.13), 0, Math.PI * 2);
+  ctx.fill();
+}
+
 /** Un archipel : une grappe d'îlots plutôt qu'une seule masse. */
 function paintCluster(ctx, x, y, radius, island) {
   const rng = makeRandom(Math.floor(Math.abs(x) * 31 + Math.abs(y) * 17) || 3);
@@ -517,7 +583,12 @@ export function drawWorldTexture(islands, width = 4096) {
     const x = lngToX(island.lng, w);
     const y = latToY(island.lat, h);
     const radius = islandRadius(island, w);
-    const draw = island.archipelago ? paintCluster : paintIsland;
+    const draw =
+      island.terrain === "mountain"
+        ? paintReverseMountain
+        : island.archipelago
+          ? paintCluster
+          : paintIsland;
     // Enroulement : une île près du méridien 180 doit apparaître des deux côtés.
     for (const offset of [-w, 0, w]) {
       if (x + offset > -radius * 3 && x + offset < w + radius * 3) {

@@ -16,6 +16,7 @@ import {
   PLACE_SIZE,
   PLACE_TERRAIN,
   ARCHIPELAGOS,
+  CREW_STOPS,
 } from "./curation.mjs";
 import { RED_LINE_LNG } from "../src/texture.js";
 
@@ -79,6 +80,7 @@ for (const [terrain, names] of Object.entries(PLACE_TERRAIN)) {
 
 const errors = [];
 const islands = [];
+const regions = new Map();
 
 for (const place of PLACES) {
   const pos = place.src ? byName.get(place.src) : null;
@@ -135,6 +137,9 @@ for (const place of PLACES) {
     tag: place.tag,
     // Nature du lieu quand ce n'est pas une île de terre ordinaire.
     kind: PLACE_KIND[place.fr] ?? null,
+    // Ce que l'équipage y a fait, et combien de temps il y est resté.
+    deed: CREW_STOPS[place.fr]?.deed ?? null,
+    days: CREW_STOPS[place.fr]?.days ?? null,
     // La taille vient de ce que l'œuvre montre, pas du rang de l'arc dans
     // la carte source ; à défaut, on retombe sur le rang.
     scale: PLACE_SIZE[place.fr] ?? pos?.scale ?? place.scale ?? 3,
@@ -147,12 +152,10 @@ for (const place of PLACES) {
     note: place.note ?? null,
     summary,
     image: images[place.wiki] ? `data/img/${images[place.wiki].file}` : null,
-    wikiTitle: w?.title ?? null,
-    wikiLang: w?.wikiId ?? null,
-    // Région telle que le wiki la déclare. Conservée pour le contrôle :
-    // elle ne sert pas à placer l'île, donc elle sert à la vérifier.
-    wikiRegion: w?.region ?? null,
   });
+  // Région déclarée par la source, gardée hors du fichier livré : elle sert
+  // au contrôle de placement, pas à l'affichage.
+  regions.set(place.fr, w?.region ?? null);
 }
 
 // Une nature attribuée à un nom qui n'existe pas ne se verrait jamais :
@@ -177,6 +180,15 @@ for (const name of TERRAIN_BY_PLACE.keys()) {
 for (const name of ARCHIPELAGOS) {
   if (!known.has(name)) errors.push(`grappe attribuée à un lieu inconnu : « ${name} »`);
 }
+for (const name of Object.keys(CREW_STOPS)) {
+  if (!known.has(name)) errors.push(`escale attribuée à un lieu inconnu : « ${name} »`);
+}
+// Une escale de la route sans récit laisserait un trou au milieu du voyage.
+for (const island of islands) {
+  if (island.step && !CREW_STOPS[island.name]) {
+    errors.push(`escale n° ${island.step} sans récit : « ${island.name} »`);
+  }
+}
 for (const island of islands) {
   if (!PLACE_SIZE[island.name]) errors.push(`taille manquante pour « ${island.name} »`);
 }
@@ -198,24 +210,18 @@ const payload = {
   generatedAt: new Date().toISOString().slice(0, 10),
   sagas: SAGAS,
   kinds: KINDS,
-  credits: {
-    positions: {
-      label: "The Library of Ohara — One Piece World Map",
-      authors: "Artur & Ririjuro",
-      url: "https://thelibraryofohara.com/one-piece-world-map/",
-    },
-    content: {
-      label: "One Piece Encyclopédie (Fandom)",
-      licence: "CC BY-SA 3.0",
-      url: "https://onepiece.fandom.com/fr",
-    },
-  },
   islands,
 };
 
 writeFileSync(
   join(HERE, "..", "data", "islands.json"),
   JSON.stringify(payload, null, 1),
+);
+
+// Table de contrôle, jamais chargée par le site.
+writeFileSync(
+  join(HERE, "_regions.json"),
+  JSON.stringify(Object.fromEntries(regions), null, 1),
 );
 
 const stats = {

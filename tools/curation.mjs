@@ -292,7 +292,6 @@ export const KINDS = {
   seafloor: { label: "Fond marin", hint: "sous la surface" },
   living: { label: "Île vivante", hint: "un être vivant porte la terre" },
   ship: { label: "Navire", hint: "flotte, ne tient pas au fond" },
-  reverse: { label: "Reverse Mountain", hint: "la seule entrée de Grand Line" },
   holy: { label: "Terre Sainte", hint: "au sommet de la Red Line" },
   port: { label: "Port", hint: "l'escale au pied de la Red Line" },
   settlement: { label: "Ville", hint: "posée sur une île plus grande" },
@@ -324,7 +323,6 @@ export const PLACE_KIND = {
   "Germa 66": "ship",
 
   // Le carrefour de la Red Line : trois lieux, trois rôles distincts.
-  "Reverse Mountain": "reverse",
   "Marie-Joie": "holy",
   "Red Port": "port",
 
@@ -380,6 +378,8 @@ export const PLACE_SIZE = {
   Dressrosa: 7,
   "Whole Cake Island": 7,
   "Totto Land": 7,
+  // Le massif déborde la Red Line de part et d'autre du croisement.
+  "Reverse Mountain": 7,
 
   // 6 — grandes îles, reconnaissables de loin
   "Water Seven": 6,
@@ -393,6 +393,7 @@ export const PLACE_SIZE = {
   "Drum / Royaume de Sakura": 6,
   Zou: 6,
   Onigashima: 6,
+
 
   // 5 — îles d'une journée de traversée
   "Dawn Island": 5,
@@ -454,7 +455,6 @@ export const PLACE_SIZE = {
   "Cap des Jumeaux": 2,
   "St. Poplar": 2,
   "San Faldo": 2,
-  "Reverse Mountain": 2,
   "Triangle de Florian": 2,
   "Calm Belt": 2,
   "Arlong Park": 2,
@@ -525,6 +525,9 @@ export const PLACE_TERRAIN = {
   ],
   cake: ["Whole Cake Island", "Île Cacao", "Totto Land"],
   ash: ["Ohara", "Royaume de Lulusia"], // ce qu'il reste après l'effacement
+  // Reverse Mountain n'est pas une île : c'est un massif à cheval sur la
+  // Red Line, dessiné comme elle et non représenté par un pictogramme.
+  mountain: ["Reverse Mountain"],
 };
 
 /** Lieux faits de plusieurs îlots, à dessiner en grappe. */
@@ -534,6 +537,238 @@ export const ARCHIPELAGOS = new Set([
   "Long Ring Long Land",
   "Royaume de Torino",
 ]);
+
+
+/**
+ * Ce que l'équipage a fait à chaque escale, et combien de temps il y est
+ * resté.
+ *
+ * Les durées sont celles que la chronologie publiée de l'œuvre permet de
+ * reconstituer : elles sont approchées, jamais données au jour près par le
+ * récit, sauf quand un personnage les énonce — les deux ans de Rusukaina,
+ * les cinquante ans de Laboon. Une escale sans durée connue reste vide
+ * plutôt que d'être inventée.
+ */
+export const CREW_STOPS = {
+  "Village de Fuchsia": {
+    days: 1,
+    deed: "Luffy y grandit sous l'œil de Makino, y avale le Gomu Gomu no Mi et reçoit le chapeau de paille de Shanks. Il quitte le village seul, dans un tonneau, à dix-sept ans.",
+  },
+  "Dawn Island": {
+    days: 1,
+    deed: "Point de départ. Luffy prend la mer depuis la côte de l'île où il a passé son enfance avec Ace et Sabo.",
+  },
+  "Shells Town": {
+    days: 1,
+    deed: "Luffy libère Zoro, ligoté depuis neuf jours dans la cour de la base, et abat le capitaine Morgan. Zoro devient le premier membre de l'équipage.",
+  },
+  "Orange Town": {
+    days: 2,
+    deed: "Nami vole la carte de Grand Line à Baggy le Clown ; Luffy le bat et la ville est rendue à ses habitants. Nami navigue avec l'équipage sans encore le rejoindre.",
+  },
+  "Village de Syrup": {
+    days: 3,
+    deed: "L'équipage déjoue le complot de Kuro contre Kaya. Usopp embarque, et Kaya leur offre le Vogue Merry.",
+  },
+  Baratie: {
+    days: 5,
+    deed: "Sanji sert au restaurant flottant de Zeff. Luffy repousse Don Krieg ; Zoro perd contre Mihawk et jure de devenir le meilleur épéiste. Sanji quitte le Baratie pour l'équipage.",
+  },
+  "Arlong Park": {
+    days: 2,
+    deed: "Luffy détruit la tour d'Arlong et brise la domination des hommes-poissons sur l'archipel de Conomi.",
+  },
+  "Village de Cocoyashi": {
+    days: 3,
+    deed: "L'équipage apprend le pacte de Nami avec Arlong et le prix payé par Bellemère. Nami rejoint l'équipage pour de bon et dessine sa première carte libre.",
+  },
+  Loguetown: {
+    days: 1,
+    deed: "Zoro achète Sandai Kitetsu et Yubashiri, Sanji fait ses provisions, Luffy monte sur l'échafaud de Roger et en réchappe. Smoker les prend en chasse ; Dragon couvre leur fuite.",
+  },
+  "Reverse Mountain": {
+    days: 1,
+    deed: "Le Vogue Merry gravit la montagne portée par les quatre courants et bascule dans Grand Line. Le mât est perdu à la descente.",
+  },
+  "Cap des Jumeaux": {
+    days: 1,
+    deed: "Luffy affronte Laboon puis lui promet de revenir après le tour du monde ; Crocus répare le navire et explique le Log Pose.",
+  },
+  "Whisky Peak": {
+    days: 1,
+    deed: "Zoro tient tête à cent chasseurs de primes de Baroque Works. Vivi et Igaram se révèlent, et l'équipage prend la route d'Alabasta.",
+  },
+  "Little Garden": {
+    days: 1,
+    deed: "L'équipage assiste au duel centenaire de Dorry et Brogy, échappe à Mr. 3 et à la cire, et Nami tombe malade en repartant.",
+  },
+  "Drum / Royaume de Sakura": {
+    days: 2,
+    deed: "Luffy escalade la falaise avec Nami sur le dos pour trouver la docteure Kureha. Chopper rejoint l'équipage ; Wapol est chassé et les cerisiers de Hiluluk fleurissent.",
+  },
+  Alabasta: {
+    days: 5,
+    deed: "L'équipage traverse le désert, brise le plan de Crocodile et arrête la guerre civile. Robin quitte Baroque Works et s'invite à bord ; Vivi reste reine et leur laisse sa marque.",
+  },
+  Jaya: {
+    days: 2,
+    deed: "Montblanc Cricket leur explique le courant ascendant et remet en état le Merry pour l'envol vers le ciel.",
+  },
+  "Mock Town": {
+    days: 1,
+    deed: "Luffy encaisse les moqueries de Bellamy sans riposter, achète une carte à prix d'or et repart.",
+  },
+  Skypiea: {
+    days: 3,
+    deed: "L'équipage franchit le Knock Up Stream, se trouve hors-la-loi au pays des Cieux, met fin au règne d'Ener et fait sonner la cloche d'or de Shandora.",
+  },
+  "Long Ring Long Land": {
+    days: 2,
+    deed: "Davy Back Fight contre Foxy : Chopper puis Robin sont perdus et regagnés. Aokiji apparaît et gèle Robin ; l'équipage comprend à qui il a affaire.",
+  },
+  "Water Seven": {
+    days: 5,
+    deed: "Le Merry est déclaré irréparable, Usopp quitte l'équipage, Robin disparaît avec le CP9. Franky et les charpentiers construisent le Thousand Sunny.",
+  },
+  "Enies Lobby": {
+    days: 1,
+    deed: "L'équipage brûle le drapeau du Gouvernement Mondial, bat le CP9 et reprend Robin. Le Merry vient les chercher une dernière fois avant ses funérailles.",
+  },
+  "Thriller Bark": {
+    days: 2,
+    deed: "Les ombres volées par Gecko Moria sont rendues. Brook récupère la sienne et rejoint l'équipage ; Zoro encaisse seul la douleur de Luffy devant Kuma.",
+  },
+  "Archipel Sabaody": {
+    days: 3,
+    deed: "Luffy frappe un Dragon Céleste et libère Kaimie. Rayleigh révèle le revêtement des navires ; Kuma disperse les neuf membres aux quatre coins du monde.",
+  },
+  "Amazon Lily": {
+    days: 4,
+    deed: "Luffy y atterrit seul, survit à l'île interdite aux hommes et gagne le concours de Boa Hancock, qui le conduit ensuite à Impel Down.",
+  },
+  "Impel Down": {
+    days: 1,
+    deed: "Luffy descend les six niveaux pour sauver Ace, échoue d'un étage, et ressort en menant l'évasion la plus massive de l'histoire de la prison.",
+  },
+  "Marine Ford": {
+    days: 1,
+    deed: "Luffy arrive au milieu de la guerre au sommet. Ace meurt dans ses bras, Barbe Blanche tombe. Jinbei et Trafalgar Law le tirent de là.",
+  },
+  Rusukaina: {
+    days: 730,
+    deed: "Deux ans d'entraînement avec Rayleigh sur une île déserte aux quarante-huit climats. Luffy y apprend à maîtriser les trois Haki.",
+  },
+  "Île des Hommes-Poissons": {
+    days: 3,
+    deed: "L'équipage se retrouve dix mille mètres sous la Red Line, bat Hody Jones et sauve l'île. Jinbei promet de les rejoindre plus tard.",
+  },
+  "Royaume de Ryugu": {
+    days: 1,
+    deed: "Luffy rencontre Shirahoshi, brise sa tour et lui fait voir la surface. Le roi Neptune scelle l'alliance avec l'équipage.",
+  },
+  "Punk Hazard": {
+    days: 2,
+    deed: "L'équipage libère les enfants de Caesar Clown et scelle l'alliance avec Trafalgar Law contre Doflamingo.",
+  },
+  Dressrosa: {
+    days: 4,
+    deed: "Luffy remporte le Colisée, brise le règne de Doflamingo et rend le royaume à la famille Riku. Sept capitaines jurent fidélité et forment la Grande Flotte.",
+  },
+  "Green Bit": {
+    days: 1,
+    deed: "Franky et Robin y découvrent le royaume Tontatta et l'usine de SMILE cachée sous Dressrosa.",
+  },
+  Zou: {
+    days: 3,
+    deed: "L'équipage retrouve les Minks sur le dos de Zunisha, apprend l'existence des Poneglyphes Rouges et se sépare en deux pour Whole Cake et Wano.",
+  },
+  "Whole Cake Island": {
+    days: 3,
+    deed: "Luffy vient chercher Sanji, empêche le mariage arrangé par Big Mom et détruit la salle des Poneglyphes. Jinbei quitte les Hommes-Poissons pour l'équipage.",
+  },
+  "Île Cacao": {
+    days: 1,
+    deed: "Sanji cuisine le gâteau qui calme Big Mom pendant que Luffy tient tête à Katakuri. L'équipage s'échappe de Totto Land.",
+  },
+  "Pays des Wa": {
+    days: 30,
+    deed: "L'équipage entre dans le pays fermé, retrouve Zoro et Sanji, s'allie aux samouraïs de Kozuki Oden et prépare le soulèvement contre Kaido et Orochi.",
+  },
+  Onigashima: {
+    days: 2,
+    deed: "La bataille de l'île : Kaido et Big Mom tombent, Momonosuke ouvre les frontières de Wano, et Luffy est proclamé Empereur.",
+  },
+  Egghead: {
+    days: 3,
+    deed: "L'équipage rencontre Vegapunk, apprend la vérité sur le Siècle Oublié et s'échappe sous le feu d'un Amiral et des Cinq Doyens.",
+  },
+  Elbaf: {
+    days: null,
+    deed: "L'équipage aborde la terre des géants, patrie de Dorry et Brogy — l'escale est en cours dans l'œuvre.",
+  },
+  "Laugh Tale": {
+    days: null,
+    deed: "Le bout de Grand Line, là où Roger a trouvé le One Piece. L'équipage n'y est pas encore arrivé.",
+  },
+
+  // ── Escales hors de la route principale ──────────────────────────────
+  "Royaume de Goa": {
+    days: null,
+    deed: "Luffy, Ace et Sabo y grandissent chez les bandits de Dadan. Le Gray Terminal est incendié sur ordre du royaume.",
+  },
+  "Village de Shimotsuki": {
+    days: null,
+    deed: "Zoro y apprend le sabre au dojo de Koshiro et perd Kuina. Il en emporte le Wado Ichimonji.",
+  },
+  "Mer Blanche": {
+    days: null,
+    deed: "La mer de nuages traversée à l'aller comme au retour de Skypiea, à bord du Merry devenu navire volant.",
+  },
+  Kuraigana: {
+    days: 730,
+    deed: "Zoro s'entraîne deux ans sous Mihawk, dans le château hanté où réside Perona.",
+  },
+  "Île Momoiro": {
+    days: 730,
+    deed: "Sanji y est retenu deux ans au royaume de Kamabakka et en ressort avec le Poing du Diable.",
+  },
+  Karakuri: {
+    days: 730,
+    deed: "Franky passe deux ans dans le laboratoire de Vegapunk, sur son île natale, et en revient transformé.",
+  },
+  Weatheria: {
+    days: 730,
+    deed: "Nami étudie deux ans la météorologie auprès de Haredas et en rapporte le Clima Tact parfait.",
+  },
+  "Royaume de Torino": {
+    days: 730,
+    deed: "Chopper perfectionne sa médecine deux ans durant chez les habitants de l'île aux oiseaux.",
+  },
+  "Archipel Boin": {
+    days: 730,
+    deed: "Usopp échoue deux ans sur les îles carnivores, y grossit, puis s'entraîne au Pop Green auprès d'Heracles.",
+  },
+  Namakura: {
+    days: 730,
+    deed: "Brook est exhibé deux ans comme attraction de cirque, jusqu'à ce que sa musique fasse de lui une vedette mondiale.",
+  },
+  "Duché de Mokomo": {
+    days: null,
+    deed: "La cité des Minks sur le dos de Zunisha, où l'équipage retrouve Raizo et apprend l'histoire de Kozuki Oden.",
+  },
+  "Royaume Tontatta": {
+    days: null,
+    deed: "Usopp y devient le dieu Usoland des Tontatta après avoir brisé l'emprise de Sugar sur Dressrosa.",
+  },
+  "Totto Land": {
+    days: null,
+    deed: "L'archipel de Big Mom traversé pendant l'opération de sauvetage de Sanji.",
+  },
+  Baltigo: {
+    days: null,
+    deed: "Jamais visité par l'équipage : l'ancien quartier général de Dragon, rasé par Barbe Noire.",
+  },
+};
 
 /** Table src → entrée, pour le croisement avec positions.json. */
 export const BY_SOURCE = new Map(

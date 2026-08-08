@@ -34,6 +34,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const { islands } = JSON.parse(
   readFileSync(join(HERE, "..", "data", "islands.json"), "utf8"),
 );
+// Les régions déclarées par la source restent hors du fichier livré.
+const REGIONS = JSON.parse(readFileSync(join(HERE, "_regions.json"), "utf8"));
 
 const problems = [];
 const notes = [];
@@ -80,8 +82,9 @@ const REGION_KEYS = [
 ];
 
 for (const island of islands) {
-  if (!island.wikiRegion) continue;
-  const hit = REGION_KEYS.find(([re]) => re.test(island.wikiRegion));
+  const wikiRegion = REGIONS[island.name] ?? null;
+  if (!wikiRegion) continue;
+  const hit = REGION_KEYS.find(([re]) => re.test(wikiRegion));
   if (!hit) continue;
   const fromWiki = hit[1];
 
@@ -97,7 +100,7 @@ for (const island of islands) {
       problems,
       island,
       "région wiki contre position",
-      `le wiki dit « ${island.wikiRegion} », la carte place l'île en ${island.sea} (lat ${island.lat}°, lng ${island.lng}°)`,
+      `la source dit « ${wikiRegion} », la carte place l'île en ${island.sea} (lat ${island.lat}°, lng ${island.lng}°)`,
     );
   }
 }

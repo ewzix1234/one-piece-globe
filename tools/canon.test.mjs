@@ -282,7 +282,6 @@ test("les lieux qui ne sont pas des îles portent une nature", () => {
     ["Calm Belt", "zone"],
     ["Triangle de Florian", "zone"],
     ["Marie-Joie", "holy"],
-    ["Reverse Mountain", "reverse"],
     ["Ohara", "lost"],
   ];
   for (const [name, kind] of MUST_HAVE) {
@@ -335,4 +334,37 @@ test("les tailles couvrent toute l'échelle, sans trou en haut", () => {
   const elbaf = get("Elbaf").scale;
   const banaro = get("Banaro").scale;
   assert.ok(elbaf - banaro >= 4, "Elbaf et Banaro se ressemblent trop");
+});
+
+test("chaque escale de la route dit ce que l'équipage y a fait", () => {
+  for (const island of islands.filter((i) => i.step)) {
+    assert.ok(
+      island.deed && island.deed.length > 40,
+      `escale n° ${island.step} sans récit : ${island.name}`,
+    );
+  }
+});
+
+test("les durées d'escale connues sont plausibles", () => {
+  // Une escale ne dure ni zéro jour ni plus des deux ans d'entraînement,
+  // qui sont la plus longue halte que le récit énonce explicitement.
+  for (const island of islands) {
+    if (island.days === null) continue;
+    assert.ok(island.days >= 1, `${island.name} : durée nulle ou négative`);
+    assert.ok(island.days <= 730, `${island.name} : ${island.days} jours, plus long que Rusukaina`);
+  }
+  assert.equal(get("Rusukaina").days, 730, "les deux ans d'entraînement sont un fait du récit");
+});
+
+test("Reverse Mountain est peinte, pas représentée par un pictogramme", () => {
+  const rm = get("Reverse Mountain");
+  assert.equal(rm.kind, null, "un pictogramme la remplacerait par un dessin");
+  assert.equal(rm.terrain, "mountain", "le massif a son propre terrain");
+});
+
+test("aucune mention de source ne subsiste dans les données livrées", () => {
+  const payload = JSON.parse(
+    readFileSync(join(HERE, "..", "data", "islands.json"), "utf8"),
+  );
+  assert.equal(payload.credits, undefined, "les crédits sont encore livrés");
 });

@@ -8,9 +8,10 @@ jusqu'à voir la planète entière. Clique une île pour ouvrir sa fiche, ou
 suis la route de l'équipage escale par escale avec les flèches.
 
 **Revivre le voyage** rejoue la traversée de bout en bout : le Vogue Merry
-puis, à partir d'Enies Lobby, le Thousand Sunny suivent la route, marquent un
-temps d'arrêt à chaque escale et laissent une trace en pointillés rouges. À
-la fin, les flèches reprennent la main.
+puis, à partir d'Enies Lobby, le Thousand Sunny suivent la route et laissent
+une trace en pointillés rouges. L'arrêt à chaque escale dure à la mesure du
+temps que l'équipage y a passé, et le bandeau compte les jours depuis le
+départ de Fuchsia. À la fin, les flèches reprennent la main.
 
 Aucune pastille de couleur n'est posée sur la carte : ce qu'on voit est
 l'île elle-même. Sa taille suit une échelle de huit rangs, du continent
@@ -24,8 +25,9 @@ Red Port une ancre, la Calm Belt deux vagues. Les villes posées sur une île
 plus grande — Fuchsia sur Dawn, Mock Town sur Jaya, Mokomo sur le dos de
 Zunisha — sont des toits, pas une seconde côte.
 
-Chaque île porte une image de paysage, sa fiche, ses personnages et sa
-position exacte. Grand Line est nommée pour ce qu'elle est : une seule route,
+Chaque île porte une image de paysage, sa fiche, ses personnages, sa position
+exacte, ce que l'équipage y a fait et le temps qu'il y a passé — d'un jour à
+Loguetown aux deux ans de Rusukaina. Grand Line est nommée pour ce qu'elle est : une seule route,
 coupée en deux par la Red Line, Paradise d'un côté et le Nouveau Monde de
 l'autre. Les Calm Belts la bordent. Les lieux qui ne sont pas des îles de
 terre — le ciel, le fond marin, une île vivante, un navire, un ouvrage, une
@@ -118,7 +120,12 @@ vendor/
   globe.gl.min.js
 ```
 
-## Sources et crédits
+## Provenance
+
+Le site n'affiche aucune mention de source : elles ont été retirées de
+l'interface à la demande. Elles restent consignées ici, parce que la chaîne
+de fabrication en dépend et qu'une licence CC BY-SA les impose à qui
+redistribue le contenu.
 
 - **Positions** — [The Library of Ohara — One Piece World Map](https://thelibraryofohara.com/one-piece-world-map/),
   par Artur & Ririjuro. Seules les positions sont reprises, converties en
@@ -127,6 +134,9 @@ vendor/
   Les textes sont sous CC BY-SA 3.0. Les images d'infobox illustrent l'œuvre
   d'Eiichiro Oda et de la Toei : usage personnel uniquement.
 - **Rendu** — [globe.gl](https://github.com/vasturiano/globe.gl) 2.46.1 (three.js inclus).
+- **Durées et récits d'escale** — reconstitués à partir de la chronologie de
+  l'œuvre. Ce sont des ordres de grandeur, sauf quand le récit les énonce :
+  les deux ans de Rusukaina, les cinquante ans de Laboon.
 
 Projet de fan, sans lien avec Eiichiro Oda ni Shueisha.
 

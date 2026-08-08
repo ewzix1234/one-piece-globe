@@ -760,19 +760,31 @@ body.panel-open .record {
   line-height: 1.62;
 }
 
-/* Mention des sources, au pied de la fiche : due, mais discrète. */
-.record-credit {
-  margin: 2rem 0 0;
-  padding-top: 0.9rem;
-  border-top: 1px solid rgba(58, 44, 30, 0.25);
+/* Ce que l'équipage a fait sur place : le cœur de la fiche, mis en avant
+   comme un encadré et non noyé dans la prose. */
+.record-deed {
+  margin: 1.4rem 0 0;
+  padding: 0.9rem 1rem;
+  background: rgba(58, 44, 30, 0.06);
+  border-left: 3px solid var(--vermilion);
+  border-radius: 0 6px 6px 0;
+}
+
+.record-deed h3 {
+  margin: 0 0 0.45rem;
   font-family: var(--data);
   font-size: 0.7rem;
-  line-height: 1.55;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--ink-soft);
 }
 
-.record-credit a {
-  color: var(--ink);
+.record-deed p {
+  margin: 0;
+  font-family: var(--prose);
+  font-size: 1rem;
+  line-height: 1.58;
 }
 
 /* --- Bandeau du voyage ---------------------------------------------------- */

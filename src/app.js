@@ -12,7 +12,6 @@ const state = {
   islands: [],
   sagas: [],
   kinds: {},
-  credits: null,
   bySaga: new Map(),
   hiddenSagas: new Set(),
   selected: null,
@@ -82,7 +81,6 @@ async function loadData() {
   state.islands = payload.islands;
   state.sagas = payload.sagas;
   state.kinds = payload.kinds ?? {};
-  state.credits = payload.credits;
   state.bySaga = new Map(payload.sagas.map((s) => [s.id, s]));
   state.route = payload.islands
     .filter((i) => i.step)
@@ -122,13 +120,6 @@ const KIND_GLYPH = {
   living:
     '<ellipse cx="7.4" cy="9.4" rx="4.3" ry="3.4"/><ellipse cx="12.1" cy="8.2" rx="2.9" ry="2.8"/><ellipse cx="10.7" cy="7" rx="1.7" ry="2"/><path d="M14.4 9.8c.7.6 1 1.4 1 2.3v2.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.6 12.2h1.5v3.1H4.6zm4 0h1.5v3.1H8.6z"/><path d="M3.2 8.6c-.9-.5-1.5-.2-1.8.4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>',
   ship: '<path d="M3.4 11.6h12.2l-1.9 3.6H5.3ZM9.5 11.2V3.6M9.5 4.2l4.6 2.4-4.6 2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-  // Reverse Mountain : le massif, et les quatre courants qui en gravissent
-  // les faces depuis les quatre Blues jusqu'au bassin du sommet.
-  reverse:
-    '<path d="M9.5 1.2 18.4 17.6H.6Z"/>' +
-    '<path d="M6.1 17.6c.7-2.6 1.8-5 3.4-7.2 1.6 2.2 2.7 4.6 3.4 7.2" fill="rgba(255,255,255,.34)"/>' +
-    '<path d="M9.5 4.2v5.6M9.5 9.8 5.3 15.4M9.5 9.8l4.2 5.6M9.5 9.8 2.9 17.6M9.5 9.8l6.6 7.8" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1" stroke-linecap="round"/>' +
-    '<circle cx="9.5" cy="4.4" r="1.5" fill="rgba(255,255,255,.9)"/>',
   // Marie-Joie : la couronne du Gouvernement Mondial, au sommet du continent.
   holy: '<path d="M3 15.2h13v2H3Zm0-1.4L4.2 6l3 3.4 2.3-5.2 2.3 5.2 3-3.4 1.2 7.8Z"/>',
   port: '<path d="M9.5 2.6a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4Zm0 3.6v10.2m-3-8h6M3.6 11.2c0 3.2 2.6 5.6 5.9 5.6s5.9-2.4 5.9-5.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
@@ -142,7 +133,7 @@ const KIND_GLYPH = {
 };
 
 /** Certains lieux méritent d'être vus de plus loin que les autres. */
-const KIND_SIZE = { reverse: 1.5, living: 1.45, holy: 1.15, settlement: 0.8 };
+const KIND_SIZE = { living: 1.45, holy: 1.15, settlement: 0.8 };
 
 const kindLabel = (kind) => state.kinds[kind]?.label ?? "";
 
@@ -435,22 +426,18 @@ const escape = (s) =>
   );
 
 /**
- * Mention des sources, au pied de chaque fiche.
+ * Durée d'une escale, en clair.
  *
- * Les positions viennent de la carte d'Ohara et les textes du wiki Fandom,
- * sous licence CC BY-SA : la mention est due. Elle est ici plutôt que
- * derrière un bouton flottant, qui encombrait la barre pour un lien qu'on
- * n'ouvre qu'une fois.
+ * Les deux ans d'entraînement ne se lisent pas en « 730 jours », et une
+ * escale d'un jour ne se lit pas « 1 jours ».
  */
-function creditLine() {
-  const { positions, content } = state.credits ?? {};
-  if (!positions || !content) return "";
-  return `<p class="record-credit">
-    Position d'après <a href="${escape(positions.url)}" target="_blank" rel="noopener">${escape(positions.label)}</a>,
-    ${escape(positions.authors)}. Fiche et image tirées de
-    <a href="${escape(content.url)}" target="_blank" rel="noopener">${escape(content.label)}</a>,
-    ${escape(content.licence)}. Projet de fan, sans lien avec Eiichiro Oda ni Shueisha.
-  </p>`;
+function formatDays(days) {
+  if (days >= 365) {
+    const years = Math.round(days / 365);
+    return years === 1 ? "environ un an" : `environ ${years} ans`;
+  }
+  if (days >= 28) return `environ ${Math.round(days / 7)} semaines`;
+  return days === 1 ? "un jour" : `environ ${days} jours`;
 }
 
 function renderRecord(island) {
@@ -469,6 +456,7 @@ function renderRecord(island) {
 
   const rows = [];
   if (island.step) rows.push(["Escale", `n° ${island.step} du voyage`]);
+  if (island.days) rows.push(["Temps sur place", formatDays(island.days)]);
   const note = SEA_NOTE[island.sea];
   rows.push(["Mer", note ? `${island.sea} — ${note}` : island.sea]);
   if (island.kind && state.kinds[island.kind]) {
@@ -504,9 +492,16 @@ function renderRecord(island) {
       <dl class="record-meta">
         ${rows.map(([k, v]) => `<dt>${escape(k)}</dt><dd>${escape(v)}</dd>`).join("")}
       </dl>
+      ${
+        island.deed
+          ? `<section class="record-deed">
+               <h3>Ce que l'équipage y a fait</h3>
+               <p>${escape(island.deed)}</p>
+             </section>`
+          : ""
+      }
       ${island.note ? `<p class="record-note">${escape(island.note)}</p>` : ""}
       ${island.summary ? `<p class="record-summary">${escape(island.summary)}</p>` : ""}
-      ${creditLine()}
     </div>
   `;
   host.scrollTop = 0;
@@ -698,10 +693,29 @@ function shipAtStep(step) {
   return step <= 20 ? "merry" : "sunny";
 }
 
-const DWELL_MS = 1500; // temps d'arrêt à quai
+/**
+ * Temps d'arrêt à quai, réglé sur le temps que l'équipage y a passé.
+ *
+ * L'échelle est logarithmique : les deux ans de Rusukaina ne peuvent pas
+ * durer sept cents fois l'escale d'un jour, mais ils doivent se sentir.
+ */
+const dwellDuration = (days) =>
+  clamp(900 + Math.log2(1 + (days ?? 1)) * 620, 1100, 4600);
+
 const SAIL_MIN = 900;
 const SAIL_MAX = 4200;
 const sailDuration = (arc) => clamp(700 + arc * 55, SAIL_MIN, SAIL_MAX);
+
+/** Durée d'escale en clair, pour le bandeau de lecture. */
+function shortDays(days) {
+  if (!days) return null;
+  if (days >= 365) {
+    const years = Math.round(days / 365);
+    return years === 1 ? "≈ 1 an à terre" : `≈ ${years} ans à terre`;
+  }
+  if (days >= 28) return `≈ ${Math.round(days / 7)} semaines à terre`;
+  return days === 1 ? "1 jour à terre" : `≈ ${days} jours à terre`;
+}
 
 const cine = {
   active: false,
@@ -715,6 +729,7 @@ const cine = {
   last: 0,
   trail: [], // [lat, lng, alt] déjà parcourus
   lastTrailPush: 0,
+  dayCount: 0, // jours cumulés depuis le départ de Fuchsia
   ship: null, // datum de la couche HTML
   hull: null,
 
@@ -778,6 +793,19 @@ function pushTrail(lat, lng, force = false) {
   cine.trail.push([lat, lng, 0.014]);
 }
 
+/**
+ * Ligne d'information d'une escale : son rang, le temps que l'équipage y a
+ * passé, et le jour du voyage auquel on se trouve.
+ */
+function hudStopLine(stop, rank) {
+  const parts = [`Escale ${rank} / ${state.route.length}`];
+  const stay = shortDays(stop.days);
+  if (stay) parts.push(stay);
+  if (cine.dayCount > 0) parts.push(`jour ${cine.dayCount}`);
+  else parts.push(stop.sea);
+  return parts.join(" · ");
+}
+
 function cineHud(place, sub) {
   $("cine-place").textContent = place;
   $("cine-sub").textContent = sub;
@@ -797,6 +825,7 @@ function startCine() {
   cine.elapsed = 0;
   cine.trail = [];
   cine.trailArc = 0;
+  cine.dayCount = first0Days();
 
   if (!cine.ship) {
     cine.ship = { lat: 0, lng: 0, alt: 0.05, el: makeShipElement() };
@@ -829,7 +858,7 @@ function startCine() {
   refreshPaths();
   globe.ringsData([first]);
   globe.pointOfView({ lat: first.lat, lng: first.lng, altitude: FOLLOW_ALT() }, 1200);
-  cineHud(first.name, `Escale 1 / ${state.route.length} — ${first.sea}`);
+  cineHud(first.name, hudStopLine(first, 1));
 
   // Mouvement réduit : on saute d'escale en escale sans animer la mer.
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -843,6 +872,13 @@ function startCine() {
 
 const FOLLOW_ALT = () => (small ? 2.1 : 1.65);
 
+/** Jours passés à la première escale, comptés dès le départ. */
+const first0Days = () => state.route[0]?.days ?? 0;
+
+/** Total des jours connus sur l'ensemble de la route. */
+const routeDays = () =>
+  state.route.reduce((total, stop) => total + (stop.days ?? 0), 0);
+
 function tickCine(now) {
   cine.raf = requestAnimationFrame(tickCine);
   const dt = Math.min(80, now - cine.last) * (cine.paused ? 0 : cine.speed);
@@ -855,7 +891,7 @@ function tickCine(now) {
   cine.elapsed += dt;
 
   if (cine.phase === "dwell") {
-    if (cine.elapsed < DWELL_MS) return;
+    if (cine.elapsed < dwellDuration(from?.days)) return;
     if (!to) return finishCine();
     cine.phase = "sail";
     cine.elapsed = 0;
@@ -892,7 +928,8 @@ function tickCine(now) {
     cine.phase = "dwell";
     cine.elapsed = 0;
     globe.ringsData([to]);
-    cineHud(to.name, `Escale ${to.step} / ${route.length} — ${to.sea}`);
+    cine.dayCount += to.days ?? 0;
+    cineHud(to.name, hudStopLine(to, to.step));
   }
 }
 
@@ -915,7 +952,11 @@ function finishCine() {
   // reprennent la route à partir de là plutôt que depuis nulle part.
   const last = state.route[state.route.length - 1];
   select(last);
-  cineHud("Voyage terminé", "Reprends la route à la main avec les flèches");
+  const total = routeDays();
+  cineHud(
+    "Voyage terminé",
+    `≈ ${total.toLocaleString("fr-FR")} jours à terre · reprends la route avec les flèches`,
+  );
 }
 
 /** Remet la scène dans son état de repos. */

@@ -89,7 +89,6 @@ async function loadData() {
     .sort((a, b) => a.step - b.step);
 }
 
-const sagaColor = (island) => state.bySaga.get(island.saga)?.color ?? "#8fa9b4";
 const isVisible = (island) => !state.hiddenSagas.has(island.saga);
 const visibleIslands = () => state.islands.filter(isVisible);
 
@@ -120,7 +119,7 @@ const KIND_GLYPH = {
   seafloor:
     '<path d="M3 6.5c1.6 0 1.6 1.6 3.2 1.6S7.8 6.5 9.4 6.5 11 8.1 12.6 8.1 14.2 6.5 15.8 6.5M3 11c1.6 0 1.6 1.6 3.2 1.6S7.8 11 9.4 11 11 12.6 12.6 12.6 14.2 11 15.8 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
   living:
-    '<path d="M4.5 13V9.4a4 4 0 0 1 8 0V13m-8 0h2m6 0h2M12.5 9.6c1.4 0 2-1.1 2-2.2M6.6 13v2.2m3.4-2.2v2.2"  fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+    '<ellipse cx="7.4" cy="9.4" rx="4.3" ry="3.4"/><ellipse cx="12.1" cy="8.2" rx="2.9" ry="2.8"/><ellipse cx="10.7" cy="7" rx="1.7" ry="2"/><path d="M14.4 9.8c.7.6 1 1.4 1 2.3v2.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.6 12.2h1.5v3.1H4.6zm4 0h1.5v3.1H8.6z"/><path d="M3.2 8.6c-.9-.5-1.5-.2-1.8.4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>',
   ship: '<path d="M3.4 11.6h12.2l-1.9 3.6H5.3ZM9.5 11.2V3.6M9.5 4.2l4.6 2.4-4.6 2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
   summit:
     '<path d="M2.6 14.4 7.4 5l3.1 5.2L12 8.3l4.4 6.1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
@@ -260,14 +259,17 @@ function buildGlobe() {
     .arcDashAnimateTime(6500)
     .arcsTransitionDuration(0);
 
-  // Marqueurs d'îles : posés au-dessus des terres peintes sur la texture.
+  // Zones sensibles : les îles peintes sur la texture sont ce qu'on voit et
+  // ce qu'on clique. Ces cylindres transparents ne servent qu'à recevoir le
+  // pointeur — une pastille de couleur par-dessus chaque terre encombrerait
+  // la carte sans rien dire de plus.
   globe
     .pointsData(visibleIslands())
     .pointLat("lat")
     .pointLng("lng")
-    .pointColor(sagaColor)
-    .pointAltitude((d) => 0.016 + (d.scale ?? 3) * 0.004)
-    .pointRadius((d) => 0.34 + (d.scale ?? 3) * 0.075)
+    .pointColor(() => "rgba(0,0,0,0)")
+    .pointAltitude(0.02)
+    .pointRadius((d) => 0.5 + (d.scale ?? 3) * 0.28)
     .pointLabel(
       (d) =>
         `<div class="tip"><strong>${escape(d.name)}</strong><span>${escape(d.sea)}${d.kind ? ` · ${escape(kindLabel(d.kind))}` : ""}${d.step ? ` · escale ${d.step}` : ""}</span></div>`,
@@ -364,21 +366,10 @@ function buildGlobe() {
 
 /* ── Éloignement ──────────────────────────────────────────────────────── */
 
+// Molette et pincement suffisent : on garde seulement les bornes, assez
+// larges pour reculer jusqu'à voir la planète entière.
 const MIN_ALTITUDE = 0.32;
-const MAX_ALTITUDE = 9; // le globe tient alors dans un tiers de l'écran
-
-function zoomBy(factor) {
-  const pov = globe.pointOfView();
-  globe.pointOfView(
-    { altitude: clamp(pov.altitude * factor, MIN_ALTITUDE, MAX_ALTITUDE) },
-    320,
-  );
-}
-
-function setupZoom() {
-  $("zoom-in").addEventListener("click", () => zoomBy(1 / 1.55));
-  $("zoom-out").addEventListener("click", () => zoomBy(1.55));
-}
+const MAX_ALTITUDE = 9;
 
 /* ── Pictogrammes sur la sphère ───────────────────────────────────────── */
 
@@ -426,6 +417,25 @@ const escape = (s) =>
     (c) =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
   );
+
+/**
+ * Mention des sources, au pied de chaque fiche.
+ *
+ * Les positions viennent de la carte d'Ohara et les textes du wiki Fandom,
+ * sous licence CC BY-SA : la mention est due. Elle est ici plutôt que
+ * derrière un bouton flottant, qui encombrait la barre pour un lien qu'on
+ * n'ouvre qu'une fois.
+ */
+function creditLine() {
+  const { positions, content } = state.credits ?? {};
+  if (!positions || !content) return "";
+  return `<p class="record-credit">
+    Position d'après <a href="${escape(positions.url)}" target="_blank" rel="noopener">${escape(positions.label)}</a>,
+    ${escape(positions.authors)}. Fiche et image tirées de
+    <a href="${escape(content.url)}" target="_blank" rel="noopener">${escape(content.label)}</a>,
+    ${escape(content.licence)}. Projet de fan, sans lien avec Eiichiro Oda ni Shueisha.
+  </p>`;
+}
 
 function renderRecord(island) {
   const host = $("record-scroll");
@@ -480,6 +490,7 @@ function renderRecord(island) {
       </dl>
       ${island.note ? `<p class="record-note">${escape(island.note)}</p>` : ""}
       ${island.summary ? `<p class="record-summary">${escape(island.summary)}</p>` : ""}
+      ${creditLine()}
     </div>
   `;
   host.scrollTop = 0;
@@ -660,25 +671,15 @@ function stepBy(delta) {
  * reste net à toutes les densités d'écran, sans texture à charger.
  */
 const SHIPS = {
-  dinghy: {
-    name: "Barque",
-    svg: '<path d="M4 20h24l-4 7H8Z"/><path d="M16 19V7l8 5-8 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>',
-  },
-  merry: {
-    name: "Vogue Merry",
-    svg: '<path d="M3 20h26l-4.5 8H7.5Z"/><path d="M16 19V5m0 1 9 5-9 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="17" r="3.1"/>',
-  },
-  sunny: {
-    name: "Thousand Sunny",
-    svg: '<path d="M2.5 19.5h27l-5 8.5H7.5Z"/><path d="M15 18.5V4m0 1 10 5.5-10 4.5M15 18.5 8 12.5l7-3.5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><circle cx="5.6" cy="16.4" r="3.4"/>',
-  },
+  merry: { name: "Vogue Merry", image: "data/ship/vogue-merry.webp" },
+  sunny: { name: "Thousand Sunny", image: "data/ship/thousand-sunny.webp" },
 };
 
 /** Coque en service au départ de l'escale n. */
 function shipAtStep(step) {
-  if (step <= 4) return "dinghy"; // avant que Kaya n'offre le Merry
-  if (step <= 20) return "merry"; // jusqu'à Water Seven, où il brûle
-  return "sunny";
+  // Le Merry mène l'équipage jusqu'à Water Seven, où il brûle ; le Sunny
+  // prend la suite à partir d'Enies Lobby.
+  return step <= 20 ? "merry" : "sunny";
 }
 
 const DWELL_MS = 1500; // temps d'arrêt à quai
@@ -723,14 +724,16 @@ const cine = {
 function makeShipElement() {
   const el = document.createElement("div");
   el.className = "ship";
-  el.innerHTML = `<svg viewBox="0 0 32 32" aria-hidden="true"></svg><span class="ship-wake"></span>`;
+  el.innerHTML = `<img alt="" decoding="async" /><span class="ship-wake"></span>`;
   return el;
 }
 
 function setHull(hull) {
   if (cine.hull === hull) return;
   cine.hull = hull;
-  cine.ship.el.querySelector("svg").innerHTML = SHIPS[hull].svg;
+  const image = cine.ship.el.querySelector("img");
+  image.src = SHIPS[hull].image;
+  image.alt = SHIPS[hull].name;
   cine.ship.el.dataset.hull = hull;
   cine.ship.el.title = SHIPS[hull].name;
 }
@@ -743,9 +746,10 @@ function moveShip(lat, lng, heading) {
   if (object && globe.getCoords) {
     Object.assign(object.position, globe.getCoords(lat, lng, cine.ship.alt));
   }
-  // Sur un élément projeté à l'écran, le cap géographique n'est pas un
-  // angle d'écran : on se contente de retourner la coque du bon bord.
-  cine.ship.el.classList.toggle("ship-west", heading > 180);
+  // Les deux dessins ont la proue tournée vers la gauche : on retourne la
+  // coque quand la route file vers l'est. Sur un élément projeté à l'écran,
+  // le cap géographique n'est pas un angle d'écran — le bord suffit.
+  cine.ship.el.classList.toggle("ship-east", heading < 180);
 }
 
 function pushTrail(lat, lng, force = false) {
@@ -947,28 +951,6 @@ function setupCine() {
   });
 }
 
-/* ── Sources ──────────────────────────────────────────────────────────── */
-
-function setupAbout() {
-  const toggle = $("about-toggle");
-  const panel = $("about");
-  const close = () => {
-    panel.hidden = true;
-    toggle.setAttribute("aria-expanded", "false");
-  };
-  toggle.addEventListener("click", (event) => {
-    event.stopPropagation();
-    panel.hidden = !panel.hidden;
-    toggle.setAttribute("aria-expanded", String(!panel.hidden));
-  });
-  document.addEventListener("click", (event) => {
-    if (!panel.hidden && !event.target.closest(".about, .about-toggle")) close();
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") close();
-  });
-}
-
 /* ── Feuille glissante (mobile) ───────────────────────────────────────── */
 
 /**
@@ -1032,14 +1014,12 @@ async function start() {
     buildGlobe();
     setupSearch();
     setupFilters();
-    setupZoom();
     setupCine();
     updateVoyage();
 
     $("record-close").addEventListener("click", () => select(null));
     $("voyage-prev").addEventListener("click", () => stepBy(-1));
     $("voyage-next").addEventListener("click", () => stepBy(1));
-    setupAbout();
     setupSheetDrag();
     document.addEventListener("keydown", (event) => {
       if (event.target.matches("input")) return;

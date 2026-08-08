@@ -326,50 +326,6 @@ body.panel-open .filters {
   font-variant-numeric: tabular-nums;
 }
 
-/* --- Éloignement : le globe entier dans l'écran --------------------------- */
-
-/* La molette manque au doigt et le pincement n'est pas toujours reconnu :
-   deux boutons garantissent qu'on peut toujours reculer jusqu'à voir la
-   planète en entier. */
-/* Coin bas-gauche : la colonne des sagas occupe déjà tout le bord droit,
-   et c'est la place que libère le Log Pose retiré. */
-.zoom {
-  position: fixed;
-  left: var(--edge);
-  bottom: var(--edge);
-  z-index: 20;
-  display: flex;
-  gap: 0.3rem;
-  transition: opacity 0.2s var(--ease);
-}
-
-.zoom button {
-  width: 2.5rem;
-  height: 2.5rem;
-  font-family: var(--data);
-  font-size: 1.15rem;
-  line-height: 1;
-  color: var(--foam-dim);
-  background: var(--glass);
-  border: 1px solid var(--glass-line);
-  border-radius: var(--radius);
-  backdrop-filter: blur(14px) saturate(1.3);
-  -webkit-backdrop-filter: blur(14px) saturate(1.3);
-  transition:
-    color 0.18s var(--ease),
-    border-color 0.18s var(--ease),
-    transform 0.18s var(--ease);
-}
-
-.zoom button:hover {
-  color: var(--straw);
-  border-color: var(--straw);
-}
-
-.zoom button:active {
-  transform: scale(0.93);
-}
-
 /* --- Pictogrammes de nature, posés sur la sphère -------------------------- */
 
 /* Une pastille dit où ; elle ne dit pas quoi. Ces marqueurs distinguent
@@ -379,33 +335,33 @@ body.panel-open .filters {
 .badge {
   display: grid;
   place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.9rem;
+  height: 1.9rem;
   padding: 0;
   /* La couche HTML de globe.gl coupe les événements de pointeur sur son
      conteneur : sans ce rappel, le pictogramme ne serait pas cliquable. */
   pointer-events: auto;
   color: var(--foam);
-  background: rgba(4, 32, 47, 0.86);
-  border: 1px solid rgba(216, 231, 234, 0.32);
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   transition:
     opacity 0.25s var(--ease),
-    transform 0.18s var(--ease),
-    border-color 0.18s var(--ease);
+    transform 0.18s var(--ease);
 }
 
+/* Le dessin seul, sans pastille : c'est le lieu qu'on veut voir, pas un
+   marqueur posé dessus. L'ombre portée le détache de la mer. */
 .badge svg {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 100%;
+  height: 100%;
   fill: currentColor;
   display: block;
+  filter:
+    drop-shadow(0 0 2px rgba(3, 20, 30, 0.95))
+    drop-shadow(0 1px 3px rgba(3, 20, 30, 0.7));
 }
 
 .badge:hover {
-  transform: scale(1.18);
-  border-color: var(--straw);
+  transform: scale(1.2);
+  color: var(--straw);
 }
 
 .badge-sky {
@@ -414,8 +370,10 @@ body.panel-open .filters {
 .badge-seafloor {
   color: #58c8dd;
 }
+/* Zunisha porte Zou depuis mille ans : la couleur est celle de l'éléphant,
+   pas celle de la forêt qu'il transporte. */
 .badge-living {
-  color: #8ed49a;
+  color: #bfcbd0;
 }
 .badge-ship {
   color: #f0d08a;
@@ -428,7 +386,6 @@ body.panel-open .filters {
 }
 .badge-zone {
   color: #86a6b8;
-  background: rgba(4, 32, 47, 0.6);
 }
 .badge-lost {
   color: #e0736a;
@@ -438,24 +395,25 @@ body.panel-open .filters {
 
 .ship {
   position: relative;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 3.4rem;
+  height: 3.4rem;
   display: grid;
   place-items: center;
   pointer-events: none;
 }
 
-.ship svg {
-  width: 2rem;
-  height: 2rem;
-  fill: #f6efdf;
-  filter: drop-shadow(0 0 6px rgba(242, 181, 68, 0.75));
+.ship img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
   transition: transform 0.3s var(--ease);
 }
 
-/* Cap vers l'ouest : on retourne la coque, faute de pouvoir orienter un
-   élément d'écran sur un relèvement géographique. */
-.ship.ship-west svg {
+/* Les deux dessins ont la proue à gauche : on retourne la coque quand la
+   route file vers l'est. */
+.ship.ship-east img {
   transform: scaleX(-1);
 }
 
@@ -610,8 +568,7 @@ body.panel-open .filters {
    commande, et deux jeux de contrôles se disputeraient le bas de l'écran. */
 body.cine-on .voyage,
 body.cine-on .filters,
-body.cine-on .masthead,
-body.cine-on .zoom {
+body.cine-on .masthead {
   opacity: 0;
   pointer-events: none;
 }
@@ -781,67 +738,19 @@ body.panel-open .record {
   line-height: 1.62;
 }
 
-/* --- Sources, repliées derrière un pictogramme ---------------------------- */
-
-/* Rangé dans le groupe de droite, il suit son décalage quand la fiche
-   s'ouvre au lieu de disparaître dessous. */
-.about-toggle {
-  width: 2rem;
-  height: 2rem;
-  font-size: 0.95rem;
-  line-height: 1;
-  color: var(--foam-dim);
-  border-radius: 50%;
-  opacity: 0.4;
-  transition:
-    opacity 0.2s var(--ease),
-    color 0.2s var(--ease);
-}
-
-.about-toggle:hover,
-.about-toggle[aria-expanded="true"] {
-  opacity: 1;
-  color: var(--straw);
-}
-
-.about {
-  position: fixed;
-  right: var(--edge);
-  bottom: calc(var(--edge) + 3.4rem + env(safe-area-inset-bottom, 0px));
-  z-index: 31;
-  transition: right 0.36s var(--ease);
-  width: min(21rem, calc(100vw - 2 * var(--edge)));
-  padding: 0.9rem 1rem;
+/* Mention des sources, au pied de la fiche : due, mais discrète. */
+.record-credit {
+  margin: 2rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(58, 44, 30, 0.25);
   font-family: var(--data);
-  font-size: 0.76rem;
+  font-size: 0.7rem;
   line-height: 1.55;
-  color: var(--foam-dim);
-  background: color-mix(in srgb, var(--abyss) 92%, transparent);
-  border: 1px solid var(--glass-line);
-  border-radius: var(--radius);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  color: var(--ink-soft);
 }
 
-body.panel-open .about {
-  right: calc(var(--panel-width) + var(--edge));
-}
-
-.about[hidden] {
-  display: none;
-}
-
-.about p {
-  margin: 0 0 0.55rem;
-}
-
-.about p:last-child {
-  margin-bottom: 0;
-}
-
-.about a {
-  color: var(--foam);
+.record-credit a {
+  color: var(--ink);
 }
 
 /* --- Bandeau du voyage ---------------------------------------------------- */
@@ -955,11 +864,6 @@ body.panel-open .voyage {
     padding-inline: 0.85rem;
   }
 
-  .about-toggle {
-    width: 2.5rem;
-    height: 2.5rem;
-    opacity: 0.6;
-  }
 
   .filters-title,
   .chip-count,
@@ -967,14 +871,6 @@ body.panel-open .voyage {
     display: none;
   }
 
-  /* Le bas est pris par la barre du voyage et la rangée des sagas : les
-     deux boutons remontent au-dessus, contre le bord droit. */
-  .zoom {
-    left: auto;
-    right: calc(var(--edge) + env(safe-area-inset-right, 0px));
-    bottom: calc(var(--bottom-inset) + 8rem);
-    flex-direction: column;
-  }
 
   /* La barre occupe toute la largeur : sources et lecture à gauche, les
      deux flèches contre le bord droit, là où le pouce les trouve. */
@@ -993,11 +889,6 @@ body.panel-open .voyage {
     width: calc(100vw - 2 * var(--edge));
   }
 
-  .about {
-    right: calc(var(--edge) + env(safe-area-inset-right, 0px));
-    bottom: calc(var(--bottom-inset) + 3.4rem);
-    width: calc(100vw - 2 * var(--edge));
-  }
 
   /* Fiche ouverte : la feuille prend le bas de l'écran. Les commandes qui
      s'y trouvaient remontent au-dessus d'elle au lieu de disparaître
@@ -1010,17 +901,7 @@ body.panel-open .voyage {
     z-index: 32;
   }
 
-  body.panel-open .zoom {
-    right: var(--edge);
-    bottom: calc(var(--sheet-height) + 4rem);
-    z-index: 32;
-  }
 
-  body.panel-open .about {
-    right: var(--edge);
-    bottom: calc(var(--sheet-height) + 3.9rem);
-    z-index: 33;
-  }
 
   /* Les sagas, elles, n'ont rien à faire par-dessus la fiche. */
   body.panel-open .filters {
@@ -1119,10 +1000,6 @@ body.panel-open .voyage {
   /* La feuille couvre l'écran entier : rien ne peut flotter au-dessus, on
      ferme d'abord. */
   body.panel-open .voyage,
-  body.panel-open .zoom {
-    opacity: 0;
-    pointer-events: none;
-  }
 
   .cine-hud {
     bottom: calc(var(--bottom-inset, var(--edge)) + 3.3rem);

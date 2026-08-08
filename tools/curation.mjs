@@ -339,6 +339,175 @@ export const PLACE_KIND = {
   "Royaume de Lulusia": "lost",
 };
 
+
+/**
+ * Taille du lieu sur la carte, de 1 (un hameau) à 6 (une terre de géants).
+ *
+ * La carte source range les lieux par importance narrative, pas par
+ * étendue : Elbaf, patrie des géants, y a la même taille que le village
+ * de Fuchsia. Cette échelle-ci lit ce que l'œuvre montre — un pays, une
+ * île, un port, un village — et non le rang de l'arc.
+ */
+export const PLACE_SIZE = {
+  // 6 — des pays entiers, plusieurs jours de marche d'un bout à l'autre
+  Elbaf: 6,
+  "Pays des Wa": 6,
+  Alabasta: 6,
+
+  // 5 — grandes îles, plusieurs villes
+  "Water Seven": 5,
+  Dressrosa: 5,
+  "Whole Cake Island": 5,
+  "Punk Hazard": 5,
+  Egghead: 5,
+  Skypiea: 5,
+  "Île des Hommes-Poissons": 5,
+  "Archipel Sabaody": 5,
+  "Marine Ford": 5,
+  Onigashima: 5,
+  "Laugh Tale": 5,
+  "Drum / Royaume de Sakura": 5,
+  "Pays de Kano": 5,
+  "Royaume de Lvneel": 5,
+
+  // 4 — îles ordinaires d'une journée de traversée
+  "Dawn Island": 4,
+  Jaya: 4,
+  "Little Garden": 4,
+  "Long Ring Long Land": 4,
+  "Enies Lobby": 4,
+  "Amazon Lily": 4,
+  Rusukaina: 4,
+  "Thriller Bark": 4,
+  "Impel Down": 4,
+  Ohara: 4,
+  "God Valley": 4,
+  Flevance: 4,
+  Karakuri: 4,
+  "Royaume de Torino": 4,
+  Kuraigana: 4,
+  Baterilla: 4,
+  "Royaume de Sorbet": 4,
+  "Germa 66": 4,
+  Hachinosu: 4,
+  "Royaume de Goa": 4,
+  "Île Momoiro": 4,
+  "Royaume de Lulusia": 4,
+  "Totto Land": 4,
+  Zou: 4,
+
+  // 3 — petites îles, un seul bourg
+  Loguetown: 3,
+  "Shells Town": 3,
+  "Orange Town": 3,
+  "Village de Syrup": 3,
+  "Green Bit": 3,
+  "Karai Bari": 3,
+  Banaro: 3,
+  Baltigo: 3,
+  Foodvalten: 3,
+  "Île Raijin": 3,
+  Lodestar: 3,
+  Sphinx: 3,
+  Namakura: 3,
+  Vira: 3,
+  "Royaume de Mogaro": 3,
+  "Royaume de Prodence": 3,
+  "Royaume de Standing": 3,
+  "Royaume Tontatta": 3,
+  "Île Minion": 3,
+  "Archipel Boin": 3,
+  Weatheria: 3,
+  "Mer Blanche": 3,
+  "Village de Shimotsuki": 3,
+  "Nouveau Marine Ford": 3,
+  "QG de la Marine": 3,
+  "Île Cacao": 3,
+  "Whisky Peak": 3,
+  Baratie: 3,
+
+  // 2 — un port, un village, un bâtiment : ce qui tient sur une île plus
+  // grande, ou ce qui n'est qu'une poignée de bâtisses
+  "Village de Fuchsia": 2,
+  "Village de Cocoyashi": 2,
+  "Arlong Park": 2,
+  "Mock Town": 2,
+  "Cap des Jumeaux": 2,
+  "St. Poplar": 2,
+  "San Faldo": 2,
+  "Red Port": 2,
+  "Marie-Joie": 2,
+  "Reverse Mountain": 2,
+  "Duché de Mokomo": 2,
+  "Royaume de Ryugu": 2,
+  "Triangle de Florian": 2,
+  "Calm Belt": 2,
+};
+
+/**
+ * Terrain dominant : ce qu'on verrait en survolant l'île.
+ *
+ * Les quatre-vingt-trois lieux peints d'un même vert donnaient une carte
+ * fausse — Alabasta est un désert, Drum une île de neige, Punk Hazard est
+ * coupée en deux entre feu et glace. Absent de la table, un lieu est boisé.
+ */
+export const PLACE_TERRAIN = {
+  desert: ["Alabasta", "Whisky Peak", "Royaume de Mogaro", "Baterilla"],
+  snow: [
+    "Drum / Royaume de Sakura",
+    "Flevance",
+    "Karakuri",
+    "Île Minion",
+    "Royaume de Lvneel",
+    "Kuraigana",
+  ],
+  split: ["Punk Hazard"], // moitié brûlée, moitié gelée
+  jungle: [
+    "Little Garden",
+    "Jaya",
+    "Green Bit",
+    "Royaume de Torino",
+    "Amazon Lily",
+    "Rusukaina",
+    "Archipel Boin",
+    "Elbaf",
+  ],
+  city: [
+    "Water Seven",
+    "Loguetown",
+    "San Faldo",
+    "St. Poplar",
+    "Dressrosa",
+    "Enies Lobby",
+    "Royaume de Goa",
+    "Shells Town",
+    "Orange Town",
+    "Nouveau Marine Ford",
+    "QG de la Marine",
+    "Marine Ford",
+  ],
+  rock: [
+    "Onigashima",
+    "Banaro",
+    "Baltigo",
+    "Lodestar",
+    "Hachinosu",
+    "Île Raijin",
+    "Karai Bari",
+    "God Valley",
+  ],
+  cake: ["Whole Cake Island", "Île Cacao", "Totto Land"],
+  ash: ["Ohara", "Royaume de Lulusia"], // ce qu'il reste après l'effacement
+};
+
+/** Lieux faits de plusieurs îlots, à dessiner en grappe. */
+export const ARCHIPELAGOS = new Set([
+  "Archipel Sabaody",
+  "Totto Land",
+  "Long Ring Long Land",
+  "Royaume de Torino",
+]);
+
 /** Table src → entrée, pour le croisement avec positions.json. */
 export const BY_SOURCE = new Map(
   PLACES.filter((p) => p.src).map((p) => [p.src, p]),

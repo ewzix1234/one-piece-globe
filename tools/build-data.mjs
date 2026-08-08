@@ -7,7 +7,16 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { PLACES, SAGAS, PEOPLE, KINDS, PLACE_KIND } from "./curation.mjs";
+import {
+  PLACES,
+  SAGAS,
+  PEOPLE,
+  KINDS,
+  PLACE_KIND,
+  PLACE_SIZE,
+  PLACE_TERRAIN,
+  ARCHIPELAGOS,
+} from "./curation.mjs";
 import { RED_LINE_LNG } from "../src/texture.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -60,6 +69,12 @@ function normaliseSea(raw, lat, lng, name) {
   const east = lng > RED_LINE_LNG[0] && lng < RED_LINE_LNG[1];
   if (lat > 0) return east ? "East Blue" : "North Blue";
   return east ? "South Blue" : "West Blue";
+}
+
+/** Table inverse du terrain : un lieu → son terrain. */
+const TERRAIN_BY_PLACE = new Map();
+for (const [terrain, names] of Object.entries(PLACE_TERRAIN)) {
+  for (const name of names) TERRAIN_BY_PLACE.set(name, terrain);
 }
 
 const errors = [];
@@ -120,7 +135,11 @@ for (const place of PLACES) {
     tag: place.tag,
     // Nature du lieu quand ce n'est pas une île de terre ordinaire.
     kind: PLACE_KIND[place.fr] ?? null,
-    scale: pos?.scale ?? place.scale ?? 3,
+    // La taille vient de ce que l'œuvre montre, pas du rang de l'arc dans
+    // la carte source ; à défaut, on retombe sur le rang.
+    scale: PLACE_SIZE[place.fr] ?? pos?.scale ?? place.scale ?? 3,
+    terrain: TERRAIN_BY_PLACE.get(place.fr) ?? "forest",
+    archipelago: ARCHIPELAGOS.has(place.fr) || undefined,
     chapter: w?.chapter ?? null,
     episode: w?.episode ?? null,
     ruler: w?.ruler ?? null,
@@ -145,6 +164,21 @@ for (const name of Object.keys(PLACE_KIND)) {
 }
 for (const [name, kind] of Object.entries(PLACE_KIND)) {
   if (!KINDS[kind]) errors.push(`nature inconnue « ${kind} » pour ${name}`);
+}
+// Une taille, un terrain ou une grappe attribués à un nom qui n'existe pas
+// resteraient invisibles : la faute de frappe passerait inaperçue.
+const known = new Set(islands.map((i) => i.name));
+for (const name of Object.keys(PLACE_SIZE)) {
+  if (!known.has(name)) errors.push(`taille attribuée à un lieu inconnu : « ${name} »`);
+}
+for (const name of TERRAIN_BY_PLACE.keys()) {
+  if (!known.has(name)) errors.push(`terrain attribué à un lieu inconnu : « ${name} »`);
+}
+for (const name of ARCHIPELAGOS) {
+  if (!known.has(name)) errors.push(`grappe attribuée à un lieu inconnu : « ${name} »`);
+}
+for (const island of islands) {
+  if (!PLACE_SIZE[island.name]) errors.push(`taille manquante pour « ${island.name} »`);
 }
 
 if (errors.length) {

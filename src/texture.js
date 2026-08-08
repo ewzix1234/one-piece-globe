@@ -52,12 +52,37 @@ const PALETTE = {
   calmBelt: "#08293a", // ni vent ni courant : un aplat mat
   redLine: "#8c4a35",
   redLineHigh: "#b4674c",
-  land: "#3f7a4f",
-  landHigh: "#5c9a63",
-  sand: "#c9a86a",
-  ice: "#cfe3ea",
-  ash: "#5b5f55", // ce qu'il reste d'une île rayée de la carte
 };
+
+/**
+ * Terrains.
+ *
+ * `low` est la masse de l'île, `high` la face éclairée, `shore` la frange
+ * de littoral, `mark` la touche qui dit le terrain d'un coup d'œil : les
+ * bosquets d'une forêt, les dunes d'un désert, les toits d'une ville.
+ */
+const TERRAIN = {
+  forest: { low: "#3d7b4d", high: "#5fa168", shore: "#c9a86a", mark: "#2b5c39" },
+  jungle: { low: "#2d6a3d", high: "#4f9a53", shore: "#cbb277", mark: "#1d4c2c" },
+  desert: { low: "#c9a25c", high: "#e3c684", shore: "#eadaae", mark: "#a97f42" },
+  snow: { low: "#cfe0e8", high: "#f2fafd", shore: "#a9c2ce", mark: "#9fb8c6" },
+  city: { low: "#8a8272", high: "#aaa08b", shore: "#c9b98f", mark: "#6d4f3d" },
+  rock: { low: "#655d52", high: "#867c6c", shore: "#8d8371", mark: "#3f3a33" },
+  cake: { low: "#e2a2b8", high: "#f7cddb", shore: "#f0e0c2", mark: "#c4738f" },
+  ash: { low: "#565a51", high: "#6d7166", shore: "#787264", mark: "#3a3d37" },
+  sky: { low: "#cfe3ea", high: "#f0f9fd", shore: "#b3ccd8", mark: "#a8c3d1" },
+  // Punk Hazard : la moitié brûlée. L'autre moitié emprunte la neige.
+  ember: { low: "#7d4132", high: "#a85a3c", shore: "#8c6552", mark: "#4d2620" },
+};
+
+/**
+ * Rayon de base d'un lieu, par taille de 1 à 6.
+ *
+ * L'écart doit se voir : un pays comme Elbaf ne peut pas avoir la même
+ * empreinte qu'un village de pêcheurs. Le pas est géométrique, pas
+ * linéaire, sinon les grandes îles n'écrasent jamais les petites.
+ */
+const SIZE_RADIUS = { 1: 3.4, 2: 4.6, 3: 6.4, 4: 9.2, 5: 13.4, 6: 19 };
 
 /**
  * Un lieu ne pose une terre sur la carte que s'il en est une.
@@ -65,9 +90,9 @@ const PALETTE = {
  * Peindre un continent pour la Calm Belt, une côte pour le Baratie ou une
  * île pour le Royaume de Ryugu — qui est à dix mille mètres de fond —
  * rendrait la carte fausse à l'endroit précis où elle prétend informer.
- * Ces lieux gardent leur marqueur et leur pictogramme, sans relief.
+ * Ces lieux gardent leur pictogramme, sans relief.
  */
-const NO_LAND = new Set(["zone", "seafloor", "ship"]);
+const NO_LAND = new Set(["zone", "seafloor", "ship", "living"]);
 const DRAWS_LAND = (island) => !NO_LAND.has(island.kind);
 
 /** Générateur pseudo-aléatoire déterministe : la carte doit être reproductible. */
@@ -226,35 +251,214 @@ function paintRedLine(ctx, w, h) {
   }
 }
 
-/** Dessine une île : un contour irrégulier, plus une frange de sable. */
-function paintIsland(ctx, x, y, radius, tint) {
-  const points = 14;
-  const trace = (r, rng) => {
-    ctx.beginPath();
-    for (let i = 0; i <= points; i++) {
-      const angle = (i / points) * Math.PI * 2;
-      const jitter = 0.62 + rng() * 0.72;
-      const px = x + Math.cos(angle) * r * jitter;
-      const py = y + Math.sin(angle) * r * jitter * 0.82;
-      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-  };
-
-  // Le tirage aléatoire doit être identique pour les deux passes, sinon
-  // le sable ne suit pas le contour de la terre.
-  const seed = Math.floor(x * 7919 + y * 104729);
-  const sandRand = makeRandom(seed);
-  const landRand = makeRandom(seed);
-
-  ctx.fillStyle = PALETTE.sand;
-  trace(radius * 1.22, sandRand);
-  ctx.fill();
-
-  ctx.fillStyle = tint ?? PALETTE.land;
-  trace(radius, landRand);
-  ctx.fill();
+/**
+ * Contour d'une île : une courbe fermée et lisse, pas un polygone.
+ *
+ * Un tracé en segments droits donne une étoile ; ce qu'on veut est une
+ * côte. On passe donc une courbe quadratique par les milieux des rayons
+ * tirés au sort, ce qui referme le contour sans angle vif.
+ */
+function traceCoast(ctx, x, y, radius, points, rng, squash = 0.84) {
+  const pts = [];
+  for (let i = 0; i < points; i++) {
+    const angle = (i / points) * Math.PI * 2;
+    const jitter = 0.7 + rng() * 0.55;
+    pts.push([
+      x + Math.cos(angle) * radius * jitter,
+      y + Math.sin(angle) * radius * jitter * squash,
+    ]);
+  }
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  ctx.beginPath();
+  let from = mid(pts[pts.length - 1], pts[0]);
+  ctx.moveTo(from[0], from[1]);
+  for (let i = 0; i < pts.length; i++) {
+    const next = mid(pts[i], pts[(i + 1) % pts.length]);
+    ctx.quadraticCurveTo(pts[i][0], pts[i][1], next[0], next[1]);
+  }
+  ctx.closePath();
 }
+
+/**
+ * Les marques qui disent le terrain d'un coup d'œil.
+ *
+ * Peu de traits, jamais de détail : à l'échelle du globe, une île tient
+ * dans quelques dizaines de pixels. Ce qui doit passer, c'est la nature
+ * du sol — sable, forêt, toits, roche, neige.
+ */
+function paintTerrainMarks(ctx, x, y, radius, terrain, rng) {
+  const paint = TERRAIN[terrain] ?? TERRAIN.forest;
+  ctx.save();
+  ctx.fillStyle = paint.mark;
+  ctx.strokeStyle = paint.mark;
+
+  if (terrain === "desert") {
+    // Trois crêtes de dunes, couchées dans le sens du vent.
+    ctx.globalAlpha = 0.5;
+    ctx.lineWidth = Math.max(1, radius * 0.09);
+    ctx.lineCap = "round";
+    for (let i = 0; i < 3; i++) {
+      const dy = (i - 1) * radius * 0.36;
+      ctx.beginPath();
+      ctx.moveTo(x - radius * 0.55, y + dy);
+      ctx.quadraticCurveTo(x, y + dy - radius * 0.24, x + radius * 0.55, y + dy);
+      ctx.stroke();
+    }
+  } else if (terrain === "city") {
+    // Des toits : de petits blocs serrés, alignés comme une ville portuaire.
+    ctx.globalAlpha = 0.72;
+    const n = Math.max(3, Math.round(radius / 2.2));
+    for (let i = 0; i < n; i++) {
+      const a = rng() * Math.PI * 2;
+      const d = Math.sqrt(rng()) * radius * 0.62;
+      const s = radius * (0.13 + rng() * 0.12);
+      ctx.fillRect(x + Math.cos(a) * d - s / 2, y + Math.sin(a) * d - s / 2, s, s * 1.3);
+    }
+  } else if (terrain === "snow") {
+    // Deux sommets : c'est ce qui distingue Drum d'une plaine gelée.
+    ctx.globalAlpha = 0.55;
+    for (let i = 0; i < 2; i++) {
+      const cx = x + (i ? radius * 0.3 : -radius * 0.28);
+      const s = radius * (i ? 0.42 : 0.55);
+      ctx.beginPath();
+      ctx.moveTo(cx - s * 0.7, y + s * 0.45);
+      ctx.lineTo(cx, y - s * 0.6);
+      ctx.lineTo(cx + s * 0.7, y + s * 0.45);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } else if (terrain === "rock" || terrain === "ash") {
+    // Des facettes anguleuses : de la pierre, pas de la végétation.
+    ctx.globalAlpha = 0.5;
+    for (let i = 0; i < 3; i++) {
+      const a = rng() * Math.PI * 2;
+      const d = rng() * radius * 0.5;
+      const s = radius * (0.22 + rng() * 0.2);
+      ctx.beginPath();
+      ctx.moveTo(x + Math.cos(a) * d, y + Math.sin(a) * d - s);
+      ctx.lineTo(x + Math.cos(a) * d + s, y + Math.sin(a) * d + s * 0.6);
+      ctx.lineTo(x + Math.cos(a) * d - s * 0.8, y + Math.sin(a) * d + s * 0.5);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } else if (terrain === "cake") {
+    // Des cerises : Totto Land se reconnaît à ses rondeurs sucrées.
+    ctx.globalAlpha = 0.65;
+    for (let i = 0; i < 4; i++) {
+      const a = rng() * Math.PI * 2;
+      const d = Math.sqrt(rng()) * radius * 0.58;
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, radius * 0.14, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (terrain !== "sky") {
+    // Bosquets : la marque par défaut d'une terre boisée.
+    ctx.globalAlpha = 0.42;
+    const n = Math.max(3, Math.round(radius / 1.8));
+    for (let i = 0; i < n; i++) {
+      const a = rng() * Math.PI * 2;
+      const d = Math.sqrt(rng()) * radius * 0.66;
+      ctx.beginPath();
+      ctx.arc(
+        x + Math.cos(a) * d,
+        y + Math.sin(a) * d,
+        radius * (0.09 + rng() * 0.07),
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+/**
+ * Peint une île : littoral, masse de terre, face éclairée, marques.
+ *
+ * Le tirage aléatoire est refait à l'identique pour chaque passe : sans
+ * cela, la frange de littoral ne suivrait pas le contour de la terre.
+ */
+function paintIsland(ctx, x, y, radius, island) {
+  const seed = Math.floor(Math.abs(x) * 7919 + Math.abs(y) * 104729) || 7;
+  const points = radius > 11 ? 16 : radius > 6 ? 13 : 10;
+  const terrain =
+    island.kind === "sky" ? "sky" : (island.terrain ?? "forest");
+  const paint = TERRAIN[terrain] ?? TERRAIN.forest;
+
+  // Littoral : une frange un peu plus large que la terre.
+  ctx.fillStyle = paint.shore;
+  traceCoast(ctx, x, y, radius * 1.17, points, makeRandom(seed));
+  ctx.fill();
+
+  // Masse de terre.
+  ctx.fillStyle = paint.low;
+  traceCoast(ctx, x, y, radius, points, makeRandom(seed));
+  ctx.fill();
+
+  // Punk Hazard est coupée en deux : brûlée d'un côté, gelée de l'autre.
+  // Le partage se fait à l'intérieur du contour, pas à côté.
+  if (island.terrain === "split") {
+    ctx.save();
+    traceCoast(ctx, x, y, radius, points, makeRandom(seed));
+    ctx.clip();
+    ctx.fillStyle = TERRAIN.ember.low;
+    ctx.fillRect(x - radius * 1.4, y - radius * 1.4, radius * 1.4, radius * 2.8);
+    ctx.fillStyle = TERRAIN.snow.low;
+    ctx.fillRect(x, y - radius * 1.4, radius * 1.4, radius * 2.8);
+    ctx.restore();
+  }
+
+  // Face éclairée : la même côte, décalée vers le nord-ouest et rognée.
+  ctx.save();
+  traceCoast(ctx, x, y, radius, points, makeRandom(seed));
+  ctx.clip();
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = island.terrain === "split" ? "#ffffff" : paint.high;
+  traceCoast(
+    ctx,
+    x - radius * 0.16,
+    y - radius * 0.18,
+    radius * 0.86,
+    points,
+    makeRandom(seed + 11),
+  );
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.restore();
+
+  if (radius > 4) {
+    paintTerrainMarks(
+      ctx,
+      x,
+      y,
+      radius,
+      island.terrain === "split" ? "rock" : terrain,
+      makeRandom(seed + 31),
+    );
+  }
+}
+
+/** Un archipel : une grappe d'îlots plutôt qu'une seule masse. */
+function paintCluster(ctx, x, y, radius, island) {
+  const rng = makeRandom(Math.floor(Math.abs(x) * 31 + Math.abs(y) * 17) || 3);
+  const count = 5 + Math.floor(rng() * 3);
+  paintIsland(ctx, x, y, radius * 0.52, island);
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2 + rng();
+    const d = radius * (0.62 + rng() * 0.5);
+    paintIsland(
+      ctx,
+      x + Math.cos(a) * d,
+      y + Math.sin(a) * d * 0.8,
+      radius * (0.26 + rng() * 0.22),
+      island,
+    );
+  }
+}
+
+/** Rayon d'un lieu en pixels, pour une texture de largeur `w`. */
+const islandRadius = (island, w) =>
+  (SIZE_RADIUS[island.scale] ?? SIZE_RADIUS[3]) * (w / 4096) * 3.2;
 
 /**
  * Peint la texture complète.
@@ -290,21 +494,22 @@ export function drawWorldTexture(islands, width = 4096) {
     ctx.fillRect(0, y1, w, y2 - y1);
   }
 
-  for (const island of islands) {
-    if (!DRAWS_LAND(island)) continue;
+  // Les grandes îles en premier : une petite posée dessus doit rester
+  // lisible, l'inverse la ferait disparaître.
+  const drawn = islands
+    .filter(DRAWS_LAND)
+    .slice()
+    .sort((a, b) => (b.scale ?? 3) - (a.scale ?? 3));
+
+  for (const island of drawn) {
     const x = lngToX(island.lng, w);
     const y = latToY(island.lat, h);
-    const radius = (2.6 + (island.scale ?? 3) * 1.9) * (w / 4096) * 3.2;
-    const tint =
-      island.kind === "sky" || island.sea === "Ciel"
-        ? PALETTE.ice
-        : island.kind === "lost"
-          ? PALETTE.ash
-          : undefined;
+    const radius = islandRadius(island, w);
+    const draw = island.archipelago ? paintCluster : paintIsland;
     // Enroulement : une île près du méridien 180 doit apparaître des deux côtés.
     for (const offset of [-w, 0, w]) {
       if (x + offset > -radius * 3 && x + offset < w + radius * 3) {
-        paintIsland(ctx, x + offset, y, radius, tint);
+        draw(ctx, x + offset, y, radius, island);
       }
     }
   }
@@ -339,7 +544,7 @@ export function drawBumpTexture(islands, width = 2048) {
     if (!DRAWS_LAND(island)) continue;
     const x = lngToX(island.lng, w);
     const y = latToY(island.lat, h);
-    const radius = (2.6 + (island.scale ?? 3) * 1.9) * (w / 4096) * 3.2;
+    const radius = islandRadius(island, w);
     for (const offset of [-w, 0, w]) {
       ctx.beginPath();
       ctx.ellipse(x + offset, y, radius, radius * 0.82, 0, 0, Math.PI * 2);

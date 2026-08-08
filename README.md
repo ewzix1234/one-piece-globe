@@ -3,14 +3,19 @@
 Globe interactif du monde de One Piece. 83 îles posées sur la sphère à leur
 position canon, de Fuchsia à Elbaf.
 
-Tourne à la souris, zoome à la molette ou aux deux boutons en bas à gauche —
-on peut reculer jusqu'à voir la planète entière. Clique une île pour ouvrir
-sa fiche, ou suis la route de l'équipage escale par escale avec les flèches.
+Tourne à la souris, zoome à la molette ou au pincement — on peut reculer
+jusqu'à voir la planète entière. Clique une île pour ouvrir sa fiche, ou
+suis la route de l'équipage escale par escale avec les flèches.
 
-**Revivre le voyage** rejoue la traversée de bout en bout : un navire suit la
-route — la barque des débuts, puis le Vogue Merry, puis le Thousand Sunny —
-marque un temps d'arrêt à chaque escale et laisse une trace en pointillés
-rouges. À la fin, les flèches reprennent la main.
+**Revivre le voyage** rejoue la traversée de bout en bout : le Vogue Merry
+puis, à partir d'Enies Lobby, le Thousand Sunny suivent la route, marquent un
+temps d'arrêt à chaque escale et laissent une trace en pointillés rouges. À
+la fin, les flèches reprennent la main.
+
+Aucune pastille de couleur n'est posée sur la carte : ce qu'on voit est
+l'île elle-même. Sa taille suit ce que l'œuvre montre — Elbaf est un pays,
+Fuchsia un village — et son terrain sa nature : désert pour Alabasta, neige
+pour Drum, toits pour Water Seven, feu et glace pour Punk Hazard.
 
 Chaque île porte une image de paysage, sa fiche, ses personnages et sa
 position exacte. Grand Line est nommée pour ce qu'elle est : une seule route,

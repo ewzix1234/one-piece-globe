@@ -104,55 +104,6 @@ const SEA_NOTE = {
   Ciel: "au-dessus des nuages",
 };
 
-/* ── Pictogrammes de nature ───────────────────────────────────────────── */
-
-/**
- * Un lieu qui n'est pas une île de terre ne peut pas se contenter d'une
- * pastille : rien ne distinguerait le Royaume de Ryugu, qui est à dix
- * mille mètres de fond, d'un caillou en surface. Chaque nature reçoit donc
- * un dessin, tracé en SVG pour rester net à toutes les densités d'écran.
- */
-const KIND_GLYPH = {
-  sky: '<path d="M4 12.5h8.6a2.6 2.6 0 1 0-.7-5.1A3.9 3.9 0 0 0 4.4 8.6 2 2 0 0 0 4 12.5Z"/>',
-  seafloor:
-    '<path d="M3 6.5c1.6 0 1.6 1.6 3.2 1.6S7.8 6.5 9.4 6.5 11 8.1 12.6 8.1 14.2 6.5 15.8 6.5M3 11c1.6 0 1.6 1.6 3.2 1.6S7.8 11 9.4 11 11 12.6 12.6 12.6 14.2 11 15.8 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
-  // Zunisha, vu de profil : c'est l'éléphant qui porte Zou, pas une île.
-  living:
-    '<ellipse cx="7.4" cy="9.4" rx="4.3" ry="3.4"/><ellipse cx="12.1" cy="8.2" rx="2.9" ry="2.8"/><ellipse cx="10.7" cy="7" rx="1.7" ry="2"/><path d="M14.4 9.8c.7.6 1 1.4 1 2.3v2.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.6 12.2h1.5v3.1H4.6zm4 0h1.5v3.1H8.6z"/><path d="M3.2 8.6c-.9-.5-1.5-.2-1.8.4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>',
-  ship: '<path d="M3.4 11.6h12.2l-1.9 3.6H5.3ZM9.5 11.2V3.6M9.5 4.2l4.6 2.4-4.6 2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-  // Marie-Joie : la couronne du Gouvernement Mondial, au sommet du continent.
-  holy: '<path d="M3 15.2h13v2H3Zm0-1.4L4.2 6l3 3.4 2.3-5.2 2.3 5.2 3-3.4 1.2 7.8Z"/>',
-  port: '<path d="M9.5 2.6a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4Zm0 3.6v10.2m-3-8h6M3.6 11.2c0 3.2 2.6 5.6 5.9 5.6s5.9-2.4 5.9-5.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
-  // Une ville posée sur une île déjà dessinée : des toits, pas une côte.
-  settlement:
-    '<path d="M2.6 16.4V9.6l3.3-2.8 3.3 2.8v6.8Zm7.4 0V7.2l3.2-2.6 3.2 2.6v9.2Z"/>',
-  works:
-    '<path d="M9.5 6.6a2.9 2.9 0 1 0 0 5.8 2.9 2.9 0 0 0 0-5.8Zm0-3.4v2m0 8.6v2m6.3-6.3h-2m-8.6 0h-2m10.8-4.5-1.4 1.4m-6.1 6.1-1.4 1.4m0-8.9 1.4 1.4m6.1 6.1 1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
-  zone: '<path d="M2.6 7.2c1.7 0 1.7 1.7 3.5 1.7S7.8 7.2 9.5 7.2s1.7 1.7 3.5 1.7 1.7-1.7 3.4-1.7M2.6 11.6c1.7 0 1.7 1.7 3.5 1.7s1.7-1.7 3.4-1.7 1.7 1.7 3.5 1.7 1.7-1.7 3.4-1.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
-  lost: '<path d="M5 5l9 9m0-9-9 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
-};
-
-/** Certains lieux méritent d'être vus de plus loin que les autres. */
-const KIND_SIZE = { living: 1.45, holy: 1.15, settlement: 0.8 };
-
-const kindLabel = (kind) => state.kinds[kind]?.label ?? "";
-
-/** Marqueur DOM posé sur la sphère pour un lieu de nature particulière. */
-function makeBadge(island) {
-  const el = document.createElement("button");
-  el.type = "button";
-  el.className = `badge badge-${island.kind}`;
-  el.title = `${island.name} — ${kindLabel(island.kind)}`;
-  el.setAttribute("aria-label", el.title);
-  el.innerHTML = `<svg viewBox="0 0 19 19" aria-hidden="true">${KIND_GLYPH[island.kind] ?? ""}</svg>`;
-  el.style.setProperty("--badge-size", KIND_SIZE[island.kind] ?? 1);
-  el.addEventListener("click", (event) => {
-    event.stopPropagation();
-    select(island, { fly: true });
-  });
-  return el;
-}
-
 /* ── Globe ────────────────────────────────────────────────────────────── */
 
 let globe;
@@ -258,8 +209,8 @@ function buildGlobe() {
     .globeImageUrl(null)
     .backgroundColor("rgba(0,0,0,0)")
     .showAtmosphere(true)
-    .atmosphereColor("#4fa8c4")
-    .atmosphereAltitude(0.17)
+    .atmosphereColor("#59b6cf")
+    .atmosphereAltitude(0.15)
     .width(window.innerWidth)
     .height(window.innerHeight);
 
@@ -317,7 +268,7 @@ function buildGlobe() {
     .pointRadius((d) => 0.5 + (d.scale ?? 3) * 0.28)
     .pointLabel(
       (d) =>
-        `<div class="tip"><strong>${escape(d.name)}</strong><span>${escape(d.sea)}${d.kind ? ` · ${escape(kindLabel(d.kind))}` : ""}${d.step ? ` · escale ${d.step}` : ""}</span></div>`,
+        `<div class="tip"><strong>${escape(d.name)}</strong><span>${escape(d.sea)}${d.kind && state.kinds[d.kind] ? ` · ${escape(state.kinds[d.kind].label)}` : ""}${d.step ? ` · escale ${d.step}` : ""}</span></div>`,
     )
     .onPointClick((d) => select(d, { fly: true }))
     .onPointHover((d) => {
@@ -340,7 +291,7 @@ function buildGlobe() {
       el.style.opacity = visible ? "" : "0";
       el.style.pointerEvents = visible ? "" : "none";
     });
-  refreshBadges();
+  refreshShipLayer();
 
   // Étiquettes de zone : elles nomment les deux moitiés de Grand Line, les
   // Calm Belts, la Red Line et les quatre Blues directement sur la sphère.
@@ -393,6 +344,24 @@ function buildGlobe() {
 
   // Sur mobile, la densité de pixels native fait tripler le nombre de
   // fragments à calculer pour un gain invisible. On la plafonne à 2.
+  // Une carte n'a pas de reflet. Le matériau par défaut de globe.gl est
+  // brillant : il posait une tache spéculaire au milieu de l'océan, qui
+  // faisait lire la sphère comme une boule de plastique.
+  const material = globe.globeMaterial?.();
+  if (material) {
+    material.shininess = 1.5;
+    material.specular?.setHex(0x0a2733);
+    material.bumpScale = 3.5;
+    material.needsUpdate = true;
+  }
+
+  // La scène par défaut de globe.gl est réglée pour une photo satellite,
+  // sombre par nature. Une carte à l'encre doit être lisible d'un bout à
+  // l'autre du globe, y compris là où le soleil ne tape pas.
+  for (const light of globe.lights?.() ?? []) {
+    light.intensity *= light.isAmbientLight ? 1.75 : 1.15;
+  }
+
   const renderer = globe.renderer?.();
   if (renderer?.setPixelRatio) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.75 : 2));
@@ -428,14 +397,17 @@ function zoneColor(zone) {
 
 function watchZoneFade() {
   let last = -1;
-  globe.onZoom((pov) => {
+  // On relève l'altitude à intervalle plutôt qu'à l'événement de zoom :
+  // une caméra déplacée par le code — une escale, le voyage rejoué — ne
+  // déclenche pas ce dernier, et les noms restaient en travers des îles.
+  setInterval(() => {
     // Pleine intensité au-delà de deux rayons, effacement complet sous un.
-    const fade = clamp((pov.altitude - 0.85) / 1.15, 0, 1);
-    if (Math.abs(fade - last) < 0.05) return;
+    const fade = clamp((globe.pointOfView().altitude - 0.85) / 1.15, 0, 1);
+    if (Math.abs(fade - last) < 0.06) return;
     last = fade;
     zoneFade = fade;
     globe.labelColor(zoneColor);
-  });
+  }, 260);
 }
 
 /* ── Éloignement ──────────────────────────────────────────────────────── */
@@ -445,27 +417,15 @@ function watchZoneFade() {
 const MIN_ALTITUDE = 0.32;
 const MAX_ALTITUDE = 9;
 
-/* ── Pictogrammes sur la sphère ───────────────────────────────────────── */
+/* ── Couche HTML : le navire de la lecture ────────────────────────────── */
 
-const badges = new Map(); // id d'île → { lat, lng, alt, el }
-
-function refreshBadges() {
-  const wanted = visibleIslands().filter((i) => i.kind && KIND_GLYPH[i.kind]);
-  for (const island of wanted) {
-    if (!badges.has(island.id)) {
-      badges.set(island.id, {
-        lat: island.lat,
-        lng: island.lng,
-        alt: 0.028 + (island.scale ?? 3) * 0.004,
-        el: makeBadge(island),
-      });
-    }
-  }
-  const keep = new Set(wanted.map((i) => i.id));
-  const data = [];
-  for (const [id, badge] of badges) if (keep.has(id)) data.push(badge);
-  if (cine.ship) data.push(cine.ship);
-  globe.htmlElementsData(data);
+/**
+ * La couche ne porte plus qu'un objet, le navire du voyage rejoué. Tout le
+ * reste — les îles, les nuages, la bulle du fond marin, les coques, la cité
+ * murée — est peint sur la sphère, où il n'a besoin d'aucune légende.
+ */
+function refreshShipLayer() {
+  globe.htmlElementsData(cine.ship ? [cine.ship] : []);
 }
 
 /* ── Sélection ────────────────────────────────────────────────────────── */
@@ -769,7 +729,7 @@ function refreshFilters() {
     );
   }
   globe.pointsData(visibleIslands());
-  refreshBadges();
+  refreshShipLayer();
   repaintWorld();
   if (state.selected && !isVisible(state.selected)) select(null);
 }
@@ -1045,7 +1005,7 @@ function startCine() {
   const first = state.route[0];
   moveShip(first.lat, first.lng, 90);
   pushTrail(first.lat, first.lng, true);
-  refreshBadges();
+  refreshShipLayer();
   refreshPaths();
   globe.ringsData([first]);
   globe.pointOfView({ lat: first.lat, lng: first.lng, altitude: FOLLOW_ALT() }, 1200);
@@ -1178,7 +1138,7 @@ function stopCineDecor(restoreArcs = true) {
     refreshPaths();
     if (cine.ship) {
       cine.ship = null;
-      refreshBadges();
+      refreshShipLayer();
     }
   }
 }
@@ -1233,79 +1193,6 @@ function setupCine() {
     }
     if (event.key === "ArrowRight") jumpToLeg(cine.leg + 1);
     if (event.key === "ArrowLeft") jumpToLeg(cine.leg - 1);
-  });
-}
-
-/* ── Légende de la carte ──────────────────────────────────────────────── */
-
-/**
- * Dix pictogrammes et neuf terrains ne se devinent pas.
- *
- * La légende dit ce que chaque signe veut dire, comme sur n'importe quelle
- * carte marine. Elle est repliée par défaut : elle sert une fois, puis on
- * l'oublie.
- */
-const TERRAIN_LEGEND = [
-  ["forest", "Forêt", "#3d7b4d"],
-  ["jungle", "Jungle", "#2d6a3d"],
-  ["desert", "Désert", "#c9a25c"],
-  ["snow", "Neige", "#cfe0e8"],
-  ["city", "Ville", "#8a8272"],
-  ["rock", "Roche", "#655d52"],
-  ["cake", "Sucre", "#e2a2b8"],
-  ["ash", "Cendre", "#565a51"],
-  ["sky", "Nuage", "#cfe3ea"],
-];
-
-function setupLegend() {
-  const panel = $("legend");
-  const toggle = $("legend-toggle");
-
-  const kinds = Object.entries(state.kinds)
-    .filter(([id]) => KIND_GLYPH[id])
-    .map(
-      ([id, { label, hint }]) =>
-        `<li><span class="legend-glyph badge-${escape(id)}">
-           <svg viewBox="0 0 19 19" aria-hidden="true">${KIND_GLYPH[id]}</svg>
-         </span><span><strong>${escape(label)}</strong> ${escape(hint ?? "")}</span></li>`,
-    )
-    .join("");
-
-  const terrains = TERRAIN_LEGEND.map(
-    ([, label, color]) =>
-      `<li><i class="legend-swatch" style="background:${color}"></i>${escape(label)}</li>`,
-  ).join("");
-
-  panel.innerHTML = `
-    <h2>Lire la carte</h2>
-    <p class="legend-intro">
-      Les îles sont peintes à leur taille et à leur terrain. Ce qui n'est pas
-      une île porte un signe.
-    </p>
-    <ul class="legend-kinds">${kinds}</ul>
-    <h3>Terrains</h3>
-    <ul class="legend-terrains">${terrains}</ul>
-    <h3>Tailles</h3>
-    <p class="legend-sizes">
-      Huit rangs, du continent — Elbaf, Wano — au lieu-dit posé sur une île
-      plus grande.
-    </p>
-  `;
-
-  const close = () => {
-    panel.hidden = true;
-    toggle.setAttribute("aria-expanded", "false");
-  };
-  toggle.addEventListener("click", (event) => {
-    event.stopPropagation();
-    panel.hidden = !panel.hidden;
-    toggle.setAttribute("aria-expanded", String(!panel.hidden));
-  });
-  document.addEventListener("click", (event) => {
-    if (!panel.hidden && !event.target.closest(".legend, .legend-toggle")) close();
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") close();
   });
 }
 
@@ -1387,7 +1274,6 @@ async function start() {
     setupSearch();
     setupFilters();
     setupCine();
-    setupLegend();
     updateVoyage();
 
     $("record-close").addEventListener("click", () => select(null));

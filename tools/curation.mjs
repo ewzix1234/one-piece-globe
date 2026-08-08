@@ -438,6 +438,10 @@ export const PLACE_SIZE = {
   "Village de Shimotsuki": 4,
   Loguetown: 4,
   "Mer Blanche": 4,
+  // La Terre Sainte et son port : petits, mais ce sont les deux seules
+  // portes de la Red Line, et on doit les trouver du premier coup d'œil.
+  "Marie-Joie": 4,
+  "Red Port": 3,
 
   // 3 — petites îles
   "Shells Town": 3,
@@ -480,8 +484,6 @@ export const PLACE_SIZE = {
   "Duché de Mokomo": 1,
   "Royaume Tontatta": 1,
   "Île Cacao": 1,
-  "Marie-Joie": 1,
-  "Red Port": 1,
 };
 
 /**

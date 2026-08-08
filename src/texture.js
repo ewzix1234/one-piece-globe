@@ -35,21 +35,21 @@ export const ZONES = [
   { label: "RED LINE", lat: 44, lng: RED_LINE_LNG[0], size: 2.6, kind: "land" },
   { label: "RED LINE", lat: -44, lng: RED_LINE_LNG[1], size: 2.6, kind: "land" },
   // Les quatre Blues sont les quadrants découpés par Grand Line et la Red
-  // Line : leurs étiquettes sont posées au centre géométrique de chacun,
-  // pas sur la moyenne des îles connues, qui n'en couvre qu'une part.
-  { label: "EAST BLUE", lat: 45, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
-  { label: "SOUTH BLUE", lat: -45, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
-  { label: "NORTH BLUE", lat: 45, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
-  { label: "WEST BLUE", lat: -45, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
+  // Line. Le centre de chacun porte sa rose des vents : le nom se pose
+  // au-dessus, dans le vide, plutôt que par-dessus la rose.
+  { label: "EAST BLUE", lat: 66, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
+  { label: "SOUTH BLUE", lat: -66, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
+  { label: "NORTH BLUE", lat: 66, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
+  { label: "WEST BLUE", lat: -66, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
 ];
 
 const PALETTE = {
-  deep: "#04202f",
-  ocean: "#0a3d55",
-  shallow: "#12607f",
+  deep: "#093247",
+  ocean: "#11536f",
+  shallow: "#1a6d8d",
   paradise: "#1e8fae", // première moitié de Grand Line, plus claire
   newWorld: "#155f80", // seconde moitié, plus profonde
-  calmBelt: "#0e3446", // ni vent ni courant : un aplat mat, mais lisible
+  calmBelt: "#123c52", // ni vent ni courant : un aplat mat, mais lisible
   redLine: "#8c4a35",
   redLineHigh: "#b4674c",
 };
@@ -87,27 +87,13 @@ const TERRAIN = {
 const SIZE_RADIUS = { 1: 2.4, 2: 3.4, 3: 4.8, 4: 6.6, 5: 9, 6: 12.2, 7: 16.4, 8: 22 };
 
 /**
- * Un lieu ne pose une terre sur la carte que s'il en est une.
+ * Quels lieux sortent du relief de la sphère.
  *
- * Peindre un continent pour la Calm Belt, une côte pour le Baratie ou une
- * île pour le Royaume de Ryugu — qui est à dix mille mètres de fond —
- * rendrait la carte fausse à l'endroit précis où elle prétend informer.
- * Ces lieux gardent leur pictogramme, sans relief.
+ * Seules les vraies terres bosselent la carte de relief : ni la bulle du
+ * fond marin, ni un banc de nuages, ni une coque, ni la brume.
  */
-const NO_LAND = new Set([
-  "zone",
-  "seafloor",
-  "ship",
-  "living",
-  // Le carrefour de la Red Line est déjà peint : la montagne, la Terre
-  // Sainte et le port sont dessus, pas à côté.
-  "reverse",
-  "holy",
-  "port",
-  // Une ville posée sur une île plus grande ne double pas sa côte.
-  "settlement",
-]);
-const DRAWS_LAND = (island) => !NO_LAND.has(island.kind);
+const NO_RELIEF = new Set(["zone", "seafloor", "ship", "sky", "settlement"]);
+const HAS_RELIEF = (island) => !NO_RELIEF.has(island.kind);
 
 /** Générateur pseudo-aléatoire déterministe : la carte doit être reproductible. */
 function makeRandom(seed) {
@@ -125,9 +111,10 @@ export const latToY = (lat, h) => ((90 - lat) / 180) * h;
 function paintOcean(ctx, w, h) {
   const gradient = ctx.createLinearGradient(0, 0, 0, h);
   gradient.addColorStop(0, PALETTE.deep);
-  gradient.addColorStop(0.28, PALETTE.ocean);
-  gradient.addColorStop(0.5, PALETTE.shallow);
-  gradient.addColorStop(0.72, PALETTE.ocean);
+  gradient.addColorStop(0.24, "#0d4460");
+  gradient.addColorStop(0.44, PALETTE.ocean);
+  gradient.addColorStop(0.56, PALETTE.shallow);
+  gradient.addColorStop(0.76, "#0d4460");
   gradient.addColorStop(1, PALETTE.deep);
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, w, h);
@@ -137,11 +124,11 @@ function paintOcean(ctx, w, h) {
   // anneaux de latitude bien visibles — l'effet inverse de celui voulu.
   const rand = makeRandom(20260807);
   ctx.lineCap = "round";
-  for (let i = 0; i < 900; i++) {
+  for (let i = 0; i < 620; i++) {
     const y = rand() * h;
     const x = rand() * w;
     const length = w * (0.02 + rand() * 0.06);
-    ctx.globalAlpha = 0.018 + rand() * 0.022;
+    ctx.globalAlpha = 0.012 + rand() * 0.016;
     ctx.strokeStyle = rand() > 0.45 ? "#9fd6e8" : "#03151f";
     ctx.lineWidth = 1 + rand() * 3;
     ctx.beginPath();
@@ -157,6 +144,121 @@ function paintOcean(ctx, w, h) {
     ctx.stroke();
   }
   ctx.globalAlpha = 1;
+}
+
+/**
+ * Graticule : parallèles et méridiens, à l'encre pâle.
+ *
+ * C'est le seul trait qui dit « carte » plutôt que « planète ». Sans lui,
+ * la sphère se lit comme un ballon peint ; avec lui, comme un relevé. Les
+ * lignes maîtresses — équateur, tropiques, méridiens de la Red Line — sont
+ * un cran plus marquées que les autres, comme sur un relevé imprimé.
+ */
+function paintGraticule(ctx, w, h) {
+  const ink = (alpha) => `rgba(190,222,236,${alpha})`;
+  ctx.lineWidth = Math.max(1, h / 2200);
+
+  for (let lat = -75; lat <= 75; lat += 15) {
+    const major = lat === 0 || Math.abs(lat) === 30 || Math.abs(lat) === 60;
+    ctx.strokeStyle = ink(major ? 0.1 : 0.055);
+    const y = latToY(lat, h);
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  for (let lng = -180; lng < 180; lng += 15) {
+    ctx.strokeStyle = ink(0.055);
+    const x = lngToX(lng, w);
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+}
+
+/**
+ * Rose des vents.
+ *
+ * Les quatre Blues sont de grandes étendues vides, et la navigatrice de
+ * l'équipage est cartographe : c'est l'objet de son monde qui a le plus sa
+ * place au milieu d'un océan. Une par quadrant, à l'encre, sans autre
+ * ornement autour.
+ */
+function paintCompassRose(ctx, x, y, radius) {
+  const ink = (a) => `rgba(202,230,242,${a})`;
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Les deux cercles de graduation.
+  ctx.strokeStyle = ink(0.16);
+  ctx.lineWidth = Math.max(1, radius * 0.014);
+  for (const k of [1, 0.82]) {
+    ctx.beginPath();
+    ctx.ellipse(0, 0, radius * k, radius * k * 0.62, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Trente-deux graduations, une par quart de vent.
+  for (let i = 0; i < 32; i++) {
+    const a = (i / 32) * Math.PI * 2;
+    const long = i % 4 === 0;
+    ctx.strokeStyle = ink(long ? 0.2 : 0.12);
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a) * radius * 0.82, Math.sin(a) * radius * 0.82 * 0.62);
+    ctx.lineTo(
+      Math.cos(a) * radius * (long ? 0.68 : 0.75),
+      Math.sin(a) * radius * (long ? 0.68 : 0.75) * 0.62,
+    );
+    ctx.stroke();
+  }
+
+  // L'étoile : huit branches, une pointe claire et une pointe sombre par
+  // branche, comme sur une rose gravée.
+  const star = (count, length, alphaA, alphaB) => {
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2 - Math.PI / 2;
+      const half = Math.PI / count;
+      const tip = [Math.cos(a) * radius * length, Math.sin(a) * radius * length * 0.62];
+      const left = [
+        Math.cos(a - half) * radius * 0.16,
+        Math.sin(a - half) * radius * 0.16 * 0.62,
+      ];
+      const right = [
+        Math.cos(a + half) * radius * 0.16,
+        Math.sin(a + half) * radius * 0.16 * 0.62,
+      ];
+      ctx.fillStyle = ink(alphaA);
+      ctx.beginPath();
+      ctx.moveTo(tip[0], tip[1]);
+      ctx.lineTo(left[0], left[1]);
+      ctx.lineTo(0, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = ink(alphaB);
+      ctx.beginPath();
+      ctx.moveTo(tip[0], tip[1]);
+      ctx.lineTo(right[0], right[1]);
+      ctx.lineTo(0, 0);
+      ctx.closePath();
+      ctx.fill();
+    }
+  };
+  star(8, 0.44, 0.1, 0.2);
+  star(4, 0.66, 0.14, 0.26);
+
+  // La fleur de lys du nord, réduite à sa silhouette.
+  ctx.fillStyle = ink(0.3);
+  ctx.beginPath();
+  ctx.moveTo(0, -radius * 0.66 * 0.62);
+  ctx.lineTo(-radius * 0.07, -radius * 0.86 * 0.62);
+  ctx.lineTo(0, -radius * 1.02 * 0.62);
+  ctx.lineTo(radius * 0.07, -radius * 0.86 * 0.62);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
 }
 
 /**
@@ -392,12 +494,38 @@ function paintTerrainMarks(ctx, x, y, radius, terrain, rng) {
  * Le tirage aléatoire est refait à l'identique pour chaque passe : sans
  * cela, la frange de littoral ne suivrait pas le contour de la terre.
  */
+/**
+ * Hauts-fonds : l'eau claire qui borde une terre.
+ *
+ * Sur une carte de navigation, la profondeur est une information, pas un
+ * dégradé décoratif. Ce halo dit où le fond remonte, et il détache l'île
+ * du bleu du large.
+ */
+function paintShallows(ctx, x, y, radius) {
+  const shelf = ctx.createRadialGradient(x, y, radius * 0.9, x, y, radius * 2.2);
+  shelf.addColorStop(0, "rgba(96,196,222,0.34)");
+  shelf.addColorStop(0.45, "rgba(60,150,186,0.16)");
+  shelf.addColorStop(1, "rgba(30,110,150,0)");
+  ctx.fillStyle = shelf;
+  ctx.beginPath();
+  ctx.ellipse(x, y, radius * 2.2, radius * 2.2 * 0.86, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 function paintIsland(ctx, x, y, radius, island) {
   const seed = Math.floor(Math.abs(x) * 7919 + Math.abs(y) * 104729) || 7;
   const points = radius > 11 ? 16 : radius > 6 ? 13 : 10;
   const terrain =
     island.kind === "sky" ? "sky" : (island.terrain ?? "forest");
   const paint = TERRAIN[terrain] ?? TERRAIN.forest;
+
+  paintShallows(ctx, x, y, radius);
+
+  // Ombre portée : sans elle, la terre est peinte sur la mer ; avec elle,
+  // elle est posée dessus.
+  ctx.fillStyle = "rgba(3,22,34,0.32)";
+  traceCoast(ctx, x + radius * 0.12, y + radius * 0.16, radius * 1.14, points, makeRandom(seed));
+  ctx.fill();
 
   // Littoral : une frange un peu plus large que la terre.
   ctx.fillStyle = paint.shore;
@@ -534,6 +662,276 @@ function paintCluster(ctx, x, y, radius, island) {
   }
 }
 
+
+/* ── Lieux qui ne sont pas des îles, peints à même la carte ───────────── */
+
+/**
+ * Aucun de ces lieux n'est une terre ordinaire, et aucun ne reçoit de
+ * pictogramme : ils sont peints, comme le reste de la carte. Un signe posé
+ * par-dessus demanderait une légende ; une forme dessinée se lit seule.
+ */
+
+/** Zou : l'île est sur le dos de Zunisha, qui marche dans la mer. */
+function paintLiving(ctx, x, y, radius, island) {
+  const grey = { body: "#8d8f92", shade: "#6f7276", light: "#a9acb0" };
+  const r = radius;
+
+  // Le corps, vu de profil : c'est ainsi que l'œuvre le montre.
+  const body = (cx, cy, w, h) => {
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, w, h, 0, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  ctx.fillStyle = grey.shade;
+  body(x - r * 0.12, y + r * 0.16, r * 0.82, r * 0.56); // masse
+  ctx.fillStyle = grey.body;
+  body(x - r * 0.12, y + r * 0.1, r * 0.78, r * 0.5);
+  body(x + r * 0.62, y - r * 0.02, r * 0.34, r * 0.34); // tête
+  ctx.fillStyle = grey.shade;
+  body(x + r * 0.5, y - r * 0.08, r * 0.2, r * 0.26); // oreille
+
+  // Les quatre colonnes qui le portent.
+  ctx.fillStyle = grey.shade;
+  for (const dx of [-0.6, -0.24, 0.16, 0.44]) {
+    ctx.fillRect(x + r * dx, y + r * 0.4, r * 0.17, r * 0.62);
+  }
+
+  // La trompe, tournée vers la mer.
+  ctx.strokeStyle = grey.body;
+  ctx.lineWidth = Math.max(1.4, r * 0.15);
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x + r * 0.92, y + r * 0.06);
+  ctx.quadraticCurveTo(x + r * 1.15, y + r * 0.4, x + r * 1.02, y + r * 0.8);
+  ctx.stroke();
+
+  // Et sur son dos, la forêt : c'est elle, l'île.
+  const paint = TERRAIN.jungle;
+  ctx.fillStyle = paint.low;
+  traceCoast(ctx, x - r * 0.14, y - r * 0.48, r * 0.62, 12, makeRandom(4242), 0.5);
+  ctx.fill();
+  ctx.fillStyle = paint.high;
+  ctx.globalAlpha = 0.6;
+  traceCoast(ctx, x - r * 0.2, y - r * 0.56, r * 0.42, 11, makeRandom(4243), 0.45);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+/** Une île du ciel : un banc de nuages, pas une côte. */
+function paintSky(ctx, x, y, radius) {
+  const lobes = [
+    [-0.5, 0.12, 0.48],
+    [0.02, -0.16, 0.62],
+    [0.52, 0.06, 0.44],
+    [-0.16, 0.28, 0.42],
+    [0.28, 0.3, 0.38],
+  ];
+  ctx.fillStyle = "rgba(190,216,228,0.55)";
+  for (const [dx, dy, r] of lobes) {
+    ctx.beginPath();
+    ctx.arc(x + radius * dx, y + radius * (dy + 0.12), radius * r * 1.1, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#eef8fc";
+  for (const [dx, dy, r] of lobes) {
+    ctx.beginPath();
+    ctx.arc(x + radius * dx, y + radius * dy, radius * r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+/** Un lieu du fond marin : une lueur sous la surface, pas une terre. */
+function paintSeafloor(ctx, x, y, radius) {
+  const halo = ctx.createRadialGradient(x, y, radius * 0.1, x, y, radius * 1.25);
+  halo.addColorStop(0, "rgba(120,226,244,0.5)");
+  halo.addColorStop(0.55, "rgba(60,150,190,0.28)");
+  halo.addColorStop(1, "rgba(20,70,100,0)");
+  ctx.fillStyle = halo;
+  ctx.beginPath();
+  ctx.arc(x, y, radius * 1.25, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Deux cercles concentriques : la bulle qui contient l'île.
+  ctx.strokeStyle = "rgba(180,240,252,0.7)";
+  ctx.lineWidth = Math.max(1, radius * 0.07);
+  ctx.beginPath();
+  ctx.arc(x, y, radius * 0.78, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 0.5;
+  ctx.beginPath();
+  ctx.arc(x, y, radius * 0.5, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+/** Une coque, pas une côte : le Baratie, Thriller Bark, Germa 66. */
+function paintShipMark(ctx, x, y, radius) {
+  const r = Math.max(radius, 3);
+  // Le sillage, qui dit que la chose flotte et se déplace.
+  ctx.strokeStyle = "rgba(200,232,242,0.4)";
+  ctx.lineWidth = Math.max(1, r * 0.14);
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x + r * 1.9, y + r * 0.25);
+  ctx.quadraticCurveTo(x + r * 0.9, y + r * 0.55, x - r * 0.2, y + r * 0.3);
+  ctx.stroke();
+
+  ctx.fillStyle = "#4b3524";
+  ctx.beginPath();
+  ctx.moveTo(x - r, y);
+  ctx.quadraticCurveTo(x, y + r * 0.72, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#e6dcc4";
+  ctx.beginPath();
+  ctx.moveTo(x - r * 0.1, y - r * 0.05);
+  ctx.lineTo(x - r * 0.1, y - r * 1.15);
+  ctx.lineTo(x + r * 0.72, y - r * 0.2);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/** Marie-Joie : la cité murée, au sommet de la Red Line. */
+function paintHoly(ctx, x, y, radius) {
+  ctx.fillStyle = "#d9cdb4";
+  traceCoast(ctx, x, y, radius, 14, makeRandom(777), 1);
+  ctx.fill();
+  ctx.strokeStyle = "#8d7f63";
+  ctx.lineWidth = Math.max(1, radius * 0.09);
+  for (const k of [0.78, 0.52]) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius * k, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#f4e9cd";
+  ctx.beginPath();
+  ctx.arc(x, y, radius * 0.26, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/**
+ * Red Port : un bassin ouvert sur la mer, fermé par deux môles.
+ *
+ * C'est la seule porte du continent côté Paradise : elle doit se trouver du
+ * premier coup d'œil, sans quoi on cherche par où l'on monte à Marie-Joie.
+ */
+function paintPort(ctx, x, y, radius) {
+  const r = Math.max(radius, 4);
+  const quay = "#7f6d55";
+
+  // Le quai, adossé au continent.
+  ctx.fillStyle = quay;
+  traceCoast(ctx, x - r * 0.35, y, r * 0.95, 11, makeRandom(31337), 1.1);
+  ctx.fill();
+
+  // Le bassin, creusé dedans et ouvert vers l'est.
+  ctx.fillStyle = "#12607f";
+  ctx.beginPath();
+  ctx.moveTo(x + r * 1.1, y - r * 0.62);
+  ctx.quadraticCurveTo(x - r * 0.15, y - r * 0.52, x - r * 0.15, y);
+  ctx.quadraticCurveTo(x - r * 0.15, y + r * 0.52, x + r * 1.1, y + r * 0.62);
+  ctx.closePath();
+  ctx.fill();
+
+  // Les deux môles qui referment la passe.
+  ctx.strokeStyle = quay;
+  ctx.lineWidth = Math.max(1.4, r * 0.22);
+  ctx.lineCap = "round";
+  for (const sign of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(x + r * 1.05, y + sign * r * 0.62);
+    ctx.lineTo(x + r * 0.35, y + sign * r * 0.34);
+    ctx.stroke();
+  }
+
+  // Les entrepôts alignés le long du quai.
+  ctx.fillStyle = "#5c4a37";
+  for (let i = 0; i < 3; i++) {
+    ctx.fillRect(x - r * (0.95 - i * 0.26), y - r * 0.16, r * 0.18, r * 0.32);
+  }
+}
+
+/** Une ville posée sur une île déjà peinte : quelques toits, rien de plus. */
+function paintSettlement(ctx, x, y, radius) {
+  const rng = makeRandom(Math.floor(Math.abs(x) * 13 + Math.abs(y) * 29) || 11);
+  const r = Math.max(radius, 2.4);
+  ctx.fillStyle = "#6d4f3d";
+  for (let i = 0; i < 6; i++) {
+    const a = rng() * Math.PI * 2;
+    const d = Math.sqrt(rng()) * r * 0.9;
+    const s = r * (0.3 + rng() * 0.22);
+    ctx.fillRect(x + Math.cos(a) * d - s / 2, y + Math.sin(a) * d - s / 2, s, s * 1.25);
+  }
+  ctx.fillStyle = "rgba(233,214,176,0.85)";
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.22, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/** Un ouvrage : la régularité d'un plan, là où une île est irrégulière. */
+function paintWorks(ctx, x, y, radius, island) {
+  const paint = TERRAIN[island.terrain] ?? TERRAIN.rock;
+  const sides = 7;
+  const ring = (r, fill) => {
+    ctx.beginPath();
+    for (let i = 0; i <= sides; i++) {
+      const a = (i / sides) * Math.PI * 2 - Math.PI / 2;
+      const px = x + Math.cos(a) * r;
+      const py = y + Math.sin(a) * r * 0.9;
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+  };
+  ring(radius * 1.12, paint.shore);
+  ring(radius, paint.low);
+  ring(radius * 0.66, paint.high);
+  ctx.fillStyle = paint.mark;
+  ctx.beginPath();
+  ctx.arc(x, y, radius * 0.22, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/** Le Triangle de Florian : une nappe de brume, sans côte. */
+function paintFog(ctx, x, y, radius) {
+  const fog = ctx.createRadialGradient(x, y, radius * 0.1, x, y, radius * 1.6);
+  fog.addColorStop(0, "rgba(196,208,216,0.34)");
+  fog.addColorStop(1, "rgba(150,168,180,0)");
+  ctx.fillStyle = fog;
+  ctx.beginPath();
+  ctx.arc(x, y, radius * 1.6, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/**
+ * La Calm Belt est déjà peinte : ce sont les deux bandes mates qui bordent
+ * Grand Line. Elle n'a donc rien à recevoir de plus.
+ */
+const paintNothing = () => {};
+
+const KIND_PAINTER = {
+  living: paintLiving,
+  sky: paintSky,
+  seafloor: paintSeafloor,
+  ship: paintShipMark,
+  holy: paintHoly,
+  port: paintPort,
+  settlement: paintSettlement,
+  works: paintWorks,
+};
+
+/** Choisit la façon de peindre un lieu selon ce qu'il est. */
+function painterFor(island) {
+  if (island.name === "Calm Belt") return paintNothing;
+  if (island.kind === "zone") return paintFog;
+  if (KIND_PAINTER[island.kind]) return KIND_PAINTER[island.kind];
+  if (island.terrain === "mountain") return paintReverseMountain;
+  return island.archipelago ? paintCluster : paintIsland;
+}
+
 /** Rayon d'un lieu en pixels, pour une texture de largeur `w`. */
 const islandRadius = (island, w) =>
   (SIZE_RADIUS[island.scale] ?? SIZE_RADIUS[3]) * (w / 4096) * 3.2;
@@ -553,6 +951,16 @@ export function drawWorldTexture(islands, width = 4096, dimmed = null) {
   const ctx = canvas.getContext("2d");
 
   paintOcean(ctx, w, h);
+  paintGraticule(ctx, w, h);
+
+  // Une rose par Blue, au centre géométrique du quadrant.
+  const roseRadius = w * 0.052;
+  for (const lat of [45, -45]) {
+    for (const lng of [PARADISE_LNG, NEW_WORLD_LNG]) {
+      paintCompassRose(ctx, lngToX(lng, w), latToY(lat, h), roseRadius);
+    }
+  }
+
   paintGrandLine(ctx, w, h);
   paintRedLine(ctx, w, h);
 
@@ -575,7 +983,6 @@ export function drawWorldTexture(islands, width = 4096, dimmed = null) {
   // Les grandes îles en premier : une petite posée dessus doit rester
   // lisible, l'inverse la ferait disparaître.
   const drawn = islands
-    .filter(DRAWS_LAND)
     .slice()
     .sort((a, b) => (b.scale ?? 3) - (a.scale ?? 3));
 
@@ -586,12 +993,7 @@ export function drawWorldTexture(islands, width = 4096, dimmed = null) {
     // Une île écartée par un filtre s'efface sans disparaître : on doit
     // continuer à lire la géographie pendant qu'on isole une saga.
     ctx.globalAlpha = dimmed?.has(island.id) ? 0.16 : 1;
-    const draw =
-      island.terrain === "mountain"
-        ? paintReverseMountain
-        : island.archipelago
-          ? paintCluster
-          : paintIsland;
+    const draw = painterFor(island);
     // Enroulement : une île près du méridien 180 doit apparaître des deux côtés.
     for (const offset of [-w, 0, w]) {
       if (x + offset > -radius * 3 && x + offset < w + radius * 3) {
@@ -628,7 +1030,7 @@ export function drawBumpTexture(islands, width = 2048) {
 
   ctx.fillStyle = "#9a9a9a";
   for (const island of islands) {
-    if (!DRAWS_LAND(island)) continue;
+    if (!HAS_RELIEF(island)) continue;
     const x = lngToX(island.lng, w);
     const y = latToY(island.lat, h);
     const radius = islandRadius(island, w);

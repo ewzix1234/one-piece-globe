@@ -7,7 +7,6 @@ Tourne à la souris, zoome à la molette ou au pincement — on peut reculer
 jusqu'à voir la planète entière. Clique une île pour ouvrir sa fiche. Les
 flèches suivent la route de l'équipage escale par escale sans recouvrir le
 globe : elles ouvrent un bandeau court, la fiche complète reste à un clic.
-Le bouton « Lire la carte » donne la légende des signes et des terrains.
 L'adresse suit l'île choisie, `…/#alabasta` s'ouvre directement dessus.
 
 **Revivre le voyage** rejoue la traversée de bout en bout : le Vogue Merry
@@ -18,8 +17,16 @@ compte les jours depuis le départ de Fuchsia. On met en pause à l'espace, on
 saute d'escale en escale aux flèches ou en cliquant la réglette, on rejoue à
 la fin. Ensuite, les flèches reprennent la route à la main.
 
-Aucune pastille de couleur n'est posée sur la carte : ce qu'on voit est
-l'île elle-même. Sa taille suit une échelle de huit rangs, du continent
+Rien n'est posé sur la carte : ni pastille, ni pictogramme, ni légende. Tout
+est peint. La sphère se lit comme un relevé — graticule tous les quinze
+degrés, hauts-fonds autour des terres, une rose des vents au centre de
+chaque Blue — et chaque lieu prend la forme de ce qu'il est : Zou est un
+éléphant qui porte une forêt, Skypiea un banc de nuages, l'Île des
+Hommes-Poissons une bulle sous la surface, le Baratie une coque avec son
+sillage, Marie-Joie une cité murée, Reverse Mountain un massif en courbes de
+niveau que quatre canaux gravissent.
+
+Ce qu'on voit est l'île elle-même. Sa taille suit une échelle de huit rangs, du continent
 (Elbaf, Wano) au lieu-dit, et son terrain dit sa nature : désert pour
 Alabasta, neige pour Drum, toits pour Water Seven, feu et glace pour Punk
 Hazard.

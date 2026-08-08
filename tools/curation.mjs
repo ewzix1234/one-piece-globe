@@ -143,8 +143,15 @@ export const PLACES = [
   { src: "Calm Belt", fr: "Calm Belt", wiki: "Calm_Belt", saga: "lore", step: null, tag: "story", note: "Deux ceintures sans vent ni courant, infestées de Rois des Mers." },
 
   // ── Positions absentes de la carte source ────────────────────────────
+  //
   // Laugh Tale n'est marquée sur aucune carte : sa position est inconnue
-  // dans l'œuvre. On la place juste au-delà de Lodestar, sur Grand Line.
+  // dans l'œuvre. Le seul repère canon est qu'elle vient juste après
+  // Lodestar, dernière île que désigne le Log Pose.
+  //
+  // En mesurant les longitudes vers l'est depuis la Red Line — le sens de
+  // navigation de l'équipage — Lodestar est à 155° et la Red Line referme
+  // la boucle à 180°. On place donc Laugh Tale à 170°, soit quinze degrés
+  // après Lodestar et dix avant la fin du tour.
   {
     src: null,
     fr: "Laugh Tale",
@@ -153,9 +160,9 @@ export const PLACES = [
     saga: "final",
     step: 40,
     tag: "story",
-    note: "Île finale de Grand Line. Roger y trouve le One Piece.",
-    lat: 0.6,
-    lng: -128.0,
+    note: "Île finale de Grand Line, au-delà de Lodestar. Roger y trouve le One Piece.",
+    lat: 0.8,
+    lng: -13.5,
     scale: 4,
     location: "New World",
   },

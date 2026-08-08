@@ -32,7 +32,18 @@ node tools/fetch-images.mjs        # paysages    → data/img/*.webp
 node tools/build-data.mjs          # croisement  → data/islands.json
 ```
 
-`fetch-wiki.mjs` garde un cache : relancé, il ne redemande que les fiches absentes.
+`fetch-wiki.mjs` et `fetch-images.mjs` gardent un cache : relancés, ils ne
+redemandent que ce qui manque.
+
+## Contrôle du jeu de données
+
+```sh
+node tools/audit.mjs
+```
+
+Croise la région déclarée par le wiki avec la position issue de la carte,
+vérifie l'ordre des sagas, les quadrants, les deux moitiés de Grand Line
+et la cohérence interne. Sort en erreur si une anomalie subsiste.
 
 ## Tests
 

@@ -24,7 +24,9 @@ const images = existsSync(imagesPath) ? read(imagesPath) : {};
 const byName = new Map(positions.map((p) => [p.name, p]));
 
 /** Normalise la mer d'appartenance en une poignée de valeurs affichables. */
-function normaliseSea(raw, lat, lng) {
+function normaliseSea(raw, lat, lng, name) {
+  // « Calm Belt » désigne la ceinture elle-même, pas Grand Line qu'elle borde.
+  if (name === "Calm Belt") return "Calm Belt";
   const s = (raw ?? "").toLowerCase();
   if (s.includes("new world") || s.includes("nouveau monde")) return "Nouveau Monde";
   if (s.includes("paradise") || s.includes("paradis")) return "Paradise";
@@ -93,7 +95,7 @@ for (const place of PLACES) {
     nameRomaji: w?.nameRomaji ?? null,
     lat: Number(lat.toFixed(4)),
     lng: Number(lng.toFixed(4)),
-    sea: normaliseSea(pos?.location ?? place.location ?? w?.region, lat, lng),
+    sea: normaliseSea(pos?.location ?? place.location ?? w?.region, lat, lng, place.fr),
     saga: place.saga,
     step: place.step,
     tag: place.tag,
@@ -107,6 +109,9 @@ for (const place of PLACES) {
     image: images[place.wiki] ? `data/img/${images[place.wiki].file}` : null,
     wikiTitle: w?.title ?? null,
     wikiLang: w?.wikiId ?? null,
+    // Région telle que le wiki la déclare. Conservée pour le contrôle :
+    // elle ne sert pas à placer l'île, donc elle sert à la vérifier.
+    wikiRegion: w?.region ?? null,
   });
 }
 

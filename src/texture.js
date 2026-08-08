@@ -18,16 +18,29 @@ export const CALM_BELT_OUTER = 9.5;
  * délimités par les méridiens de la Red Line ; celles des quatre Blues
  * viennent de la position moyenne de leurs îles.
  */
+const PARADISE_LNG = 86.5; // milieu de l'arc entre les deux Red Lines
+const NEW_WORLD_LNG = -93.5; // milieu de l'arc opposé
+const CALM_BELT_MID = (GRAND_LINE_HALF_WIDTH + CALM_BELT_OUTER) / 2;
+
 export const ZONES = [
-  { label: "PARADISE", lat: 0, lng: 86.5, size: 3.4, kind: "route" },
-  { label: "NOUVEAU MONDE", lat: 0, lng: -93.5, size: 3.4, kind: "route" },
-  { label: "CALM BELT", lat: 6.6, lng: 130, size: 2.2, kind: "belt" },
-  { label: "CALM BELT", lat: -6.6, lng: -50, size: 2.2, kind: "belt" },
-  { label: "RED LINE", lat: 46, lng: -3.5, size: 2.6, kind: "land" },
-  { label: "EAST BLUE", lat: 38, lng: 92, size: 3.2, kind: "blue" },
-  { label: "SOUTH BLUE", lat: -40, lng: 74, size: 3.2, kind: "blue" },
-  { label: "NORTH BLUE", lat: 46, lng: -107, size: 3.2, kind: "blue" },
-  { label: "WEST BLUE", lat: -38, lng: -109, size: 3.2, kind: "blue" },
+  // « Paradise » seul se lit comme une mer à part, alors que c'est la
+  // première moitié de Grand Line. Les deux étiquettes portent donc le nom
+  // de la route avant celui de la moitié.
+  { label: "GRAND LINE · PARADISE", lat: 0, lng: PARADISE_LNG, size: 2.7, kind: "route" },
+  { label: "GRAND LINE · NOUVEAU MONDE", lat: 0, lng: NEW_WORLD_LNG, size: 2.7, kind: "route" },
+  { label: "CALM BELT", lat: CALM_BELT_MID, lng: 130, size: 2.2, kind: "belt" },
+  { label: "CALM BELT", lat: -CALM_BELT_MID, lng: -50, size: 2.2, kind: "belt" },
+  // La Red Line fait deux fois le tour du globe par les pôles : une seule
+  // étiquette en laisserait la moitié anonyme.
+  { label: "RED LINE", lat: 44, lng: RED_LINE_LNG[0], size: 2.6, kind: "land" },
+  { label: "RED LINE", lat: -44, lng: RED_LINE_LNG[1], size: 2.6, kind: "land" },
+  // Les quatre Blues sont les quadrants découpés par Grand Line et la Red
+  // Line : leurs étiquettes sont posées au centre géométrique de chacun,
+  // pas sur la moyenne des îles connues, qui n'en couvre qu'une part.
+  { label: "EAST BLUE", lat: 45, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
+  { label: "SOUTH BLUE", lat: -45, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
+  { label: "NORTH BLUE", lat: 45, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
+  { label: "WEST BLUE", lat: -45, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
 ];
 
 const PALETTE = {
@@ -43,7 +56,19 @@ const PALETTE = {
   landHigh: "#5c9a63",
   sand: "#c9a86a",
   ice: "#cfe3ea",
+  ash: "#5b5f55", // ce qu'il reste d'une île rayée de la carte
 };
+
+/**
+ * Un lieu ne pose une terre sur la carte que s'il en est une.
+ *
+ * Peindre un continent pour la Calm Belt, une côte pour le Baratie ou une
+ * île pour le Royaume de Ryugu — qui est à dix mille mètres de fond —
+ * rendrait la carte fausse à l'endroit précis où elle prétend informer.
+ * Ces lieux gardent leur marqueur et leur pictogramme, sans relief.
+ */
+const NO_LAND = new Set(["zone", "seafloor", "ship"]);
+const DRAWS_LAND = (island) => !NO_LAND.has(island.kind);
 
 /** Générateur pseudo-aléatoire déterministe : la carte doit être reproductible. */
 function makeRandom(seed) {
@@ -266,10 +291,16 @@ export function drawWorldTexture(islands, width = 4096) {
   }
 
   for (const island of islands) {
+    if (!DRAWS_LAND(island)) continue;
     const x = lngToX(island.lng, w);
     const y = latToY(island.lat, h);
     const radius = (2.6 + (island.scale ?? 3) * 1.9) * (w / 4096) * 3.2;
-    const tint = island.sea === "Ciel" ? PALETTE.ice : undefined;
+    const tint =
+      island.kind === "sky" || island.sea === "Ciel"
+        ? PALETTE.ice
+        : island.kind === "lost"
+          ? PALETTE.ash
+          : undefined;
     // Enroulement : une île près du méridien 180 doit apparaître des deux côtés.
     for (const offset of [-w, 0, w]) {
       if (x + offset > -radius * 3 && x + offset < w + radius * 3) {
@@ -305,6 +336,7 @@ export function drawBumpTexture(islands, width = 2048) {
 
   ctx.fillStyle = "#9a9a9a";
   for (const island of islands) {
+    if (!DRAWS_LAND(island)) continue;
     const x = lngToX(island.lng, w);
     const y = latToY(island.lat, h);
     const radius = (2.6 + (island.scale ?? 3) * 1.9) * (w / 4096) * 3.2;

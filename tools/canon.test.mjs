@@ -218,3 +218,88 @@ test("Laugh Tale vient après Lodestar, au bout de Grand Line", () => {
     "Laugh Tale dépasse le tour complet de Grand Line",
   );
 });
+
+/* ── Cohérence des zones affichées ────────────────────────────────────── */
+
+test("aucune île ne reste dans un « Grand Line » indéterminé", () => {
+  // Grand Line n'est pas une zone : c'est la route entière. Une fiche qui
+  // l'affiche ne dit ni Paradise ni Nouveau Monde, donc ne dit rien.
+  const vague = islands.filter((i) => i.sea === "Grand Line");
+  assert.equal(
+    vague.length,
+    0,
+    `à moitié situées : ${vague.map((i) => i.name).join(", ")}`,
+  );
+});
+
+test("les mers affichées font partie du jeu attendu", () => {
+  const KNOWN = new Set([
+    "East Blue",
+    "West Blue",
+    "North Blue",
+    "South Blue",
+    "Paradise",
+    "Nouveau Monde",
+    "Calm Belt",
+    "Red Line",
+    "Ciel",
+  ]);
+  for (const island of islands) {
+    assert.ok(KNOWN.has(island.sea), `mer inconnue pour ${island.name} : ${island.sea}`);
+  }
+});
+
+test("les îles du ciel sont dans le ciel, pas dans un Blue", () => {
+  for (const name of ["Skypiea", "Mer Blanche", "Weatheria"]) {
+    assert.equal(get(name).sea, "Ciel", `${name} n'est pas rangée dans le ciel`);
+  }
+});
+
+test("chaque nature de lieu correspond à une entrée de la table", () => {
+  const { kinds } = JSON.parse(
+    readFileSync(join(HERE, "..", "data", "islands.json"), "utf8"),
+  );
+  for (const island of islands) {
+    if (island.kind === null) continue;
+    assert.ok(kinds[island.kind], `nature inconnue pour ${island.name} : ${island.kind}`);
+  }
+});
+
+test("les lieux qui ne sont pas des îles portent une nature", () => {
+  // Sans pictogramme, une ceinture de mer, une île céleste ou un navire
+  // se lisent comme n'importe quelle terre : c'est faux et c'est trompeur.
+  const MUST_HAVE = [
+    ["Skypiea", "sky"],
+    ["Mer Blanche", "sky"],
+    ["Weatheria", "sky"],
+    ["Île des Hommes-Poissons", "seafloor"],
+    ["Royaume de Ryugu", "seafloor"],
+    ["Zou", "living"],
+    ["Duché de Mokomo", "living"],
+    ["Thriller Bark", "ship"],
+    ["Baratie", "ship"],
+    ["Calm Belt", "zone"],
+    ["Triangle de Florian", "zone"],
+    ["Marie-Joie", "summit"],
+    ["Reverse Mountain", "summit"],
+    ["Ohara", "lost"],
+  ];
+  for (const [name, kind] of MUST_HAVE) {
+    assert.equal(get(name).kind, kind, `${name} devrait être de nature « ${kind} »`);
+  }
+});
+
+/* ── La route de l'équipage est jouable d'un bout à l'autre ───────────── */
+
+test("les escales se suivent sans trou ni doublon", () => {
+  // La lecture cinématique enchaîne les escales dans l'ordre : un numéro
+  // manquant coupe le voyage en deux, un doublon le fait bégayer.
+  const steps = islands
+    .filter((i) => i.step)
+    .map((i) => i.step)
+    .sort((a, b) => a - b);
+  assert.equal(new Set(steps).size, steps.length, "deux escales portent le même numéro");
+  for (let k = 0; k < steps.length; k++) {
+    assert.equal(steps[k], k + 1, `l'escale n° ${k + 1} manque`);
+  }
+});

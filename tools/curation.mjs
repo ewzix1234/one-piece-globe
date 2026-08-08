@@ -70,6 +70,9 @@ export const PLACES = [
     wiki: "Cap_des_Jumeaux",
     lat: 0.9,
     lng: 1.8,
+    // Le wiki le range « Grand Line, Red Line » parce qu'il touche les deux ;
+    // on navigue déjà dans Paradise quand on l'atteint.
+    sea: "Paradise",
     saga: "alabasta",
     step: 11,
     tag: "crew",
@@ -83,8 +86,10 @@ export const PLACES = [
   // ── Skypiea ──────────────────────────────────────────────────────────
   { src: "Jaya Island", fr: "Jaya", wiki: "Jaya", saga: "skypiea", step: 16, tag: "crew" },
   { src: "Mock Town", fr: "Mock Town", wiki: "Mock_Town", saga: "skypiea", step: 17, tag: "crew", note: "Bellamy y humilie Montblanc Cricket." },
-  { src: "Godland Skypiea", fr: "Skypiea", wiki: "Skypiea", alias: ["Skypia", "Ile du ciel"], saga: "skypiea", step: 18, tag: "crew", note: "Île céleste. Ener s'y proclame dieu." },
-  { src: "Sky Sea", fr: "Mer Blanche", wiki: "Mer_Blanche", saga: "skypiea", step: null, tag: "story" },
+  // La carte source ne donne pas de mer pour les îles du ciel : sans cette
+  // précision, la déduction par quadrant les rangeait en East Blue.
+  { src: "Godland Skypiea", fr: "Skypiea", wiki: "Skypiea", alias: ["Skypia", "Ile du ciel"], sea: "Ciel", saga: "skypiea", step: 18, tag: "crew", note: "Île céleste. Ener s'y proclame dieu." },
+  { src: "Sky Sea", fr: "Mer Blanche", wiki: "Mer_Blanche", sea: "Ciel", saga: "skypiea", step: null, tag: "story" },
   { src: "Long Ring Long Land", fr: "Long Ring Long Land", wiki: "Long_Ring_Long_Land", saga: "skypiea", step: 19, tag: "crew", note: "Davy Back Fight contre Foxy. Aokiji y apparaît." },
 
   // ── Water Seven ──────────────────────────────────────────────────────
@@ -117,7 +122,7 @@ export const PLACES = [
   // Kamabakka qu'elle abrite : on ne garde qu'un marqueur.
   { src: "Momoiro Island", fr: "Île Momoiro", wiki: "Momoiro", alias: ["Kamabakka", "Royaume de Kamabakka", "Rose Island"], saga: "summit-war", step: null, tag: "crew", note: "Royaume de Kamabakka, fief d'Emporio Ivankov. Sanji y apprend le Poing du Diable." },
   { src: "Karakuri Island", fr: "Karakuri", wiki: "Karakuri", saga: "summit-war", step: null, tag: "crew", note: "Île natale de Franky et de Vegapunk." },
-  { src: "Weatheria", fr: "Weatheria", wiki: "Weatheria", saga: "summit-war", step: null, tag: "crew", note: "Île du ciel où Nami étudie la météo." },
+  { src: "Weatheria", fr: "Weatheria", wiki: "Weatheria", sea: "Ciel", saga: "summit-war", step: null, tag: "crew", note: "Île du ciel où Nami étudie la météo." },
   { src: "Torino Kingdom", fr: "Royaume de Torino", wiki: "Torino", saga: "summit-war", step: null, tag: "crew", note: "Chopper y perfectionne sa médecine." },
   { src: "Namakura", fr: "Namakura", wiki: "Namakura", saga: "summit-war", step: null, tag: "crew", note: "Brook y est retenu comme attraction de cirque." },
   { src: "Banaro Island", fr: "Banaro", wiki: "Banaro", saga: "summit-war", step: null, tag: "story", note: "Ace y affronte Barbe Noire et est capturé." },
@@ -125,7 +130,9 @@ export const PLACES = [
 
   // ── Île des Hommes-Poissons ──────────────────────────────────────────
   { src: "Fish-Man Island", fr: "Île des Hommes-Poissons", wiki: "Île_des_Hommes-Poissons", alias: ["Fishman Island", "Ile des Hommes Poissons"], saga: "fishman", step: 28, tag: "crew", note: "Dix mille mètres sous la surface, sous la Red Line." },
-  { src: "Ryugu Kingdom", fr: "Royaume de Ryugu", wiki: "Ryugu", saga: "fishman", step: 29, tag: "crew", note: "Palais de Neptune et de la princesse Shirahoshi." },
+  // Le palais est dans l'île, et l'île est sous la Red Line : sa longitude
+  // tombe du côté Nouveau Monde, mais elle n'appartient à aucune moitié.
+  { src: "Ryugu Kingdom", fr: "Royaume de Ryugu", wiki: "Ryugu", sea: "Red Line", saga: "fishman", step: 29, tag: "crew", note: "Palais de Neptune et de la princesse Shirahoshi." },
   { src: "Holyland Mary Geoise", fr: "Marie-Joie", wiki: "Marie-Joie", alias: ["Mariejois", "Mary Geoise", "Terre Sainte"], saga: "fishman", step: null, tag: "story", note: "Capitale du Gouvernement Mondial, siège des Dragons Célestes et d'Imu." },
 
   // ── Dressrosa ────────────────────────────────────────────────────────
@@ -266,6 +273,70 @@ export const PEOPLE = {
   "Laugh Tale": ["Gol D. Roger", "Rayleigh", "Oden"],
   "Royaume de Lulusia": ["Imu"],
   "Île Raijin": ["Barbe Noire"],
+};
+
+/**
+ * Nature du lieu, quand ce n'est pas une île de terre ordinaire.
+ *
+ * Une pastille de couleur ne dit rien d'un lieu qui n'est pas une île :
+ * Skypiea flotte dans le ciel, l'Île des Hommes-Poissons est à dix mille
+ * mètres de fond, Zou marche sur le dos d'un éléphant, la Calm Belt est
+ * une ceinture de mer et non une terre. Ces lieux reçoivent un pictogramme
+ * qui dit ce qu'ils sont ; les autres n'en ont pas besoin.
+ *
+ * `glyph` est dessiné en SVG dans src/app.js — aucune police d'icônes,
+ * aucun émoji : le rendu doit être identique sur tous les appareils.
+ */
+export const KINDS = {
+  sky: { label: "Île céleste", hint: "portée par un courant ascendant" },
+  seafloor: { label: "Fond marin", hint: "sous la surface" },
+  living: { label: "Île vivante", hint: "un être vivant porte la terre" },
+  ship: { label: "Navire", hint: "flotte, ne tient pas au fond" },
+  summit: { label: "Red Line", hint: "sur le continent-barrière" },
+  works: { label: "Ouvrage", hint: "bâti de main d'homme" },
+  zone: { label: "Zone maritime", hint: "une étendue de mer, pas une terre" },
+  lost: { label: "Lieu détruit", hint: "rayé de la carte" },
+};
+
+/** Nature d'un lieu, indexée par son nom français. Absent = île ordinaire. */
+export const PLACE_KIND = {
+  // Le ciel : trois lieux, tous portés par des courants ascendants.
+  Skypiea: "sky",
+  "Mer Blanche": "sky",
+  Weatheria: "sky",
+
+  // Le fond : l'Île des Hommes-Poissons et son palais, sous la Red Line.
+  "Île des Hommes-Poissons": "seafloor",
+  "Royaume de Ryugu": "seafloor",
+
+  // Des îles qui bougent parce qu'elles sont vivantes.
+  Zou: "living",
+  "Duché de Mokomo": "living",
+  "Archipel Boin": "living",
+
+  // Des coques, pas des côtes.
+  Baratie: "ship",
+  "Thriller Bark": "ship",
+  "Germa 66": "ship",
+
+  // Le continent-barrière : on n'y accoste pas, on y monte.
+  "Reverse Mountain": "summit",
+  "Marie-Joie": "summit",
+  "Red Port": "summit",
+
+  // Construits, pas trouvés.
+  Egghead: "works",
+  "Impel Down": "works",
+  "Enies Lobby": "works",
+
+  // De la mer nommée, sans terre.
+  "Calm Belt": "zone",
+  "Triangle de Florian": "zone",
+
+  // Effacés du monde par un Buster Call, un Dragon Céleste ou une guerre.
+  Ohara: "lost",
+  "God Valley": "lost",
+  "Royaume de Lulusia": "lost",
 };
 
 /** Table src → entrée, pour le croisement avec positions.json. */

@@ -23,10 +23,6 @@
     </div>
 
     <header class="masthead">
-      <h1>
-        Blue&nbsp;Star
-        <em>Le monde de One Piece</em>
-      </h1>
       <div class="search">
         <label class="visually-hidden" for="search-input">Chercher une île</label>
         <input
@@ -44,25 +40,37 @@
       <span class="filters-title">Sagas</span>
     </nav>
 
-    <div class="logpose" id="logpose">
-      <div class="logpose-dial" role="img" aria-label="Log Pose">
-        <div class="logpose-needle" id="logpose-needle"></div>
-        <div class="logpose-hub"></div>
-      </div>
-      <div class="logpose-readout">
-        <div class="logpose-label">Log Pose</div>
-        <div class="logpose-from" id="logpose-from" hidden></div>
-        <div class="logpose-target" id="logpose-target">Aucun cap</div>
-        <div class="logpose-bearing" id="logpose-bearing">Choisis une île</div>
-      </div>
+    <!-- Éloignement : la molette et le pincement ne sont pas disponibles
+         partout, et le globe se recule maintenant bien plus loin. -->
+    <div class="zoom" id="zoom">
+      <button id="zoom-in" type="button" aria-label="Se rapprocher">+</button>
+      <button id="zoom-out" type="button" aria-label="S'éloigner">−</button>
     </div>
 
     <div class="voyage" id="voyage">
       <button class="about-toggle" id="about-toggle" type="button" aria-label="Sources" aria-expanded="false">ⓘ</button>
+      <button class="cine-start" id="cine-start" type="button">
+        <span class="cine-icon" aria-hidden="true">▶</span>
+        <span class="cine-label">Revivre le voyage</span>
+      </button>
       <span class="voyage-step" id="voyage-step">Route de l'équipage</span>
       <div class="voyage-nav">
         <button id="voyage-prev" type="button" title="Escale précédente" aria-label="Escale précédente">←</button>
         <button id="voyage-next" type="button" title="Escale suivante" aria-label="Escale suivante">→</button>
+      </div>
+    </div>
+
+    <!-- Bandeau de la lecture cinématique, visible seulement pendant. -->
+    <div class="cine-hud" id="cine-hud" hidden aria-live="polite">
+      <div class="cine-track"><i id="cine-progress"></i></div>
+      <div class="cine-read">
+        <strong id="cine-place">Village de Fuchsia</strong>
+        <span id="cine-sub"></span>
+      </div>
+      <div class="cine-actions">
+        <button id="cine-speed" type="button" aria-label="Vitesse de lecture">×1</button>
+        <button id="cine-pause" type="button" aria-label="Mettre en pause">❚❚</button>
+        <button id="cine-stop" type="button" aria-label="Arrêter la lecture">✕</button>
       </div>
     </div>
 

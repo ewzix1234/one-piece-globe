@@ -3,12 +3,21 @@
 Globe interactif du monde de One Piece. 83 îles posées sur la sphère à leur
 position canon, de Fuchsia à Elbaf.
 
-Tourne à la souris, zoome à la molette, clique une île pour ouvrir sa fiche.
-Le Log Pose en bas à gauche donne le cap d'une escale vers la suivante.
+Tourne à la souris, zoome à la molette ou aux deux boutons en bas à gauche —
+on peut reculer jusqu'à voir la planète entière. Clique une île pour ouvrir
+sa fiche, ou suis la route de l'équipage escale par escale avec les flèches.
+
+**Revivre le voyage** rejoue la traversée de bout en bout : un navire suit la
+route — la barque des débuts, puis le Vogue Merry, puis le Thousand Sunny —
+marque un temps d'arrêt à chaque escale et laisse une trace en pointillés
+rouges. À la fin, les flèches reprennent la main.
 
 Chaque île porte une image de paysage, sa fiche, ses personnages et sa
-position exacte. Le globe distingue Paradise du Nouveau Monde de part et
-d'autre de la Red Line, et fait ressortir les Calm Belts.
+position exacte. Grand Line est nommée pour ce qu'elle est : une seule route,
+coupée en deux par la Red Line, Paradise d'un côté et le Nouveau Monde de
+l'autre. Les Calm Belts la bordent. Les lieux qui ne sont pas des îles de
+terre — le ciel, le fond marin, une île vivante, un navire, un ouvrage, une
+zone de mer, un lieu détruit — portent un pictogramme qui dit leur nature.
 
 Site statique, fonctionne hors-ligne, aucun appel réseau à l'exécution.
 
@@ -86,7 +95,7 @@ dont la position est inconnue dans l'œuvre.
 ```
 index.html
 src/
-  app.js        globe, sélection, recherche, filtres, Log Pose
+  app.js        globe, sélection, recherche, filtres, lecture du voyage
   texture.js    peint la sphère en canvas équirectangulaire
   style.css
 data/

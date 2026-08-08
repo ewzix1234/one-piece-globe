@@ -7,7 +7,8 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { PLACES, SAGAS, PEOPLE } from "./curation.mjs";
+import { PLACES, SAGAS, PEOPLE, KINDS, PLACE_KIND } from "./curation.mjs";
+import { RED_LINE_LNG } from "../src/texture.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const read = (p) => JSON.parse(readFileSync(p, "utf8"));
@@ -24,24 +25,39 @@ const images = existsSync(imagesPath) ? read(imagesPath) : {};
 const byName = new Map(positions.map((p) => [p.name, p]));
 
 /** Normalise la mer d'appartenance en une poignée de valeurs affichables. */
+/**
+ * Moitié de Grand Line où tombe une longitude.
+ *
+ * « Grand Line » n'est pas une zone qu'on peut afficher : c'est la route
+ * entière, et elle est coupée en deux par la Red Line. Entre les deux
+ * méridiens on est dans Paradise, au-delà dans le Nouveau Monde. Laisser
+ * « Grand Line » sur une fiche revient à ne rien dire.
+ */
+const grandLineHalf = (lng) =>
+  lng > RED_LINE_LNG[0] && lng < RED_LINE_LNG[1] ? "Paradise" : "Nouveau Monde";
+
 function normaliseSea(raw, lat, lng, name) {
   // « Calm Belt » désigne la ceinture elle-même, pas Grand Line qu'elle borde.
   if (name === "Calm Belt") return "Calm Belt";
   const s = (raw ?? "").toLowerCase();
+  // Le ciel se lit avant tout le reste : « Nomad, Sky » ne doit pas être
+  // ramené au quadrant qu'il survole.
+  if (s.includes("sky")) return "Ciel";
+  // « Red Line/Paradise » désigne le continent, pas la mer qu'il borde :
+  // le contrôle passe avant celui des deux moitiés de Grand Line.
+  if (s.includes("red line")) return "Red Line";
   if (s.includes("new world") || s.includes("nouveau monde")) return "Nouveau Monde";
   if (s.includes("paradise") || s.includes("paradis")) return "Paradise";
   if (s.includes("east blue")) return "East Blue";
   if (s.includes("west blue")) return "West Blue";
   if (s.includes("north blue")) return "North Blue";
   if (s.includes("south blue")) return "South Blue";
-  if (s.includes("red line")) return "Red Line";
   if (s.includes("calm belt")) return "Calm Belt";
-  if (s.includes("grand line")) return "Grand Line";
-  if (s.includes("sky")) return "Ciel";
+  if (s.includes("grand line")) return grandLineHalf(lng);
   // Sans indication, on déduit du quadrant : l'équateur est Grand Line,
   // les méridiens de la Red Line séparent les paires de Blues.
-  if (Math.abs(lat) < 8) return "Grand Line";
-  const east = lng > -3.5 && lng < 176.5;
+  if (Math.abs(lat) < 8) return grandLineHalf(lng);
+  const east = lng > RED_LINE_LNG[0] && lng < RED_LINE_LNG[1];
   if (lat > 0) return east ? "East Blue" : "North Blue";
   return east ? "South Blue" : "West Blue";
 }
@@ -102,6 +118,8 @@ for (const place of PLACES) {
     saga: place.saga,
     step: place.step,
     tag: place.tag,
+    // Nature du lieu quand ce n'est pas une île de terre ordinaire.
+    kind: PLACE_KIND[place.fr] ?? null,
     scale: pos?.scale ?? place.scale ?? 3,
     chapter: w?.chapter ?? null,
     episode: w?.episode ?? null,
@@ -116,6 +134,17 @@ for (const place of PLACES) {
     // elle ne sert pas à placer l'île, donc elle sert à la vérifier.
     wikiRegion: w?.region ?? null,
   });
+}
+
+// Une nature attribuée à un nom qui n'existe pas ne se verrait jamais :
+// la faute de frappe passerait pour un lieu ordinaire.
+for (const name of Object.keys(PLACE_KIND)) {
+  if (!islands.some((i) => i.name === name)) {
+    errors.push(`nature attribuée à un lieu inconnu : « ${name} »`);
+  }
+}
+for (const [name, kind] of Object.entries(PLACE_KIND)) {
+  if (!KINDS[kind]) errors.push(`nature inconnue « ${kind} » pour ${name}`);
 }
 
 if (errors.length) {
@@ -134,6 +163,7 @@ islands.sort((a, b) => {
 const payload = {
   generatedAt: new Date().toISOString().slice(0, 10),
   sagas: SAGAS,
+  kinds: KINDS,
   credits: {
     positions: {
       label: "The Library of Ohara — One Piece World Map",

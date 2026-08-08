@@ -13,9 +13,16 @@ temps d'arrêt à chaque escale et laissent une trace en pointillés rouges. À
 la fin, les flèches reprennent la main.
 
 Aucune pastille de couleur n'est posée sur la carte : ce qu'on voit est
-l'île elle-même. Sa taille suit ce que l'œuvre montre — Elbaf est un pays,
-Fuchsia un village — et son terrain sa nature : désert pour Alabasta, neige
-pour Drum, toits pour Water Seven, feu et glace pour Punk Hazard.
+l'île elle-même. Sa taille suit une échelle de huit rangs, du continent
+(Elbaf, Wano) au lieu-dit, et son terrain dit sa nature : désert pour
+Alabasta, neige pour Drum, toits pour Water Seven, feu et glace pour Punk
+Hazard.
+
+Ce qui n'est pas une île n'en reçoit pas le dessin : Zou est un éléphant,
+Reverse Mountain une montagne à quatre courants, Marie-Joie une couronne,
+Red Port une ancre, la Calm Belt deux vagues. Les villes posées sur une île
+plus grande — Fuchsia sur Dawn, Mock Town sur Jaya, Mokomo sur le dos de
+Zunisha — sont des toits, pas une seconde côte.
 
 Chaque île porte une image de paysage, sa fiche, ses personnages et sa
 position exacte. Grand Line est nommée pour ce qu'elle est : une seule route,

@@ -275,13 +275,14 @@ test("les lieux qui ne sont pas des îles portent une nature", () => {
     ["Île des Hommes-Poissons", "seafloor"],
     ["Royaume de Ryugu", "seafloor"],
     ["Zou", "living"],
-    ["Duché de Mokomo", "living"],
+    // La cité sur le dos de Zunisha est une ville, pas un second éléphant.
+    ["Duché de Mokomo", "settlement"],
     ["Thriller Bark", "ship"],
     ["Baratie", "ship"],
     ["Calm Belt", "zone"],
     ["Triangle de Florian", "zone"],
-    ["Marie-Joie", "summit"],
-    ["Reverse Mountain", "summit"],
+    ["Marie-Joie", "holy"],
+    ["Reverse Mountain", "reverse"],
     ["Ohara", "lost"],
   ];
   for (const [name, kind] of MUST_HAVE) {
@@ -302,4 +303,36 @@ test("les escales se suivent sans trou ni doublon", () => {
   for (let k = 0; k < steps.length; k++) {
     assert.equal(steps[k], k + 1, `l'escale n° ${k + 1} manque`);
   }
+});
+
+test("un seul lieu porte l'éléphant", () => {
+  // Zunisha marche seule : deux éléphants côte à côte sur la carte
+  // laisseraient croire à deux îles vivantes voisines.
+  const living = islands.filter((i) => i.kind === "living");
+  assert.deepEqual(living.map((i) => i.name), ["Zou"]);
+});
+
+test("les villes posées sur une autre île ne dessinent pas de terre", () => {
+  // Fuchsia est sur Dawn, Mock Town sur Jaya, Mokomo sur Zou : leur peindre
+  // une côte ferait deux îles là où l'œuvre n'en montre qu'une.
+  const NESTED_TOWNS = [
+    "Village de Fuchsia",
+    "Royaume de Goa",
+    "Mock Town",
+    "Duché de Mokomo",
+    "Royaume Tontatta",
+  ];
+  for (const name of NESTED_TOWNS) {
+    assert.equal(get(name).kind, "settlement", `${name} devrait être une ville`);
+  }
+});
+
+test("les tailles couvrent toute l'échelle, sans trou en haut", () => {
+  const sizes = islands.map((i) => i.scale);
+  assert.ok(Math.max(...sizes) >= 8, "aucun lieu n'atteint la taille d'un continent");
+  assert.ok(Math.min(...sizes) <= 1, "aucun lieu n'est un simple lieu-dit");
+  // Un pays doit écraser un îlot : le rapport doit rester lisible.
+  const elbaf = get("Elbaf").scale;
+  const banaro = get("Banaro").scale;
+  assert.ok(elbaf - banaro >= 4, "Elbaf et Banaro se ressemblent trop");
 });

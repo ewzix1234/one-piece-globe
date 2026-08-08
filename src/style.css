@@ -335,16 +335,17 @@ body.panel-open .filters {
 .badge {
   display: grid;
   place-items: center;
-  width: 1.9rem;
-  height: 1.9rem;
+  width: calc(1.9rem * var(--badge-size, 1));
+  height: calc(1.9rem * var(--badge-size, 1));
   padding: 0;
   /* La couche HTML de globe.gl coupe les événements de pointeur sur son
      conteneur : sans ce rappel, le pictogramme ne serait pas cliquable. */
   pointer-events: auto;
   color: var(--foam);
-  transition:
-    opacity 0.25s var(--ease),
-    transform 0.18s var(--ease);
+  /* Aucune transition sur `transform` : c'est le moteur de rendu qui écrit
+     cette propriété à chaque image pour suivre la rotation du globe, et une
+     transition la ferait traîner derrière la sphère dès qu'on tourne vite. */
+  transition: opacity 0.25s var(--ease);
 }
 
 /* Le dessin seul, sans pastille : c'est le lieu qu'on veut voir, pas un
@@ -360,8 +361,17 @@ body.panel-open .filters {
 }
 
 .badge:hover {
-  transform: scale(1.2);
   color: var(--straw);
+}
+
+/* Le grossissement au survol porte sur le dessin, jamais sur l'élément
+   positionné : sa transformation appartient au globe. */
+.badge svg {
+  transition: transform 0.18s var(--ease);
+}
+
+.badge:hover svg {
+  transform: scale(1.18);
 }
 
 .badge-sky {
@@ -386,6 +396,18 @@ body.panel-open .filters {
 }
 .badge-zone {
   color: #86a6b8;
+}
+.badge-reverse {
+  color: #c98460;
+}
+.badge-holy {
+  color: #f0d68a;
+}
+.badge-port {
+  color: #d9bfa8;
+}
+.badge-settlement {
+  color: #cbbb9a;
 }
 .badge-lost {
   color: #e0736a;

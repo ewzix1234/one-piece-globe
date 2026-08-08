@@ -82,7 +82,7 @@ const TERRAIN = {
  * empreinte qu'un village de pêcheurs. Le pas est géométrique, pas
  * linéaire, sinon les grandes îles n'écrasent jamais les petites.
  */
-const SIZE_RADIUS = { 1: 3.4, 2: 4.6, 3: 6.4, 4: 9.2, 5: 13.4, 6: 19 };
+const SIZE_RADIUS = { 1: 2.4, 2: 3.4, 3: 4.8, 4: 6.6, 5: 9, 6: 12.2, 7: 16.4, 8: 22 };
 
 /**
  * Un lieu ne pose une terre sur la carte que s'il en est une.
@@ -92,7 +92,19 @@ const SIZE_RADIUS = { 1: 3.4, 2: 4.6, 3: 6.4, 4: 9.2, 5: 13.4, 6: 19 };
  * rendrait la carte fausse à l'endroit précis où elle prétend informer.
  * Ces lieux gardent leur pictogramme, sans relief.
  */
-const NO_LAND = new Set(["zone", "seafloor", "ship", "living"]);
+const NO_LAND = new Set([
+  "zone",
+  "seafloor",
+  "ship",
+  "living",
+  // Le carrefour de la Red Line est déjà peint : la montagne, la Terre
+  // Sainte et le port sont dessus, pas à côté.
+  "reverse",
+  "holy",
+  "port",
+  // Une ville posée sur une île plus grande ne double pas sa côte.
+  "settlement",
+]);
 const DRAWS_LAND = (island) => !NO_LAND.has(island.kind);
 
 /** Générateur pseudo-aléatoire déterministe : la carte doit être reproductible. */

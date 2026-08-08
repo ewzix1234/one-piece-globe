@@ -118,16 +118,31 @@ const KIND_GLYPH = {
   sky: '<path d="M4 12.5h8.6a2.6 2.6 0 1 0-.7-5.1A3.9 3.9 0 0 0 4.4 8.6 2 2 0 0 0 4 12.5Z"/>',
   seafloor:
     '<path d="M3 6.5c1.6 0 1.6 1.6 3.2 1.6S7.8 6.5 9.4 6.5 11 8.1 12.6 8.1 14.2 6.5 15.8 6.5M3 11c1.6 0 1.6 1.6 3.2 1.6S7.8 11 9.4 11 11 12.6 12.6 12.6 14.2 11 15.8 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+  // Zunisha, vu de profil : c'est l'éléphant qui porte Zou, pas une île.
   living:
     '<ellipse cx="7.4" cy="9.4" rx="4.3" ry="3.4"/><ellipse cx="12.1" cy="8.2" rx="2.9" ry="2.8"/><ellipse cx="10.7" cy="7" rx="1.7" ry="2"/><path d="M14.4 9.8c.7.6 1 1.4 1 2.3v2.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.6 12.2h1.5v3.1H4.6zm4 0h1.5v3.1H8.6z"/><path d="M3.2 8.6c-.9-.5-1.5-.2-1.8.4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>',
   ship: '<path d="M3.4 11.6h12.2l-1.9 3.6H5.3ZM9.5 11.2V3.6M9.5 4.2l4.6 2.4-4.6 2.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
-  summit:
-    '<path d="M2.6 14.4 7.4 5l3.1 5.2L12 8.3l4.4 6.1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+  // Reverse Mountain : le massif, et les quatre courants qui en gravissent
+  // les faces depuis les quatre Blues jusqu'au bassin du sommet.
+  reverse:
+    '<path d="M9.5 1.2 18.4 17.6H.6Z"/>' +
+    '<path d="M6.1 17.6c.7-2.6 1.8-5 3.4-7.2 1.6 2.2 2.7 4.6 3.4 7.2" fill="rgba(255,255,255,.34)"/>' +
+    '<path d="M9.5 4.2v5.6M9.5 9.8 5.3 15.4M9.5 9.8l4.2 5.6M9.5 9.8 2.9 17.6M9.5 9.8l6.6 7.8" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1" stroke-linecap="round"/>' +
+    '<circle cx="9.5" cy="4.4" r="1.5" fill="rgba(255,255,255,.9)"/>',
+  // Marie-Joie : la couronne du Gouvernement Mondial, au sommet du continent.
+  holy: '<path d="M3 15.2h13v2H3Zm0-1.4L4.2 6l3 3.4 2.3-5.2 2.3 5.2 3-3.4 1.2 7.8Z"/>',
+  port: '<path d="M9.5 2.6a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4Zm0 3.6v10.2m-3-8h6M3.6 11.2c0 3.2 2.6 5.6 5.9 5.6s5.9-2.4 5.9-5.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+  // Une ville posée sur une île déjà dessinée : des toits, pas une côte.
+  settlement:
+    '<path d="M2.6 16.4V9.6l3.3-2.8 3.3 2.8v6.8Zm7.4 0V7.2l3.2-2.6 3.2 2.6v9.2Z"/>',
   works:
     '<path d="M9.5 6.6a2.9 2.9 0 1 0 0 5.8 2.9 2.9 0 0 0 0-5.8Zm0-3.4v2m0 8.6v2m6.3-6.3h-2m-8.6 0h-2m10.8-4.5-1.4 1.4m-6.1 6.1-1.4 1.4m0-8.9 1.4 1.4m6.1 6.1 1.4 1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
   zone: '<path d="M2.6 7.2c1.7 0 1.7 1.7 3.5 1.7S7.8 7.2 9.5 7.2s1.7 1.7 3.5 1.7 1.7-1.7 3.4-1.7M2.6 11.6c1.7 0 1.7 1.7 3.5 1.7s1.7-1.7 3.4-1.7 1.7 1.7 3.5 1.7 1.7-1.7 3.4-1.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
   lost: '<path d="M5 5l9 9m0-9-9 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
 };
+
+/** Certains lieux méritent d'être vus de plus loin que les autres. */
+const KIND_SIZE = { reverse: 1.5, living: 1.45, holy: 1.15, settlement: 0.8 };
 
 const kindLabel = (kind) => state.kinds[kind]?.label ?? "";
 
@@ -139,6 +154,7 @@ function makeBadge(island) {
   el.title = `${island.name} — ${kindLabel(island.kind)}`;
   el.setAttribute("aria-label", el.title);
   el.innerHTML = `<svg viewBox="0 0 19 19" aria-hidden="true">${KIND_GLYPH[island.kind] ?? ""}</svg>`;
+  el.style.setProperty("--badge-size", KIND_SIZE[island.kind] ?? 1);
   el.addEventListener("click", (event) => {
     event.stopPropagation();
     select(island, { fly: true });

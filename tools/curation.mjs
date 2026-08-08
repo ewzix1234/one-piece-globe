@@ -45,8 +45,36 @@ export const PLACES = [
   { src: "Shimotsuki Village", fr: "Village de Shimotsuki", wiki: "Shimotsuki_(village)", saga: "east-blue", step: null, tag: "character", note: "Village natal de Zoro. Kuina y meurt." },
 
   // ── Entrée dans Grand Line ───────────────────────────────────────────
-  { src: "Reverse Mountain", fr: "Reverse Mountain", wiki: "Reverse_Mountain", saga: "alabasta", step: 10, tag: "crew", note: "Seule entrée navigable de Grand Line." },
-  { src: "Twin Capes", fr: "Cap des Jumeaux", wiki: "Cap_des_Jumeaux", saga: "alabasta", step: 11, tag: "crew", note: "Crocus y veille sur Laboon depuis cinquante ans." },
+  //
+  // Deux positions corrigées ici. La carte source dessine Reverse Mountain
+  // une dizaine de degrés au nord de Grand Line, sans doute pour que le
+  // sommet reste lisible par-dessus le trait du courant. Mais le récit est
+  // formel : la montagne est au croisement même de la Red Line et de Grand
+  // Line, et c'est par elle qu'on entre dans la route. On la ramène donc
+  // sur l'intersection, et le Cap des Jumeaux à son pied, côté Paradise —
+  // c'est là que Crocus veille sur Laboon.
+  {
+    src: "Reverse Mountain",
+    fr: "Reverse Mountain",
+    wiki: "Reverse_Mountain",
+    lat: 0,
+    lng: -3.5,
+    saga: "alabasta",
+    step: 10,
+    tag: "crew",
+    note: "Seule entrée navigable de Grand Line, au croisement de la Red Line.",
+  },
+  {
+    src: "Twin Capes",
+    fr: "Cap des Jumeaux",
+    wiki: "Cap_des_Jumeaux",
+    lat: 0.9,
+    lng: 1.8,
+    saga: "alabasta",
+    step: 11,
+    tag: "crew",
+    note: "Au pied de Reverse Mountain. Crocus y veille sur Laboon depuis cinquante ans.",
+  },
   { src: "Whisky Peak", fr: "Whisky Peak", wiki: "Whisky_Peak", saga: "alabasta", step: 12, tag: "crew", note: "Ville de chasseurs de primes au service de Baroque Works." },
   { src: "Giant Island Little Garden", fr: "Little Garden", wiki: "Little_Garden", saga: "alabasta", step: 13, tag: "crew", note: "Île préhistorique. Duel sans fin de Dorry et Brogy." },
   { src: "Sakura Kingdom", fr: "Drum / Royaume de Sakura", wiki: "Drum", alias: ["Drum Island", "Sakura"], saga: "alabasta", step: 14, tag: "crew", note: "Île de Chopper et du docteur Kureha." },
@@ -75,9 +103,16 @@ export const PLACES = [
   { src: "Amazon Lily Empire", fr: "Amazon Lily", wiki: "Amazon_Lily", saga: "summit-war", step: 24, tag: "crew", note: "Royaume des Kuja, gouverné par Boa Hancock." },
   { src: "Impel Down", fr: "Impel Down", wiki: "Impel_Down", saga: "summit-war", step: 25, tag: "crew", note: "Prison sous-marine à six niveaux." },
   { src: "Marineford", fr: "Marine Ford", wiki: "Marine_Ford", saga: "summit-war", step: 26, tag: "crew", note: "Ace y meurt. Barbe Blanche y tombe." },
-  { src: "Rusukaina", fr: "Rusukaina", wiki: "Rusukaina", saga: "summit-war", step: 27, tag: "crew", note: "Luffy s'y entraîne deux ans avec Rayleigh." },
+  // La carte source la rattache à Paradise, mais le récit la situe dans la
+  // Calm Belt, au nord-ouest d'Amazon Lily : c'est ce qui la rend déserte
+  // et la peuple de bêtes féroces.
+  { src: "Rusukaina", fr: "Rusukaina", wiki: "Rusukaina", sea: "Calm Belt", saga: "summit-war", step: 27, tag: "crew", note: "Île déserte de la Calm Belt. Luffy s'y entraîne deux ans avec Rayleigh." },
   { src: "Kuraigana Island", fr: "Kuraigana", wiki: "Kuraigana", alias: ["Obscuria", "Ile Obscuria", "Mihawk"], saga: "summit-war", step: null, tag: "crew", note: "Zoro s'y entraîne sous Mihawk. Perona y réside." },
-  { src: "Boin Island Chain", fr: "Archipel Boin", wiki: "Archipel_Boin", saga: "summit-war", step: null, tag: "crew", note: "Usopp y devient plus fort en mangeant les plantes de l'île." },
+  // Posé à 9,2° de latitude, soit en pleine Calm Belt. Le wiki ne lui
+  // attribue aucune région, et l'archipel dérive au gré des courants sans
+  // jamais figurer sur une route : la ceinture est le seul rattachement
+  // que la position et le récit s'accordent à donner.
+  { src: "Boin Island Chain", fr: "Archipel Boin", wiki: "Archipel_Boin", sea: "Calm Belt", saga: "summit-war", step: null, tag: "crew", note: "Quatre îles vivantes et carnivores. Usopp y grossit avant d'y devenir fort." },
   // Le wiki francophone ne fait qu'une page de Momoiro et du Royaume de
   // Kamabakka qu'elle abrite : on ne garde qu'un marqueur.
   { src: "Momoiro Island", fr: "Île Momoiro", wiki: "Momoiro", alias: ["Kamabakka", "Royaume de Kamabakka", "Rose Island"], saga: "summit-war", step: null, tag: "crew", note: "Royaume de Kamabakka, fief d'Emporio Ivankov. Sanji y apprend le Poing du Diable." },

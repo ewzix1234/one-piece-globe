@@ -56,8 +56,11 @@ for (const place of PLACES) {
     continue;
   }
 
-  const lat = pos ? pos.lat : place.lat;
-  const lng = pos ? pos.lng : place.lng;
+  // Une position peut être reprise à la carte source, ou fixée ici quand
+  // le récit impose un emplacement que la carte rend approximativement.
+  // L'override est toujours motivé en commentaire dans curation.mjs.
+  const lat = place.lat ?? pos?.lat;
+  const lng = place.lng ?? pos?.lng;
   if (typeof lat !== "number" || typeof lng !== "number") {
     errors.push(`coordonnées manquantes pour « ${place.fr} »`);
     continue;
@@ -95,7 +98,7 @@ for (const place of PLACES) {
     nameRomaji: w?.nameRomaji ?? null,
     lat: Number(lat.toFixed(4)),
     lng: Number(lng.toFixed(4)),
-    sea: normaliseSea(pos?.location ?? place.location ?? w?.region, lat, lng, place.fr),
+    sea: place.sea ?? normaliseSea(pos?.location ?? place.location ?? w?.region, lat, lng, place.fr),
     saga: place.saga,
     step: place.step,
     tag: place.tag,

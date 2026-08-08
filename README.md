@@ -38,12 +38,22 @@ redemandent que ce qui manque.
 ## Contrôle du jeu de données
 
 ```sh
-node tools/audit.mjs
+node tools/audit.mjs                  # cohérence du jeu de données
+node --test "tools/**/*.test.mjs"    # lecteur wikitexte + faits canon
 ```
 
-Croise la région déclarée par le wiki avec la position issue de la carte,
-vérifie l'ordre des sagas, les quadrants, les deux moitiés de Grand Line
-et la cohérence interne. Sort en erreur si une anomalie subsiste.
+Deux contrôles complémentaires.
+
+`audit.mjs` croise la région déclarée par le wiki avec la position issue de
+la carte — deux sources sans rapport — puis vérifie l'ordre des sagas, les
+quadrants, les moitiés de Grand Line et la cohérence interne.
+
+`canon.test.mjs` confronte les données aux faits que le récit impose :
+Marie-Joie à l'aplomb de l'Île des Hommes-Poissons, Reverse Mountain au
+croisement de la Red Line et de Grand Line, Amazon Lily et Impel Down dans
+la Calm Belt, Onigashima au large de Wano, Skypiea au-dessus de Jaya,
+Laugh Tale après Lodestar. Aucune carte ne prime sur ces contraintes : une
+carte qui en viole une est fausse, quelle que soit sa source.
 
 ## Tests
 

@@ -103,12 +103,13 @@ for (const place of PLACES) {
 
   // Les noms se cherchent dans les deux langues : « Wano » doit trouver
   // « Pays des Wa », « Fishman » doit trouver « Île des Hommes-Poissons ».
+  // Quand la page du wiki est partagée avec un autre lieu, ses noms
+  // appartiennent à l'autre : les reprendre rendrait la recherche ambiguë —
+  // « Marinfōdo » renvoyait à la fois Marine Ford et le Nouveau Marine Ford.
   const aliases = [
     place.src,
     ...(place.alias ?? []),
-    w?.title,
-    w?.nameRomaji,
-    w?.nameJp,
+    ...(place.ownNoteOnly ? [] : [w?.title, w?.nameRomaji, w?.nameJp]),
   ]
     .filter(Boolean)
     .map((s) => s.replace(/\s+/g, " ").trim())
@@ -129,8 +130,8 @@ for (const place of PLACES) {
     name: place.fr,
     aliases: [...new Set(aliases)],
     people: PEOPLE[place.fr] ?? [],
-    nameJp: w?.nameJp ?? null,
-    nameRomaji: w?.nameRomaji ?? null,
+    nameJp: place.ownNoteOnly ? null : (w?.nameJp ?? null),
+    nameRomaji: place.ownNoteOnly ? null : (w?.nameRomaji ?? null),
     lat: Number(lat.toFixed(4)),
     lng: Number(lng.toFixed(4)),
     sea: place.sea ?? normaliseSea(pos?.location ?? place.location ?? w?.region, lat, lng, place.fr),
@@ -142,6 +143,11 @@ for (const place of PLACES) {
     // Ce que l'équipage y a fait, et combien de temps il y est resté.
     deed: CREW_STOPS[place.fr]?.deed ?? null,
     days: CREW_STOPS[place.fr]?.days ?? null,
+    // « récit » : la durée est énoncée dans l'œuvre. « estimation » : elle
+    // est reconstituée d'après l'arc. La distinction est affichée.
+    daysBasis: CREW_STOPS[place.fr]?.days
+      ? (CREW_STOPS[place.fr].daysBasis ?? "estimation")
+      : null,
     // La taille vient de ce que l'œuvre montre, pas du rang de l'arc dans
     // la carte source ; à défaut, on retombe sur le rang.
     scale: PLACE_SIZE[place.fr] ?? pos?.scale ?? place.scale ?? 3,
@@ -188,6 +194,12 @@ for (const name of Object.keys(CREW_STOPS)) {
   if (!known.has(name)) errors.push(`escale attribuée à un lieu inconnu : « ${name} »`);
 }
 // Une escale de la route sans récit laisserait un trou au milieu du voyage.
+// Une durée sans origine déclarée passerait pour un fait.
+for (const island of islands) {
+  if (island.days && !["récit", "estimation"].includes(island.daysBasis)) {
+    errors.push(`durée sans origine pour « ${island.name} »`);
+  }
+}
 for (const island of islands) {
   if (island.step && !CREW_STOPS[island.name]) {
     errors.push(`escale n° ${island.step} sans récit : « ${island.name} »`);

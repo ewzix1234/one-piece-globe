@@ -368,3 +368,56 @@ test("aucune mention de source ne subsiste dans les données livrées", () => {
   );
   assert.equal(payload.credits, undefined, "les crédits sont encore livrés");
 });
+
+/* ── Ce que les données prétendent savoir ─────────────────────────────── */
+
+test("chaque durée dit d'où elle vient", () => {
+  // Une estimation affichée comme un fait est une erreur, même juste. Seules
+  // les durées énoncées dans l'œuvre portent la mention « récit ».
+  for (const island of islands) {
+    if (!island.days) {
+      assert.equal(island.daysBasis, null, `${island.name} : origine sans durée`);
+      continue;
+    }
+    assert.ok(
+      ["récit", "estimation"].includes(island.daysBasis),
+      `${island.name} : durée sans origine déclarée`,
+    );
+  }
+});
+
+test("les seules durées établies sont les deux ans de la séparation", () => {
+  const stated = islands.filter((i) => i.daysBasis === "récit");
+  assert.ok(stated.length > 0, "aucune durée n'est rattachée au récit");
+  for (const island of stated) {
+    assert.equal(
+      island.days,
+      730,
+      `${island.name} donne ${island.days} jours comme un fait du récit`,
+    );
+  }
+});
+
+test("la route s'arrête là où l'œuvre en est", () => {
+  // Laugh Tale n'est pas une escale : personne de l'équipage n'y est allé.
+  assert.equal(get("Laugh Tale").step, null, "Laugh Tale comptée comme escale");
+  const route = islands.filter((i) => i.step).sort((a, b) => a.step - b.step);
+  assert.equal(route[route.length - 1].name, "Elbaf");
+  for (const stop of route) {
+    assert.equal(stop.tag, "crew", `${stop.name} est une escale sans être visitée`);
+  }
+});
+
+test("aucun alias ne désigne deux lieux à la fois", () => {
+  const owner = new Map();
+  for (const island of islands) {
+    for (const alias of island.aliases ?? []) {
+      const key = alias.toLowerCase();
+      assert.ok(
+        !owner.has(key) || owner.get(key) === island.name,
+        `« ${alias} » désigne ${owner.get(key)} et ${island.name}`,
+      );
+      owner.set(key, island.name);
+    }
+  }
+});

@@ -502,7 +502,7 @@ const escape = (s) =>
 function formatDays(days) {
   if (days >= 365) {
     const years = Math.round(days / 365);
-    return years === 1 ? "environ un an" : `environ ${years} ans`;
+    return years === 1 ? "un an" : `${years} ans`;
   }
   if (days >= 28) return `environ ${Math.round(days / 7)} semaines`;
   return days === 1 ? "un jour" : `environ ${days} jours`;
@@ -550,7 +550,12 @@ function renderRecord(island) {
 
   const rows = [];
   if (island.step) rows.push(["Escale", `n° ${island.step} du voyage`]);
-  if (island.days) rows.push(["Temps sur place", formatDays(island.days)]);
+  if (island.days) {
+    // L'origine de la durée est dite, pas sous-entendue : une estimation
+    // affichée comme un fait est une erreur, même quand elle est juste.
+    const basis = island.daysBasis === "récit" ? "établi par le récit" : "estimation";
+    rows.push(["Temps sur place", `${formatDays(island.days)} — ${basis}`]);
+  }
   const note = SEA_NOTE[island.sea];
   rows.push(["Mer", note ? `${island.sea} — ${note}` : island.sea]);
   if (island.kind && state.kinds[island.kind]) {
@@ -812,14 +817,16 @@ const SAIL_MAX = 4200;
 const sailDuration = (arc) => clamp(700 + arc * 55, SAIL_MIN, SAIL_MAX);
 
 /** Durée d'escale en clair, pour le bandeau de lecture. */
-function shortDays(days) {
+function shortDays(days, basis) {
   if (!days) return null;
+  const mark = basis === "estimation" ? " ≈" : "";
+  void mark;
   if (days >= 365) {
     const years = Math.round(days / 365);
-    return years === 1 ? "≈ 1 an à terre" : `≈ ${years} ans à terre`;
+    return years === 1 ? "un an à terre" : `${years} ans à terre`;
   }
   if (days >= 28) return `≈ ${Math.round(days / 7)} semaines à terre`;
-  return days === 1 ? "1 jour à terre" : `≈ ${days} jours à terre`;
+  return days === 1 ? "≈ 1 jour à terre" : `≈ ${days} jours à terre`;
 }
 
 const cine = {
@@ -947,7 +954,7 @@ function pushTrail(lat, lng, force = false) {
  */
 function hudStopLine(stop, rank) {
   const parts = [`Escale ${rank} / ${state.route.length}`];
-  const stay = shortDays(stop.days);
+  const stay = shortDays(stop.days, stop.daysBasis);
   if (stay) parts.push(stay);
   if (cine.dayCount > 0) parts.push(`jour ${cine.dayCount}`);
   else parts.push(stop.sea);
@@ -1104,11 +1111,11 @@ function finishCine() {
   // On s'arrête sur la dernière escale, sélectionnée : les flèches
   // reprennent la route à partir de là plutôt que depuis nulle part.
   const last = state.route[state.route.length - 1];
-  select(last);
+  select(last, { panel: false });
   const total = routeDays();
   cineHud(
     "Voyage terminé",
-    `${state.route.length} escales · ≈ ${total.toLocaleString("fr-FR")} jours à terre`,
+    `${state.route.length} escales · ≈ ${total.toLocaleString("fr-FR")} jours à terre, estimation`,
     "Les flèches reprennent la route à la main, escale par escale.",
   );
 }

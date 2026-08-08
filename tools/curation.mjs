@@ -213,7 +213,9 @@ export const PLACES = [
     alias: ["Raftel", "Rafte", "One Piece"],
     wiki: "Laugh_Tale",
     saga: "final",
-    step: 40,
+    // Ce n'est pas une escale : l'équipage n'y est pas encore arrivé. La
+    // route s'arrête donc à Elbaf, là où le récit en est.
+    step: null,
     tag: "story",
     note: "Île finale de Grand Line, au-delà de Lodestar. Roger y trouve le One Piece.",
     lat: 0.8,
@@ -558,16 +560,21 @@ export const ARCHIPELAGOS = new Set([
  * Ce que l'équipage a fait à chaque escale, et combien de temps il y est
  * resté.
  *
- * Les durées sont celles que la chronologie publiée de l'œuvre permet de
- * reconstituer : elles sont approchées, jamais données au jour près par le
- * récit, sauf quand un personnage les énonce — les deux ans de Rusukaina,
- * les cinquante ans de Laboon. Une escale sans durée connue reste vide
- * plutôt que d'être inventée.
+ * Sur les durées, il faut être net : l'œuvre ne compte presque jamais les
+ * jours. Deux cas seulement, distingués par `daysBasis` :
+ *
+ *   « récit »      — la durée est énoncée dans l'œuvre. Ce sont les deux
+ *                    ans de la séparation, et rien d'autre.
+ *   « estimation » — la durée est reconstituée d'après ce que l'arc montre.
+ *                    C'est un ordre de grandeur, pas un relevé.
+ *
+ * Une escale dont la durée ne se laisse pas estimer reste vide plutôt que
+ * d'être inventée : Elbaf est en cours, Laugh Tale jamais atteinte.
  */
 export const CREW_STOPS = {
   "Village de Fuchsia": {
     days: 1,
-    deed: "Luffy y grandit sous l'œil de Makino, y avale le Gomu Gomu no Mi et reçoit le chapeau de paille de Shanks. Il quitte le village seul, dans un tonneau, à dix-sept ans.",
+    deed: "Luffy y grandit sous l'œil de Makino, y avale le Gomu Gomu no Mi et reçoit le chapeau de paille de Shanks. Il en repart seul, en barque, à dix-sept ans.",
   },
   "Dawn Island": {
     days: 1,
@@ -595,7 +602,7 @@ export const CREW_STOPS = {
   },
   "Village de Cocoyashi": {
     days: 3,
-    deed: "L'équipage apprend le pacte de Nami avec Arlong et le prix payé par Bellemère. Nami rejoint l'équipage pour de bon et dessine sa première carte libre.",
+    deed: "L'équipage apprend le pacte de Nami avec Arlong et le prix payé par Bellemère. Nami rejoint l'équipage pour de bon.",
   },
   Loguetown: {
     days: 1,
@@ -603,7 +610,7 @@ export const CREW_STOPS = {
   },
   "Reverse Mountain": {
     days: 1,
-    deed: "Le Vogue Merry gravit la montagne portée par les quatre courants et bascule dans Grand Line. Le mât est perdu à la descente.",
+    deed: "Le Vogue Merry gravit la montagne portée par les quatre courants et bascule de l'autre côté, dans Grand Line.",
   },
   "Cap des Jumeaux": {
     days: 1,
@@ -639,7 +646,7 @@ export const CREW_STOPS = {
   },
   "Long Ring Long Land": {
     days: 2,
-    deed: "Davy Back Fight contre Foxy : Chopper puis Robin sont perdus et regagnés. Aokiji apparaît et gèle Robin ; l'équipage comprend à qui il a affaire.",
+    deed: "Davy Back Fight contre Foxy : des membres de l'équipage sont mis en jeu, puis regagnés. Aokiji apparaît ensuite, gèle Robin, et l'équipage mesure ce qu'est un Amiral.",
   },
   "Water Seven": {
     days: 5,
@@ -659,11 +666,11 @@ export const CREW_STOPS = {
   },
   "Amazon Lily": {
     days: 4,
-    deed: "Luffy y atterrit seul, survit à l'île interdite aux hommes et gagne le concours de Boa Hancock, qui le conduit ensuite à Impel Down.",
+    deed: "Projeté seul sur l'île interdite aux hommes, Luffy y survit et gagne l'estime de Boa Hancock, qui accepte de le mener à Impel Down.",
   },
   "Impel Down": {
     days: 1,
-    deed: "Luffy descend les six niveaux pour sauver Ace, échoue d'un étage, et ressort en menant l'évasion la plus massive de l'histoire de la prison.",
+    deed: "Luffy descend jusqu'au sixième niveau pour sauver Ace, mais celui-ci a déjà été transféré à Marine Ford. Il ressort en menant la plus grande évasion de l'histoire de la prison.",
   },
   "Marine Ford": {
     days: 1,
@@ -671,6 +678,7 @@ export const CREW_STOPS = {
   },
   Rusukaina: {
     days: 730,
+    daysBasis: "récit",
     deed: "Deux ans d'entraînement avec Rayleigh sur une île déserte aux quarante-huit climats. Luffy y apprend à maîtriser les trois Haki.",
   },
   "Île des Hommes-Poissons": {
@@ -679,7 +687,7 @@ export const CREW_STOPS = {
   },
   "Royaume de Ryugu": {
     days: 1,
-    deed: "Luffy rencontre Shirahoshi, brise sa tour et lui fait voir la surface. Le roi Neptune scelle l'alliance avec l'équipage.",
+    deed: "Luffy fait sortir Shirahoshi de la tour où elle vit recluse depuis dix ans. Le roi Neptune scelle ensuite l'alliance avec l'équipage.",
   },
   "Punk Hazard": {
     days: 2,
@@ -691,15 +699,15 @@ export const CREW_STOPS = {
   },
   "Green Bit": {
     days: 1,
-    deed: "Franky et Robin y découvrent le royaume Tontatta et l'usine de SMILE cachée sous Dressrosa.",
+    deed: "Robin et Usopp y trouvent le royaume Tontatta, caché sous la forêt, et apprennent des nains ce que Doflamingo fabrique de l'autre côté du pont.",
   },
   Zou: {
     days: 3,
-    deed: "L'équipage retrouve les Minks sur le dos de Zunisha, apprend l'existence des Poneglyphes Rouges et se sépare en deux pour Whole Cake et Wano.",
+    deed: "L'équipage retrouve les Minks sur le dos de Zunisha, apprend l'existence des Poneglyphes Road et se sépare en deux : l'un part pour Whole Cake, l'autre pour Wano.",
   },
   "Whole Cake Island": {
     days: 3,
-    deed: "Luffy vient chercher Sanji, empêche le mariage arrangé par Big Mom et détruit la salle des Poneglyphes. Jinbei quitte les Hommes-Poissons pour l'équipage.",
+    deed: "Luffy vient chercher Sanji et fait échouer le mariage arrangé par Big Mom, pendant que Brook relève le Poneglyphe Road gardé dans son trésor. Jinbei quitte les Hommes-Poissons pour l'équipage.",
   },
   "Île Cacao": {
     days: 1,
@@ -715,15 +723,15 @@ export const CREW_STOPS = {
   },
   Egghead: {
     days: 3,
-    deed: "L'équipage rencontre Vegapunk, apprend la vérité sur le Siècle Oublié et s'échappe sous le feu d'un Amiral et des Cinq Doyens.",
+    deed: "L'équipage rencontre Vegapunk et entend le message qu'il diffuse au monde entier avant d'être interrompu. Il s'échappe sous le feu d'un Amiral et d'un Doyen.",
   },
   Elbaf: {
     days: null,
-    deed: "L'équipage aborde la terre des géants, patrie de Dorry et Brogy — l'escale est en cours dans l'œuvre.",
+    deed: "L'équipage aborde la terre des géants, patrie de Dorry et Brogy. C'est la dernière escale connue : l'arc est en cours dans l'œuvre.",
   },
   "Laugh Tale": {
     days: null,
-    deed: "Le bout de Grand Line, là où Roger a trouvé le One Piece. L'équipage n'y est pas encore arrivé.",
+    deed: "Le bout de Grand Line, là où Roger a trouvé le One Piece. L'équipage n'y est pas arrivé : la route s'arrête, pour l'instant, à Elbaf.",
   },
 
   // ── Escales hors de la route principale ──────────────────────────────
@@ -741,30 +749,37 @@ export const CREW_STOPS = {
   },
   Kuraigana: {
     days: 730,
+    daysBasis: "récit",
     deed: "Zoro s'entraîne deux ans sous Mihawk, dans le château hanté où réside Perona.",
   },
   "Île Momoiro": {
     days: 730,
+    daysBasis: "récit",
     deed: "Sanji y est retenu deux ans au royaume de Kamabakka et en ressort avec le Poing du Diable.",
   },
   Karakuri: {
     days: 730,
+    daysBasis: "récit",
     deed: "Franky passe deux ans dans le laboratoire de Vegapunk, sur son île natale, et en revient transformé.",
   },
   Weatheria: {
     days: 730,
+    daysBasis: "récit",
     deed: "Nami étudie deux ans la météorologie auprès de Haredas et en rapporte le Clima Tact parfait.",
   },
   "Royaume de Torino": {
     days: 730,
+    daysBasis: "récit",
     deed: "Chopper perfectionne sa médecine deux ans durant chez les habitants de l'île aux oiseaux.",
   },
   "Archipel Boin": {
     days: 730,
+    daysBasis: "récit",
     deed: "Usopp échoue deux ans sur les îles carnivores, y grossit, puis s'entraîne au Pop Green auprès d'Heracles.",
   },
   Namakura: {
     days: 730,
+    daysBasis: "récit",
     deed: "Brook est exhibé deux ans comme attraction de cirque, jusqu'à ce que sa musique fasse de lui une vedette mondiale.",
   },
   "Duché de Mokomo": {

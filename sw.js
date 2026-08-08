@@ -2,7 +2,7 @@
  * Service worker : le globe doit rester consultable sans réseau.
  * Tout est pré-chargé à l'installation ; aucune ressource n'est distante.
  */
-const CACHE = "blue-star-v12";
+const CACHE = "blue-star-v13";
 
 const ASSETS = [
   ".",

@@ -35,12 +35,11 @@ export const ZONES = [
   { label: "RED LINE", lat: 44, lng: RED_LINE_LNG[0], size: 2.6, kind: "land" },
   { label: "RED LINE", lat: -44, lng: RED_LINE_LNG[1], size: 2.6, kind: "land" },
   // Les quatre Blues sont les quadrants découpés par Grand Line et la Red
-  // Line. Le centre de chacun porte sa rose des vents : le nom se pose
-  // au-dessus, dans le vide, plutôt que par-dessus la rose.
-  { label: "EAST BLUE", lat: 66, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
-  { label: "SOUTH BLUE", lat: -66, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
-  { label: "NORTH BLUE", lat: 66, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
-  { label: "WEST BLUE", lat: -66, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
+  // Line : leurs étiquettes sont posées au centre géométrique de chacun.
+  { label: "EAST BLUE", lat: 48, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
+  { label: "SOUTH BLUE", lat: -48, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
+  { label: "NORTH BLUE", lat: 48, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
+  { label: "WEST BLUE", lat: -48, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
 ];
 
 const PALETTE = {
@@ -176,89 +175,6 @@ function paintGraticule(ctx, w, h) {
     ctx.lineTo(x, h);
     ctx.stroke();
   }
-}
-
-/**
- * Rose des vents.
- *
- * Les quatre Blues sont de grandes étendues vides, et la navigatrice de
- * l'équipage est cartographe : c'est l'objet de son monde qui a le plus sa
- * place au milieu d'un océan. Une par quadrant, à l'encre, sans autre
- * ornement autour.
- */
-function paintCompassRose(ctx, x, y, radius) {
-  const ink = (a) => `rgba(202,230,242,${a})`;
-  ctx.save();
-  ctx.translate(x, y);
-
-  // Les deux cercles de graduation.
-  ctx.strokeStyle = ink(0.16);
-  ctx.lineWidth = Math.max(1, radius * 0.014);
-  for (const k of [1, 0.82]) {
-    ctx.beginPath();
-    ctx.ellipse(0, 0, radius * k, radius * k * 0.62, 0, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-
-  // Trente-deux graduations, une par quart de vent.
-  for (let i = 0; i < 32; i++) {
-    const a = (i / 32) * Math.PI * 2;
-    const long = i % 4 === 0;
-    ctx.strokeStyle = ink(long ? 0.2 : 0.12);
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(a) * radius * 0.82, Math.sin(a) * radius * 0.82 * 0.62);
-    ctx.lineTo(
-      Math.cos(a) * radius * (long ? 0.68 : 0.75),
-      Math.sin(a) * radius * (long ? 0.68 : 0.75) * 0.62,
-    );
-    ctx.stroke();
-  }
-
-  // L'étoile : huit branches, une pointe claire et une pointe sombre par
-  // branche, comme sur une rose gravée.
-  const star = (count, length, alphaA, alphaB) => {
-    for (let i = 0; i < count; i++) {
-      const a = (i / count) * Math.PI * 2 - Math.PI / 2;
-      const half = Math.PI / count;
-      const tip = [Math.cos(a) * radius * length, Math.sin(a) * radius * length * 0.62];
-      const left = [
-        Math.cos(a - half) * radius * 0.16,
-        Math.sin(a - half) * radius * 0.16 * 0.62,
-      ];
-      const right = [
-        Math.cos(a + half) * radius * 0.16,
-        Math.sin(a + half) * radius * 0.16 * 0.62,
-      ];
-      ctx.fillStyle = ink(alphaA);
-      ctx.beginPath();
-      ctx.moveTo(tip[0], tip[1]);
-      ctx.lineTo(left[0], left[1]);
-      ctx.lineTo(0, 0);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = ink(alphaB);
-      ctx.beginPath();
-      ctx.moveTo(tip[0], tip[1]);
-      ctx.lineTo(right[0], right[1]);
-      ctx.lineTo(0, 0);
-      ctx.closePath();
-      ctx.fill();
-    }
-  };
-  star(8, 0.44, 0.1, 0.2);
-  star(4, 0.66, 0.14, 0.26);
-
-  // La fleur de lys du nord, réduite à sa silhouette.
-  ctx.fillStyle = ink(0.3);
-  ctx.beginPath();
-  ctx.moveTo(0, -radius * 0.66 * 0.62);
-  ctx.lineTo(-radius * 0.07, -radius * 0.86 * 0.62);
-  ctx.lineTo(0, -radius * 1.02 * 0.62);
-  ctx.lineTo(radius * 0.07, -radius * 0.86 * 0.62);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.restore();
 }
 
 /**
@@ -952,14 +868,6 @@ export function drawWorldTexture(islands, width = 4096, dimmed = null) {
 
   paintOcean(ctx, w, h);
   paintGraticule(ctx, w, h);
-
-  // Une rose par Blue, au centre géométrique du quadrant.
-  const roseRadius = w * 0.052;
-  for (const lat of [45, -45]) {
-    for (const lng of [PARADISE_LNG, NEW_WORLD_LNG]) {
-      paintCompassRose(ctx, lngToX(lng, w), latToY(lat, h), roseRadius);
-    }
-  }
 
   paintGrandLine(ctx, w, h);
   paintRedLine(ctx, w, h);

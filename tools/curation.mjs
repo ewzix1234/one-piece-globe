@@ -81,7 +81,20 @@ export const PLACES = [
   { src: "Whisky Peak", fr: "Whisky Peak", wiki: "Whisky_Peak", saga: "alabasta", step: 12, tag: "crew", note: "Ville de chasseurs de primes au service de Baroque Works." },
   { src: "Giant Island Little Garden", fr: "Little Garden", wiki: "Little_Garden", saga: "alabasta", step: 13, tag: "crew", note: "Île préhistorique. Duel sans fin de Dorry et Brogy." },
   { src: "Sakura Kingdom", fr: "Drum / Royaume de Sakura", wiki: "Drum", alias: ["Drum Island", "Sakura"], saga: "alabasta", step: 14, tag: "crew", note: "Île de Chopper et du docteur Kureha." },
-  { src: "Sandy Island", fr: "Alabasta", wiki: "Alabasta", alias: ["Arabasta", "Alubarna"], saga: "alabasta", step: 15, tag: "crew", note: "Royaume de Vivi, déstabilisé par Crocodile." },
+    // Le résumé récupéré commence par « est un royaume… » : l'extraction a
+  // mangé le sujet. On le réécrit plutôt que de livrer une phrase bancale.
+  {
+    src: "Sandy Island",
+    fr: "Alabasta",
+    wiki: "Alabasta",
+    alias: ["Arabasta", "Alubarna"],
+    saga: "alabasta",
+    step: 15,
+    tag: "crew",
+    summary:
+      "Alabasta est un royaume désertique de Grand Line, dont la capitale est Alubarna. Gouverné par la famille Nefertari depuis des siècles, il compte parmi les vingt royaumes fondateurs du Gouvernement Mondial — et la seule de ces familles à avoir refusé de monter à Marie-Joie. Une sécheresse de trois ans, provoquée par la Dance Powder de Crocodile, y a jeté le pays dans la guerre civile.",
+    note: "Royaume de Vivi, déstabilisé par Crocodile.",
+  },
 
   // ── Skypiea ──────────────────────────────────────────────────────────
   { src: "Jaya Island", fr: "Jaya", wiki: "Jaya", saga: "skypiea", step: 16, tag: "crew" },

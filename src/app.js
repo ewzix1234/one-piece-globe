@@ -205,6 +205,50 @@ function refreshPaths() {
   globe.pathsData(paths);
 }
 
+/**
+ * La texture est peinte localement : on la passe en data URL plutôt que par
+ * une requête réseau, pour garder le site utilisable hors-ligne.
+ */
+const toUrl = (canvas) =>
+  canvas.convertToBlob
+    ? canvas.convertToBlob({ type: "image/png" }).then(URL.createObjectURL)
+    : Promise.resolve(canvas.toDataURL("image/png"));
+
+let worldUrl = null;
+let repaintTimer = null;
+
+/**
+ * Repeint la sphère en tenant compte des sagas masquées.
+ *
+ * Depuis que les pastilles ont disparu, filtrer une saga ne changeait plus
+ * rien à l'écran : l'île restait peinte sur la texture. Elle s'efface
+ * maintenant pour de bon — en fondu, pour qu'on continue de lire la
+ * géographie pendant qu'on isole une saga.
+ */
+let paintedFilter = "";
+
+function repaintWorld() {
+  // Chaque flèche du voyage rouvre les filtres pour révéler l'escale :
+  // repeindre à chaque fois coûterait deux cents millisecondes pour une
+  // texture identique. On ne repeint que si le jeu masqué a bougé.
+  const signature = [...state.hiddenSagas].sort().join("|");
+  if (signature === paintedFilter) return;
+  paintedFilter = signature;
+
+  clearTimeout(repaintTimer);
+  repaintTimer = setTimeout(() => {
+    const dimmed = new Set(
+      state.islands.filter((i) => !isVisible(i)).map((i) => i.id),
+    );
+    const world = drawWorldTexture(state.islands, small ? 2048 : 4096, dimmed);
+    toUrl(world).then((url) => {
+      globe.globeImageUrl(url);
+      if (worldUrl?.startsWith("blob:")) URL.revokeObjectURL(worldUrl);
+      worldUrl = url;
+    });
+  }, 140);
+}
+
 function buildGlobe() {
   small = isHandheld();
   const world = drawWorldTexture(state.islands, small ? 2048 : 4096);
@@ -219,15 +263,9 @@ function buildGlobe() {
     .width(window.innerWidth)
     .height(window.innerHeight);
 
-  // La texture est peinte localement : on la passe en data URL plutôt que
-  // par une requête réseau, pour garder le site utilisable hors-ligne.
-  const toUrl = (canvas) =>
-    canvas.convertToBlob
-      ? canvas.convertToBlob({ type: "image/png" }).then(URL.createObjectURL)
-      : Promise.resolve(canvas.toDataURL("image/png"));
-
-  Promise.all([toUrl(world), toUrl(bump)]).then(([worldUrl, bumpUrl]) => {
-    globe.globeImageUrl(worldUrl).bumpImageUrl(bumpUrl);
+  Promise.all([toUrl(world), toUrl(bump)]).then(([world0, bumpUrl]) => {
+    worldUrl = world0;
+    globe.globeImageUrl(world0).bumpImageUrl(bumpUrl);
   });
 
   // Red Line et Grand Line : deux grands cercles perpendiculaires, en relief.
@@ -308,18 +346,12 @@ function buildGlobe() {
   // Calm Belts, la Red Line et les quatre Blues directement sur la sphère.
   // Posées en filigrane, comme sur une carte marine : elles nomment le fond
   // sans masquer ce qui s'y trouve.
-  const ZONE_COLOR = {
-    route: "rgba(198,238,248,0.42)",
-    belt: "rgba(128,166,186,0.45)",
-    land: "rgba(232,176,146,0.5)",
-    blue: "rgba(168,202,216,0.4)",
-  };
   globe
     .labelsData(ZONES)
     .labelLat("lat")
     .labelLng("lng")
     .labelText("label")
-    .labelColor((z) => ZONE_COLOR[z.kind])
+    .labelColor(zoneColor)
     .labelSize((z) => z.size * (small ? 1.25 : 1))
     .labelDotRadius(0)
     .labelResolution(3)
@@ -350,6 +382,8 @@ function buildGlobe() {
     if (!cine.active) controls.autoRotate = false;
   });
 
+  watchZoneFade();
+
   // Poignée de mise au point : permet de piloter la caméra depuis la
   // console ou depuis les tests de bout en bout.
   window.blueStar = { globe, state, cine };
@@ -369,6 +403,39 @@ function buildGlobe() {
   const resize = () => globe.width(window.innerWidth).height(window.innerHeight);
   window.addEventListener("resize", resize);
   window.addEventListener("orientationchange", () => setTimeout(resize, 150));
+}
+
+/* ── Étiquettes de zone ───────────────────────────────────────────────── */
+
+const ZONE_ALPHA = { route: 0.42, belt: 0.45, land: 0.5, blue: 0.4 };
+const ZONE_RGB = {
+  route: "198,238,248",
+  belt: "128,166,186",
+  land: "232,176,146",
+  blue: "168,202,216",
+};
+
+/**
+ * De près, les noms de zone barrent les îles qu'ils survolent — « GRAND
+ * LINE · PARADISE » traversait Alabasta. Ils s'effacent donc à mesure qu'on
+ * se rapproche : ils servent à s'orienter de loin, pas à lire une côte.
+ */
+let zoneFade = 1;
+
+function zoneColor(zone) {
+  return `rgba(${ZONE_RGB[zone.kind]},${(ZONE_ALPHA[zone.kind] * zoneFade).toFixed(3)})`;
+}
+
+function watchZoneFade() {
+  let last = -1;
+  globe.onZoom((pov) => {
+    // Pleine intensité au-delà de deux rayons, effacement complet sous un.
+    const fade = clamp((pov.altitude - 0.85) / 1.15, 0, 1);
+    if (Math.abs(fade - last) < 0.05) return;
+    last = fade;
+    zoneFade = fade;
+    globe.labelColor(zoneColor);
+  });
 }
 
 /* ── Éloignement ──────────────────────────────────────────────────────── */
@@ -403,8 +470,15 @@ function refreshBadges() {
 
 /* ── Sélection ────────────────────────────────────────────────────────── */
 
-function select(island, { fly = false } = {}) {
+function select(island, { fly = false, quiet = false, panel = true } = {}) {
   state.selected = island;
+  // L'adresse suit la sélection : on peut envoyer une île à quelqu'un.
+  if (!quiet) {
+    const hash = island ? `#${island.id}` : "";
+    if (location.hash !== hash) {
+      history.replaceState(null, "", hash || location.pathname + location.search);
+    }
+  }
   globe.ringsData(island ? [island] : []);
 
   if (island && fly) {
@@ -412,8 +486,42 @@ function select(island, { fly = false } = {}) {
     globe.pointOfView({ lat: island.lat, lng: island.lng, altitude: 1.7 }, 900);
   }
 
-  renderRecord(island);
+  if (panel) {
+    renderStopCard(null);
+    renderRecord(island);
+  } else {
+    renderRecord(null);
+    renderStopCard(island);
+  }
   updateVoyage();
+}
+
+/**
+ * Bandeau d'escale, pour la navigation aux flèches.
+ *
+ * Ouvrir la fiche pleine à chaque flèche revenait à recouvrir le globe
+ * qu'on est en train de parcourir — sur téléphone, elle prenait les deux
+ * tiers de l'écran. Le bandeau dit l'essentiel et laisse voir la carte ; la
+ * fiche complète reste à un clic.
+ */
+function renderStopCard(island) {
+  const card = $("stopcard");
+  if (!island) {
+    card.hidden = true;
+    document.body.classList.remove("card-open");
+    return;
+  }
+  const bits = [];
+  if (island.step) bits.push(`Escale ${island.step} / ${state.route.length}`);
+  bits.push(island.sea);
+  if (island.days) bits.push(shortDays(island.days));
+  $("stopcard-name").textContent = island.name;
+  $("stopcard-meta").textContent = bits.filter(Boolean).join(" · ");
+  const deed = $("stopcard-deed");
+  deed.textContent = island.deed ?? "";
+  deed.hidden = !island.deed;
+  card.hidden = false;
+  document.body.classList.add("card-open");
 }
 
 /* ── Fiche ────────────────────────────────────────────────────────────── */
@@ -438,6 +546,32 @@ function formatDays(days) {
   }
   if (days >= 28) return `environ ${Math.round(days / 7)} semaines`;
   return days === 1 ? "un jour" : `environ ${days} jours`;
+}
+
+/**
+ * Résumé de la fiche, écourté quand il est long.
+ *
+ * Dix fiches dépassent six cents signes et noyaient le récit d'escale sous
+ * une notice. On coupe à la fin d'une phrase, jamais au milieu d'un mot, et
+ * on laisse dérouler le reste à la demande.
+ */
+const SUMMARY_LIMIT = 340;
+
+function renderSummary(summary) {
+  if (!summary) return "";
+  if (summary.length <= SUMMARY_LIMIT) {
+    return `<p class="record-summary">${escape(summary)}</p>`;
+  }
+  // On cherche la dernière fin de phrase avant la limite ; à défaut, le
+  // dernier espace, pour ne jamais couper un mot en deux.
+  const head = summary.slice(0, SUMMARY_LIMIT);
+  const sentence = Math.max(head.lastIndexOf(". "), head.lastIndexOf(" ; "));
+  const cut = sentence > SUMMARY_LIMIT * 0.5 ? sentence + 1 : head.lastIndexOf(" ");
+  return `<div class="record-summary">
+    <p>${escape(summary.slice(0, cut).trim())}</p>
+    <p class="record-more" hidden>${escape(summary.slice(cut).trim())}</p>
+    <button type="button" class="record-unfold">Lire la suite</button>
+  </div>`;
 }
 
 function renderRecord(island) {
@@ -501,9 +635,13 @@ function renderRecord(island) {
           : ""
       }
       ${island.note ? `<p class="record-note">${escape(island.note)}</p>` : ""}
-      ${island.summary ? `<p class="record-summary">${escape(island.summary)}</p>` : ""}
+      ${renderSummary(island.summary)}
     </div>
   `;
+  host.querySelector(".record-unfold")?.addEventListener("click", (event) => {
+    event.currentTarget.previousElementSibling.hidden = false;
+    event.currentTarget.remove();
+  });
   host.scrollTop = 0;
   document.body.classList.add("panel-open");
 }
@@ -548,6 +686,12 @@ function setupSearch() {
       }
       if (fold(island.sea).includes(q)) {
         hits.push({ island, via: island.sea, rank: 3 });
+        continue;
+      }
+      // « Kuina », « Buster Call », « ombre » : ce que l'équipage y a fait
+      // est souvent le seul souvenir qu'on garde d'une île.
+      if (q.length >= 3 && island.deed && fold(island.deed).includes(q)) {
+        hits.push({ island, via: "dans le récit de l'escale", rank: 4 });
       }
     }
     hits.sort((a, b) => a.rank - b.rank || a.island.name.localeCompare(b.island.name, "fr"));
@@ -626,6 +770,7 @@ function refreshFilters() {
   }
   globe.pointsData(visibleIslands());
   refreshBadges();
+  repaintWorld();
   if (state.selected && !isVisible(state.selected)) select(null);
 }
 
@@ -666,7 +811,7 @@ function stepBy(delta) {
   if (!island) return;
   state.hiddenSagas.delete(island.saga);
   refreshFilters();
-  select(island, { fly: true });
+  select(island, { fly: true, panel: false });
 }
 
 /* ── Lecture cinématique du voyage ────────────────────────────────────── */
@@ -783,6 +928,49 @@ function moveShip(lat, lng, heading) {
   cine.ship.el.classList.toggle("ship-east", heading < 180);
 }
 
+/**
+ * Reconstruit la trace du départ jusqu'à l'escale d'indice `index`.
+ *
+ * Sans cela, sauter au milieu du voyage laisserait une carte vierge
+ * derrière le navire, comme s'il venait d'apparaître là.
+ */
+function buildTrailTo(index) {
+  cine.trail = [];
+  cine.trailArc = 0;
+  const first = state.route[0];
+  pushTrail(first.lat, first.lng, true);
+  for (let k = 0; k < index; k++) {
+    const from = state.route[k];
+    const to = state.route[k + 1];
+    const steps = Math.max(2, Math.round(angularDistance(from, to) / 1.2));
+    for (let n = 1; n <= steps; n++) {
+      const at = along(from, to, n / steps);
+      pushTrail(at.lat, at.lng, n === steps);
+    }
+  }
+}
+
+/** Jours cumulés du départ jusqu'à l'escale d'indice `index`, incluse. */
+const daysUpTo = (index) =>
+  state.route.slice(0, index + 1).reduce((total, s) => total + (s.days ?? 0), 0);
+
+/** Place la lecture à une escale donnée, à quai. */
+function jumpToLeg(index) {
+  const target = clamp(index, 0, state.route.length - 1);
+  const stop = state.route[target];
+  cine.leg = target;
+  cine.phase = "dwell";
+  cine.elapsed = 0;
+  cine.dayCount = daysUpTo(target);
+  buildTrailTo(target);
+  refreshPaths();
+  setHull(shipAtStep(stop.step));
+  moveShip(stop.lat, stop.lng, 90);
+  globe.ringsData([stop]);
+  globe.pointOfView({ lat: stop.lat, lng: stop.lng, altitude: FOLLOW_ALT() }, 700);
+  cineHud(stop.name, hudStopLine(stop, stop.step), stop.deed);
+}
+
 function pushTrail(lat, lng, force = false) {
   const last = cine.trail[cine.trail.length - 1];
   if (last) {
@@ -806,9 +994,12 @@ function hudStopLine(stop, rank) {
   return parts.join(" · ");
 }
 
-function cineHud(place, sub) {
+function cineHud(place, sub, deed = null) {
   $("cine-place").textContent = place;
   $("cine-sub").textContent = sub;
+  const story = $("cine-deed");
+  story.textContent = deed ?? "";
+  story.hidden = !deed;
   const done = (cine.leg + (cine.phase === "sail" ? 0.5 : 0)) / (state.route.length - 1);
   $("cine-progress").style.transform = `scaleX(${clamp(done, 0, 1)})`;
 }
@@ -858,7 +1049,7 @@ function startCine() {
   refreshPaths();
   globe.ringsData([first]);
   globe.pointOfView({ lat: first.lat, lng: first.lng, altitude: FOLLOW_ALT() }, 1200);
-  cineHud(first.name, hudStopLine(first, 1));
+  cineHud(first.name, hudStopLine(first, 1), first.deed);
 
   // Mouvement réduit : on saute d'escale en escale sans animer la mer.
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -929,7 +1120,7 @@ function tickCine(now) {
     cine.elapsed = 0;
     globe.ringsData([to]);
     cine.dayCount += to.days ?? 0;
-    cineHud(to.name, hudStopLine(to, to.step));
+    cineHud(to.name, hudStopLine(to, to.step), to.deed);
   }
 }
 
@@ -947,6 +1138,8 @@ function finishCine() {
   $("cine-progress").style.transform = "scaleX(1)";
   $("cine-pause").hidden = true;
   $("cine-speed").hidden = true;
+  $("cine-skip").hidden = true;
+  $("cine-replay").hidden = false;
 
   // On s'arrête sur la dernière escale, sélectionnée : les flèches
   // reprennent la route à partir de là plutôt que depuis nulle part.
@@ -955,7 +1148,8 @@ function finishCine() {
   const total = routeDays();
   cineHud(
     "Voyage terminé",
-    `≈ ${total.toLocaleString("fr-FR")} jours à terre · reprends la route avec les flèches`,
+    `${state.route.length} escales · ≈ ${total.toLocaleString("fr-FR")} jours à terre`,
+    "Les flèches reprennent la route à la main, escale par escale.",
   );
 }
 
@@ -971,6 +1165,8 @@ function stopCineDecor(restoreArcs = true) {
   $("cine-hud").hidden = true;
   $("cine-pause").hidden = false;
   $("cine-speed").hidden = false;
+  $("cine-skip").hidden = false;
+  $("cine-replay").hidden = true;
   globe.controls().enabled = true;
   if (restoreArcs) {
     const legs = state.route.slice(0, -1).map((from, i) => ({
@@ -989,6 +1185,26 @@ function stopCineDecor(restoreArcs = true) {
 
 function setupCine() {
   $("cine-start").addEventListener("click", startCine);
+  $("cine-replay").addEventListener("click", startCine);
+
+  // Sauter à l'escale suivante sans attendre la traversée.
+  $("cine-skip").addEventListener("click", () => {
+    if (cine.active) jumpToLeg(cine.leg + 1);
+  });
+
+  // La barre de progression est une réglette : on clique où l'on veut aller.
+  const track = $("cine-track");
+  const seek = (event) => {
+    if (!cine.active) return;
+    const box = track.getBoundingClientRect();
+    const ratio = clamp((event.clientX - box.left) / box.width, 0, 1);
+    jumpToLeg(Math.round(ratio * (state.route.length - 1)));
+  };
+  track.addEventListener("click", seek);
+  track.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowRight") jumpToLeg(cine.leg + 1);
+    if (event.key === "ArrowLeft") jumpToLeg(cine.leg - 1);
+  });
   $("cine-stop").addEventListener("click", () => {
     stopCineDecor();
     globe.ringsData(state.selected ? [state.selected] : []);
@@ -1006,6 +1222,105 @@ function setupCine() {
     cine.speed = cine.speed >= 4 ? 1 : cine.speed * 2;
     $("cine-speed").textContent = `×${cine.speed}`;
   });
+
+  // Au clavier : espace met en pause, les flèches sautent d'escale en
+  // escale, Échap arrête. Ce sont les touches d'un lecteur, pas d'une carte.
+  document.addEventListener("keydown", (event) => {
+    if (!cine.active || event.target.matches("input")) return;
+    if (event.code === "Space") {
+      event.preventDefault();
+      $("cine-pause").click();
+    }
+    if (event.key === "ArrowRight") jumpToLeg(cine.leg + 1);
+    if (event.key === "ArrowLeft") jumpToLeg(cine.leg - 1);
+  });
+}
+
+/* ── Légende de la carte ──────────────────────────────────────────────── */
+
+/**
+ * Dix pictogrammes et neuf terrains ne se devinent pas.
+ *
+ * La légende dit ce que chaque signe veut dire, comme sur n'importe quelle
+ * carte marine. Elle est repliée par défaut : elle sert une fois, puis on
+ * l'oublie.
+ */
+const TERRAIN_LEGEND = [
+  ["forest", "Forêt", "#3d7b4d"],
+  ["jungle", "Jungle", "#2d6a3d"],
+  ["desert", "Désert", "#c9a25c"],
+  ["snow", "Neige", "#cfe0e8"],
+  ["city", "Ville", "#8a8272"],
+  ["rock", "Roche", "#655d52"],
+  ["cake", "Sucre", "#e2a2b8"],
+  ["ash", "Cendre", "#565a51"],
+  ["sky", "Nuage", "#cfe3ea"],
+];
+
+function setupLegend() {
+  const panel = $("legend");
+  const toggle = $("legend-toggle");
+
+  const kinds = Object.entries(state.kinds)
+    .filter(([id]) => KIND_GLYPH[id])
+    .map(
+      ([id, { label, hint }]) =>
+        `<li><span class="legend-glyph badge-${escape(id)}">
+           <svg viewBox="0 0 19 19" aria-hidden="true">${KIND_GLYPH[id]}</svg>
+         </span><span><strong>${escape(label)}</strong> ${escape(hint ?? "")}</span></li>`,
+    )
+    .join("");
+
+  const terrains = TERRAIN_LEGEND.map(
+    ([, label, color]) =>
+      `<li><i class="legend-swatch" style="background:${color}"></i>${escape(label)}</li>`,
+  ).join("");
+
+  panel.innerHTML = `
+    <h2>Lire la carte</h2>
+    <p class="legend-intro">
+      Les îles sont peintes à leur taille et à leur terrain. Ce qui n'est pas
+      une île porte un signe.
+    </p>
+    <ul class="legend-kinds">${kinds}</ul>
+    <h3>Terrains</h3>
+    <ul class="legend-terrains">${terrains}</ul>
+    <h3>Tailles</h3>
+    <p class="legend-sizes">
+      Huit rangs, du continent — Elbaf, Wano — au lieu-dit posé sur une île
+      plus grande.
+    </p>
+  `;
+
+  const close = () => {
+    panel.hidden = true;
+    toggle.setAttribute("aria-expanded", "false");
+  };
+  toggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    panel.hidden = !panel.hidden;
+    toggle.setAttribute("aria-expanded", String(!panel.hidden));
+  });
+  document.addEventListener("click", (event) => {
+    if (!panel.hidden && !event.target.closest(".legend, .legend-toggle")) close();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") close();
+  });
+}
+
+/* ── Lien partageable ─────────────────────────────────────────────────── */
+
+/** Ouvre l'île nommée dans l'adresse, au chargement comme au retour arrière. */
+function openFromHash({ fly = true } = {}) {
+  const id = decodeURIComponent(location.hash.replace(/^#/, ""));
+  if (!id) return false;
+  const island = state.islands.find((i) => i.id === id);
+  if (!island) return false;
+  state.hiddenSagas.delete(island.saga);
+  refreshFilters();
+  select(island, { fly, quiet: true });
+  return true;
 }
 
 /* ── Feuille glissante (mobile) ───────────────────────────────────────── */
@@ -1072,18 +1387,31 @@ async function start() {
     setupSearch();
     setupFilters();
     setupCine();
+    setupLegend();
     updateVoyage();
 
     $("record-close").addEventListener("click", () => select(null));
+    $("stopcard-close").addEventListener("click", () => select(null));
+    $("stopcard-open").addEventListener("click", () => {
+      if (state.selected) select(state.selected, { panel: true });
+    });
     $("voyage-prev").addEventListener("click", () => stepBy(-1));
     $("voyage-next").addEventListener("click", () => stepBy(1));
     setupSheetDrag();
     document.addEventListener("keydown", (event) => {
       if (event.target.matches("input")) return;
-      if (event.key === "Escape") select(null);
+      if (event.key === "Escape") {
+        if (cine.active) return $("cine-stop").click();
+        select(null);
+      }
       if (event.key === "ArrowLeft") stepBy(-1);
       if (event.key === "ArrowRight") stepBy(1);
     });
+
+    window.addEventListener("hashchange", () => {
+      if (!openFromHash()) select(null);
+    });
+    openFromHash({ fly: true });
 
     const loader = $("loader");
     loader.classList.add("done");

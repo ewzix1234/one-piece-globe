@@ -115,7 +115,9 @@ for (const place of PLACES) {
     .filter((s) => s.toLowerCase() !== place.fr.toLowerCase());
   // `ownNoteOnly` : la page du wiki est partagée avec un autre lieu, ou
   // ne parle pas vraiment de celui-ci. On ne garde alors que notre note.
-  const summary = place.ownNoteOnly ? null : (w?.summary ?? null);
+  // Un résumé peut être réécrit dans la curation quand celui de la source
+  // est tronqué ou bancal.
+  const summary = place.summary ?? (place.ownNoteOnly ? null : (w?.summary ?? null));
 
   islands.push({
     id: place.fr
@@ -149,7 +151,9 @@ for (const place of PLACES) {
     episode: w?.episode ?? null,
     ruler: w?.ruler ?? null,
     affiliation: w?.affiliation ?? null,
-    note: place.note ?? null,
+    // Quand l'escale a son récit, la note d'une ligne le redisait en plus
+    // court juste en dessous : on garde le récit et on laisse tomber l'écho.
+    note: CREW_STOPS[place.fr]?.deed ? null : (place.note ?? null),
     summary,
     image: images[place.wiki] ? `data/img/${images[place.wiki].file}` : null,
   });

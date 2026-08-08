@@ -40,6 +40,11 @@
       <span class="filters-title">Sagas</span>
     </nav>
 
+    <button class="legend-toggle" id="legend-toggle" type="button" aria-expanded="false">
+      <span aria-hidden="true">◈</span> Lire la carte
+    </button>
+    <aside class="legend" id="legend" hidden aria-label="Légende de la carte"></aside>
+
     <div class="voyage" id="voyage">
       <button class="cine-start" id="cine-start" type="button">
         <span class="cine-icon" aria-hidden="true">▶</span>
@@ -54,15 +59,35 @@
 
     <!-- Bandeau de la lecture cinématique, visible seulement pendant. -->
     <div class="cine-hud" id="cine-hud" hidden aria-live="polite">
-      <div class="cine-track"><i id="cine-progress"></i></div>
+      <div class="cine-track" id="cine-track" role="slider" tabindex="0"
+           aria-label="Avancer dans le voyage" aria-valuemin="1" aria-valuemax="40">
+        <i id="cine-progress"></i>
+      </div>
       <div class="cine-read">
         <strong id="cine-place">Village de Fuchsia</strong>
         <span id="cine-sub"></span>
+        <p id="cine-deed" hidden></p>
       </div>
       <div class="cine-actions">
         <button id="cine-speed" type="button" aria-label="Vitesse de lecture">×1</button>
+        <button id="cine-skip" type="button" aria-label="Escale suivante">⏭</button>
         <button id="cine-pause" type="button" aria-label="Mettre en pause">❚❚</button>
+        <button id="cine-replay" type="button" hidden aria-label="Rejouer le voyage">↻</button>
         <button id="cine-stop" type="button" aria-label="Arrêter la lecture">✕</button>
+      </div>
+    </div>
+
+    <!-- Navigation aux flèches : un bandeau qui laisse voir le globe, au
+         lieu de la fiche pleine qui le recouvrait. -->
+    <div class="stopcard" id="stopcard" hidden aria-live="polite">
+      <div class="stopcard-read">
+        <strong id="stopcard-name"></strong>
+        <span id="stopcard-meta"></span>
+        <p id="stopcard-deed" hidden></p>
+      </div>
+      <div class="stopcard-actions">
+        <button id="stopcard-open" type="button">Fiche complète</button>
+        <button id="stopcard-close" type="button" aria-label="Fermer">✕</button>
       </div>
     </div>
 

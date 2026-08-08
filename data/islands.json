@@ -135,7 +135,7 @@
    "episode": 4,
    "ruler": null,
    "affiliation": null,
-   "note": "Village natal de Luffy. Shanks lui confie son chapeau.",
+   "note": null,
    "summary": "Le village de Fuchsia (littéralement « village du Moulin à vent ») est un petit village portuaire situé sur l’île de Dawn et faisant partie du royaume de Goa. Il constitue le premier lieu de l’arc Romance Dawn et l’endroit où débute l’histoire de One Piece. D'après la carte de East Blue issue du Color Walk 1, le village est situé à proximité de la masse continentale supérieure proche de Redline au nord-est de East Blue.",
    "image": "data/img/village-de-fuchsia.webp"
   },
@@ -194,7 +194,7 @@
    "episode": 1,
    "ruler": null,
    "affiliation": "153e Branche",
-   "note": "Luffy y libère Zoro de la base de Morgan.",
+   "note": null,
    "summary": "Shells Town (シェルズタウン,Sheruzu Taun) est une ville située sur l'Île Yotsuba à East Blue.",
    "image": "data/img/shells-town.webp"
   },
@@ -223,7 +223,7 @@
    "episode": 4,
    "ruler": null,
    "affiliation": null,
-   "note": "Première confrontation avec Baggy.",
+   "note": null,
    "summary": "Orange Town est une localité située sur l'Archipel des Orgao dans East Blue.",
    "image": "data/img/orange-town.webp"
   },
@@ -258,7 +258,7 @@
    "episode": 8,
    "ruler": null,
    "affiliation": "Archipel des Gekko",
-   "note": "Village d'Usopp. L'équipage y reçoit le Vogue Merry.",
+   "note": null,
    "summary": "Sirop (シロップ村, Shiroppu-mura) est le village natal de Usopp et c'est une place très paisible. Il y a deux pistes de chaque côté de l'île qui sont les deux seuls moyens d'entrer et de sortir du village, dues au fait qu'il y est des falaises très hautes bordant le reste de l'île. C'est le lieu de l'Arc du Capitaine Kuro. Les lieux les plus connus de Sirop sont le Restaurant Meshi, le Manoir de Kaya et la maison d'Usopp. Il y a aussi une forêt. Le village se situe sur l'Archipel des Gekkô.",
    "image": "data/img/village-de-syrup.webp"
   },
@@ -287,7 +287,7 @@
    "episode": null,
    "ruler": null,
    "affiliation": null,
-   "note": "Restaurant flottant de Zeff. Sanji y travaille.",
+   "note": null,
    "summary": "Le Baratie (バラティエ, Baratie) est un restaurant de haute mer, fondé et dirigé par Zeff. Il est situé dans la région de Sambas (サンバス 海域 Sanbasu Kaiiki) d'East Blue.",
    "image": "data/img/baratie.webp"
   },
@@ -354,7 +354,7 @@
    "episode": 32,
    "ruler": null,
    "affiliation": "Arlong Park",
-   "note": "Village de Nami. Bellemère y est tuée par Arlong.",
+   "note": null,
    "summary": "Le Village de Kokoyashi est le village où Nami et sa soeur d'adoption, Nojiko, ont été élevées par Bell-mère. Le village est le lieu le plus proche d'Arlong Park et c'est ici qu'Arlong avait choisi d'exercer principalement sa tyrannie. Après la défaite d'Arlong et de son Équipage par Luffy et son Équipage, le village retrouva sa tranquillité et suit attentivement les aventures de L'Équipage. On le revoit découvrant la première prime de Nami.",
    "image": "data/img/village-de-cocoyashi.webp"
   },
@@ -388,7 +388,7 @@
    "episode": 47,
    "ruler": null,
    "affiliation": null,
-   "note": "Ville de naissance et d'exécution de Gol D. Roger.",
+   "note": null,
    "summary": "Logue Town (ローグタウン, Rōgutaun) est une ville située sur une des îles d'East Blue nommées les Îles Polestar (ポルスター諸島, Porusutā Shotō). La ville couvre presque toute l'île, hormis quelques collines. Logue Town est une ville majeure, car presque tous les navires, navires pirates compris, y font leurs provisions pour Grand Line (Logue Town se situant proche de Reverse Mountain, hors de la vue de Red Line).",
    "image": "data/img/loguetown.webp"
   },
@@ -417,7 +417,7 @@
    "episode": 61,
    "ruler": null,
    "affiliation": null,
-   "note": "Seule entrée navigable de Grand Line, au croisement de la Red Line.",
+   "note": null,
    "summary": "Reverse Mountain (リヴァース・マウンテン, Rivāsu Maunten) est une montagne se situant là où les quatre Mers East Blue, West Blue, North Blue et South Blue se rencontrent, et est l'une des deux entrées connues pour aller sur Grand Line, avec Calm Belt.",
    "image": "data/img/reverse-mountain.webp"
   },
@@ -450,7 +450,7 @@
    "episode": 62,
    "ruler": null,
    "affiliation": null,
-   "note": "Au pied de Reverse Mountain. Crocus y veille sur Laboon depuis cinquante ans.",
+   "note": null,
    "summary": "Le Cap des Jumeaux, aussi appelé Phare des Jumeaux est situé en bas de Reverse Mountain, à la sortie qui mène vers Grand Line. Il s'agit du point précis qui sépare Red Line et Grand Line. De cet endroit, il est possible de choisir une des sept destinations possibles de Grand Line en suivant les différentes directions du Log Pose.",
    "image": "data/img/cap-des-jumeaux.webp"
   },
@@ -480,7 +480,7 @@
    "episode": 64,
    "ruler": null,
    "affiliation": null,
-   "note": "Ville de chasseurs de primes au service de Baroque Works.",
+   "note": null,
    "summary": "Whiskey Peak (ウイスキーピーク, Uisukī Pīku) est la seule localité de l'île de Cactus Island. Elle était habitée par des chasseurs de primes travaillant pour Baroque Works, qui capturaient des individus recherchés se dirigeant vers l'île. Roronoa Zoro y a vaincu 100 chasseurs de primes.",
    "image": "data/img/whisky-peak.webp"
   },
@@ -513,7 +513,7 @@
    "episode": 67,
    "ruler": null,
    "affiliation": "Grand Line · Baroque Works",
-   "note": "Île préhistorique. Duel sans fin de Dorry et Brogy.",
+   "note": null,
    "summary": "Little Garden (リトルガーデン, Ritoru Gāden) est une île de Grand Line. En raison du climat, les dinosaures sont encore en vie là-bas. C'est la deuxième île a être visitée par les pirates du chapeau de paille sur la route de tous les périls. C'est là-bas que vivaient les géants Dorry et Brogy.",
    "image": "data/img/little-garden.webp"
   },
@@ -551,7 +551,7 @@
    "episode": 51,
    "ruler": null,
    "affiliation": null,
-   "note": "Île de Chopper et du docteur Kureha.",
+   "note": null,
    "summary": "Le Royaume des Cerisiers (aussi appelé Royaume de Sakura), anciennement Royaume de Drum, est situé sur l'Île de Drum. Son souverain actuel est Dalton. C'est de ce Royaume que vient le docteur de l'Équipage du Chapeau de Paille, Tony Tony Chopper. Lors de la première apparition du Royaume dans l'animé et le manga, ce royaume n'a pas encore été créé, il s'agit alors du Royaume de Drum, dont le roi était Wapol.",
    "image": "data/img/drum-royaume-de-sakura.webp"
   },
@@ -589,8 +589,8 @@
    "episode": 78,
    "ruler": null,
    "affiliation": null,
-   "note": "Royaume de Vivi, déstabilisé par Crocodile.",
-   "summary": "est un royaume du désert situé sur, sur Grand Line, dont la capitale est la ville d'Alubarna. Selon Nico Robin, ce Royaume existait déjà bien avant l'arrivée du Siècle Oublié. Il fait partie des 20 royaumes qui ont fondé le Gouvernement Mondial il y a 800 ans, ayant à sa tête la Famille Nefertari. Cependant, la famille avait refusé de vivre avec les 19 autres familles à Marie-Joie, et est restée à Alabasta.",
+   "note": null,
+   "summary": "Alabasta est un royaume désertique de Grand Line, dont la capitale est Alubarna. Gouverné par la famille Nefertari depuis des siècles, il compte parmi les vingt royaumes fondateurs du Gouvernement Mondial — et la seule de ces familles à avoir refusé de monter à Marie-Joie. Une sécheresse de trois ans, provoquée par la Dance Powder de Crocodile, y a jeté le pays dans la guerre civile.",
    "image": "data/img/alabasta.webp"
   },
   {
@@ -650,7 +650,7 @@
    "episode": 146,
    "ruler": null,
    "affiliation": null,
-   "note": "Bellamy y humilie Montblanc Cricket.",
+   "note": null,
    "summary": "Mock Town (モックタウン, Mokku Taun) est une ville de Jaya. Cette ville est habitée par de nombreux Pirates. C'est à cet endroit que L'Équipage du New Age vivait, c'est là qu'a eu lieu l’affrontement entre Bellamy et Luffy et c'est également à cet endroit qu'est décédé Roshio.",
    "image": "data/img/mock-town.webp"
   },
@@ -686,7 +686,7 @@
    "episode": 154,
    "ruler": null,
    "affiliation": null,
-   "note": "Île céleste. Ener s'y proclame dieu.",
+   "note": null,
    "summary": "Skypiea (スカイピア, Sukaipia) est une île céleste située au dessus de Grand Line (à 10 000 mètres d'altitude). C'est le lieu principal où se déroule l'Arc Skypiea. Après l'ellipse des deux ans, il y a une grande statue d'Usopp à l'entrée. C'est la première île céleste à être mentionnée dans le manga.",
    "image": "data/img/skypiea.webp"
   },
@@ -716,7 +716,7 @@
    "episode": 207,
    "ruler": null,
    "affiliation": null,
-   "note": "Davy Back Fight contre Foxy. Aokiji y apparaît.",
+   "note": null,
    "summary": "Long Ring Long Land est une chaîne de dix îles en forme de bague, avec un chemin entre les îles qui remonte à la surface une fois par an. Les animaux qui vivent ici sont uniques, ils sont tous plus grand et/ou plus long que la normale. C'est aussi l'emplacement de l'Arc Davy Back Fight.",
    "image": "data/img/long-ring-long-land.webp"
   },
@@ -753,7 +753,7 @@
    "episode": 229,
    "ruler": null,
    "affiliation": null,
-   "note": "Cité des charpentiers navals. Franky y rejoint l'équipage.",
+   "note": null,
    "summary": "Water Seven (ウォーターセブン, Wōtā Sebun), surnommée la Cité sur l'Eau (水の都, Mizu no Miyako) est une ville connue pour ses charpentiers marins aux talents exceptionnels pour la construction de navire en tout genre. L'équipage de Chapeau de paille s'est arrêté ici après son escale à Skypiea pour changer l'or récupéré contre des Berrys, ainsi que pour la réparation du Vogue Merry et pour aussi se réapprovisionner. C'est la 6e île de Grand Line rencontrée par l'équipage. Water Seven a sept \"Docks\", c'est à dire sept quais possédant les charpentiers les plus expérimentés. Cette ville est connue aussi pour avoir abrité Tom, le charpentier du bateau du légendaire Gol D. Roger, l'Oro Jackson. Un jour, un élève de Tom, nommé Icebarg réunit tous les Docks en une seule société, Galley-La Company. Depuis, les Dock ont travaillé indépendamment. Certains membres du CP9 ont infiltré Galley-La Company afin de s'emparer de l'arme antique Pluton. Icebarg, tout en étant le chef de la Galley-La Company est également le maire bien-aimé de Water Seven.",
    "image": "data/img/water-seven.webp"
   },
@@ -786,7 +786,7 @@
    "episode": 263,
    "ruler": null,
    "affiliation": null,
-   "note": "Île judiciaire. L'équipage déclare la guerre au Gouvernement Mondial.",
+   "note": null,
    "summary": "Enies Lobby également appelée \"L'Île Judiciaire\" (司法の島, Shihō no Shima); est une île appartenant au Gouvernement mondial où les pirates de plus haut rang sont amenés afin d'y être jugés. Elle est entourée d'eau pour l'isoler complètement de toute tentative d'intrusion et n'est accessible que par le train des mers. L'île est réputée imprenable d'une part à cause de son isolement, d'autre part parce qu'elle est le QG du CP9, corps de soldats d'élite. Enies Lobby demeura inviolée durant 800 ans jusqu'à l'arrivée de l'équipage de Chapeau de paille, des contre-maîtres de la Galley-La Company, et de la Franky Family qui semèrent le trouble sur l'île, couronné par un Buster Call qui détruisit l'île, enclenché par erreur de Spandam.",
    "image": "data/img/enies-lobby.webp"
   },
@@ -816,7 +816,7 @@
    "episode": null,
    "ruler": null,
    "affiliation": null,
-   "note": "Navire-île de Gecko Moria. Brook y récupère son ombre.",
+   "note": null,
    "summary": "Thriller Bark (スリラーバーク, Surirā Bāku) est un bateau ressemblant à une île, situé dans le Triangle de Florian. Tel que révélé par Brook, ce bateau naviguait autrefois dans West Blue. C'est le plus grand navire pirate au monde, appartenant au Grand Corsaire Gecko Moria. Il fut endommagé par les attaques de Moria et de Kuma lors de leurs combats contre l'Équipage du Chapeau de Paille et, après la défaite de Moria, il fut laissé à l'abandon. C'est là que l'équipage du Chapeau de Paille a vaincu Moria qui avait l'ombre de Luffy. Après l'ellipse, Thriller Bark est de nouveau en activité et se trouve dans le Nouveau Monde, on le retrouve accosté sur l'Île des Pirates lors de l'Arc Pays des Wa.",
    "image": "data/img/thriller-bark.webp"
   },
@@ -852,7 +852,7 @@
    "episode": 390,
    "ruler": null,
    "affiliation": null,
-   "note": "Dernière escale avant l'Île des Hommes-Poissons. Kuma y disperse l'équipage.",
+   "note": null,
    "summary": "L'archipel des Sabaody est une zone proche de Red Line sur la première moitié de Grand Line. Bien que le lieu soit appelé archipel, c'est en fait un réseau de mangroves formant une forêt massive au milieu de l'océan. Chaque mangrove prend racine au fond de l'océan et chaque arbre de la forêt forme un \"îlot\". Cet îlot se forme sur les racines de la mangrove ce qui permet aux personnes d'y vivre. Les îlots sont reliés entre eux ce qui va ainsi former \"l'archipel\" de mangroves. Comme ce n'est qu'une simple forêt au milieu de l'océan et non une île, par rapport à celles que l'on trouve sur Grand Line, elle n'a aucune attraction magnétique pour affecter le Log Pose. En raison de sa proximité avec Red Line, l'archipel permet la transition entre la première moitié de Grand Line et le Nouveau Monde. Il y a une aire de repos très visitée pour toutes sortes de voyageurs souhaitant se préparer avant d'entrer dans le Nouveau Monde. En plus de son environnement unique et du fait qu'il soit un centre d'affaire en plein essor, il est à noter qu'il y a un commerce d'esclaves très apprécié par les nobles mondiaux qui visitent l'île. De nombreux Chasseurs de Primes et de pirates sont ainsi présents sur l'archipel pour le commerce d'esclaves. Un groupe de chasseur d'esclaves, les Exocet Riders (nouvellement appelés les Rosy Life Riders), ont leur siège à environ plusieurs kilomètres de l'archipel.",
    "image": "data/img/archipel-sabaody.webp"
   },
@@ -885,7 +885,7 @@
    "episode": 408,
    "ruler": null,
    "affiliation": "Kuja",
-   "note": "Royaume des Kuja, gouverné par Boa Hancock.",
+   "note": null,
    "summary": "Amazon Lily (アマゾン・リリー, Amazon Rirī), aussi nommée l'île des femmes (女ヶ島, Nyōga shima), est une île habitée par la tribu Kuja. Elle est actuellement gouvernée par l'Impératrice Boa Hancock.",
    "image": "data/img/amazon-lily.webp"
   },
@@ -918,7 +918,7 @@
    "episode": 422,
    "ruler": null,
    "affiliation": "Gouvernement Mondial",
-   "note": "Prison sous-marine à six niveaux.",
+   "note": null,
    "summary": "Impel Down, aussi connue comme La Prison Sous-marine (海底監獄, Kaitē Kangoku) ou encore La Grande Prison (大監獄, Dai Kangoku), est la prison la plus sécurisée du Gouvernement Mondial retenant prisonniers les criminels et les pirates les plus dangereux du monde. Elle est constituée officiellement de 5 niveaux (7 en réalité) et est située au milieu de la Calm Belt. La prison est dirigée actuellement par Hannyabal, en remplacement de Magellan.",
    "image": "data/img/impel-down.webp"
   },
@@ -954,7 +954,7 @@
    "episode": 45,
    "ruler": null,
    "affiliation": null,
-   "note": "Ace y meurt. Barbe Blanche y tombe.",
+   "note": null,
    "summary": "Marine Ford est l'ancien Quartier Général de la Marine ainsi que la ville des soldats qui y travaillent comme les Amiraux ou les Vice-Amiraux, ainsi que l'Amiral Commandant en Chef Sengoku. La ville autour de Marine Ford était autrefois habitée par la famille des soldats et autres marines qui y travaillaient. Elle est située à la fin de la première moitié de Grand Line, très proche de Red Line, de Mary Geoise et de l'archipel sabaody. Le seul moyen sûr d'accéder au QG de la Marine est de passer par les Portes de la Justice.",
    "image": "data/img/nouveau-marine-ford.webp"
   },
@@ -986,7 +986,7 @@
    "episode": 516,
    "ruler": null,
    "affiliation": null,
-   "note": "Île déserte de la Calm Belt. Luffy s'y entraîne deux ans avec Rayleigh.",
+   "note": null,
    "summary": "L'île de Ruskaina se trouve sur Calm Belt au Nord-Ouest d'Amazon Lily. Autrefois, cet endroit abritait le royaume aujourd’hui déchu d’Ottankaina (オッタンカイナ王国, Ottankaina Ōkoku).",
    "image": "data/img/rusukaina.webp"
   },
@@ -1023,7 +1023,7 @@
    "episode": 526,
    "ruler": null,
    "affiliation": "Royaume Ryugu · Équipage de Chapeau de paille · Équipage de Big Mom (anciennement) · Équipage de Barbe Blanche (anciennement)",
-   "note": "Dix mille mètres sous la surface, sous la Red Line.",
+   "note": null,
    "summary": "L'île des hommes-poissons est la terre natale des Sirènes et des hommes-poissons. Contrairement à d'autres îles, il s'agit là d'une île sous-marine qui se situe à 10 000 mètres de profondeur en-dessous de Red Line. Cette île est pour tous ceux qui ne veulent (ou qui ne peuvent) pas passer par la terre sacrée de Mary Geoise, l'unique moyen de se rendre dans le Nouveau Monde et ce malgré les nombreux risques encourus. Bien qu'elle soit littéralement, -et directement, -située sous le siège du pouvoir du Gouvernement Mondial, l'île fut contrôlée par Barbe Blanche jusqu'à sa mort lors de la bataille de Marine Ford. Après quoi, l'île tomba entre les mains de Big Mom, mais, jugeant cette dernière beaucoup trop dangereuse, Monkey D. Luffy lui déclare la guerre afin de la lui reprendre. Suite aux évènements de l'Arc Whole Cake Island, l'île passa sous la protection de l'équipage de Chapeau de paille.",
    "image": "data/img/ile-des-hommes-poissons.webp"
   },
@@ -1052,7 +1052,7 @@
    "episode": null,
    "ruler": null,
    "affiliation": null,
-   "note": "Palais de Neptune et de la princesse Shirahoshi.",
+   "note": null,
    "summary": "Le Ryugu, également appelé la « gondole royale », est le bateau du royaume de Ryugu.",
    "image": "data/img/royaume-de-ryugu.webp"
   },
@@ -1086,7 +1086,7 @@
    "episode": 579,
    "ruler": null,
    "affiliation": null,
-   "note": "Île coupée en deux, feu et glace. Alliance avec Law.",
+   "note": null,
    "summary": "Punk Hazard (パンクハザード島, Panku Hazādo-tō) est une île située dans le Nouveau Monde, c'est la première île que l'équipage de Chapeau de paille visite après être arrivé dans le Nouveau Monde. Selon Trafalgar Law, le Log Pose ne pointe jamais sur cette île et ne peut pas s'y recharger non plus. C'est ici que pendant 10 jours, les amiraux Aokiji et Akainu se sont affrontés pour le poste d'Amiral Commandant en chef. L'île est relativement proche de Dressrosa.",
    "image": "data/img/punk-hazard.webp"
   },
@@ -1121,7 +1121,7 @@
    "episode": 608,
    "ruler": "Doflamingo (anciennement) · Riku Doldo III",
    "affiliation": "L'Équipage de Don Quichotte Doflamingo (anciennement) · Gouvernement Mondial",
-   "note": "Royaume des jouets, sous la coupe de Doflamingo.",
+   "note": null,
    "summary": "Dressrosa, décrit comme \"Le Pays de L'Amour, de La Passion et des Jouets\" est un royaume situé dans le Nouveau Monde. Il a été mentionné pour la première fois par Vergo. L'île constitue le principal lieu de l'Arc Dressrosa.",
    "image": "data/img/dressrosa.webp"
   },
@@ -1153,7 +1153,7 @@
    "episode": 639,
    "ruler": null,
    "affiliation": null,
-   "note": "Île des Tontatta, reliée à Dressrosa par un pont de fer.",
+   "note": null,
    "summary": "Green Bit (グリーンビット, Gurīn Bitto) est une île isolée qui se trouve dans le Nouveau Monde, au nord de Dressrosa. Le nom de cette île a été mentionné pour la première fois par Law à Smoker, après les événements de Punk Hazard. Sous cette île sont construits des souterrains où se trouve le royaume de Tontatta, peuplé uniquement par des nains.",
    "image": "data/img/green-bit.webp"
   },
@@ -1187,7 +1187,7 @@
    "episode": 739,
    "ruler": null,
    "affiliation": null,
-   "note": "Île portée sur le dos d'un éléphant millénaire.",
+   "note": null,
    "summary": "Zou (ゾウ, Zō) est une \"île\" du Nouveau Monde. C'est également la troisième \"île\" visitée par les Chapeaux de Paille dans le Nouveau Monde ainsi que le lieu principal de l'Arc Zou. Il s'agit d'un éléphant géant répondant au nom de Zunesh L'île a été mentionnée pour la première fois par Trafalgar Law au cours du Chapitre 700. Elle apparaît pour la première fois au Chapitre 802 où l'on apprend qu'elle se situe sur le dos d'un éléphant gigantesque, Zunesh. Comme le dit Law, c'est une île en constant déplacement, dépendante de la direction que prend Zunesh.",
    "image": "data/img/zou.webp"
   },
@@ -1221,7 +1221,7 @@
    "episode": 571,
    "ruler": null,
    "affiliation": "L'Équipage de Big Mom",
-   "note": "Territoire de Big Mom. Mariage manqué de Sanji.",
+   "note": null,
    "summary": "Whole Cake Island est une île localisée dans le Nouveau Monde qui est sous le contrôle de Big Mom, l'un des Quatre Empereurs, et semble être la base des opérations de son équipage. C'est également le centre nerveux de l'Archipel Totto Land.",
    "image": "data/img/whole-cake-island.webp"
   },
@@ -1289,7 +1289,7 @@
    "episode": 736,
    "ruler": null,
    "affiliation": "Famille Kozuki · Équipage de Chapeau de paille · Équipage des cent bêtes (anciennement) · Famille Kurozumi (anciennement)",
-   "note": "Pays fermé, sous la domination de Kaido et Orochi.",
+   "note": null,
    "summary": "Le pays des Wa (ワノ国, Wano Kuni), ou Wano, aussi appelé anciennement \"Pays de l'Or\" est un pays peuplé essentiellement de samouraïs et de ninjas, non affilié au Gouvernement Mondial. Il a été mentionné pour la première fois par Hogback, mais n'est apparu que bien plus tard, lors de l'Arc du même nom. L’île est située dans le Nouveau Monde. Autrefois dirigé pendent plusieurs siècles par la Famille Kozuki, le pays est actuellement occupé par l'équipage des cent bêtes de l'Empereur Kaidou, allié au Shogun de l'île, Kurozumi Orochi, et subit d'ailleurs une grande répression depuis plus de 20 ans.",
    "image": "data/img/pays-des-wa.webp"
   },
@@ -1322,7 +1322,7 @@
    "episode": 736,
    "ruler": null,
    "affiliation": "L'Équipage aux Cent Bêtes",
-   "note": "Repaire de l'Équipage aux Cent Bêtes.",
+   "note": null,
    "summary": "Onigashima (鬼ヶ島, Onigashima) est une île du Pays des Wa, située dans le Nouveau Monde. Il s'agit à la fois de la résidence de l'Empereur Kaidou et du QG de L'Équipage aux Cent Bêtes. L'équipage l'a nommée ainsi après l'avoir colonisé il y a moins de 25 ans. Dans le cadre du Plan pour une Nouvelle Onigashima, l'île a été déplacée de son emplacement en mer par Kaidou, qui prévoit de la déplacer vers la Capitale des fleurs.",
    "image": "data/img/onigashima.webp"
   },
@@ -1357,7 +1357,7 @@
    "episode": 1090,
    "ruler": null,
    "affiliation": "Marine",
-   "note": "Île du futur, laboratoire de Vegapunk.",
+   "note": null,
    "summary": "LÎle d'Egg Head est une île située dans le Nouveau Monde liée à la Marine. On dit de cette île qu'elle a 500 ans d'avance comparés aux autres. Elle y abrite le laboratoire de Vegapunk. C'est le lieu principal de l'Arc Egg Head et où se déroule l'incident d'Egg Head. C'est ici que le SSG mène ses recherches.",
    "image": "data/img/egghead.webp"
   },
@@ -1394,7 +1394,7 @@
    "episode": 836,
    "ruler": null,
    "affiliation": "L'Équipage des Géants",
-   "note": "Terre des géants, patrie de Dorry et Brogy. Le Royaume de Warland s'y trouve.",
+   "note": null,
    "summary": "Erbaf, romanisé ELBAPH dans la version japonaise, est une île peuplée seulement d'êtres vivants géants dont les plus notables sont les Géants. Officiellement, l'Île d'Erbaf (エルバフ島, Erubafu-tō) est l'endroit où se trouve le Royaume de Warland (ウォーランド王国, Wōrando Ōkoku), mais il est d'usage d'utiliser le terme général d'Erbaf pour désigner l'un ou l'autre. Elle est aussi connue pour ses nombreux géants devenus pirates. Cette île est principalement composée d'un arbre géant, plus grand que la base de l'île, qui se trouve être l'arbre d'Adam dont une grande partie des civilisations de l'ile vivent sur ses branches. Cette île possède un prince, Loki, actuellement enchainé à l'Arbre d'Adam. L'Empereur pirate Shanks Le Roux a des affinités avec les géants de cette île.",
    "image": "data/img/elbaf.webp"
   },
@@ -1430,7 +1430,7 @@
    "episode": 63,
    "ruler": null,
    "affiliation": null,
-   "note": "Île finale de Grand Line, au-delà de Lodestar. Roger y trouve le One Piece.",
+   "note": null,
    "summary": "Laugh Tale (ラフテル, Rafuteru), ou Raftel dans les débuts de l'anime, est l'île située géographiquement à la fin de Grand Line qui abriterait le fameux One Piece. Les seules personnes connues à avoir atteint Laugh Tale sont Joy Boy et les membres de l'Équipage des Pirates Roger, qui l'ont nommé ainsi (\"l'histoire de ceux qui rient\") parce qu'ils ont tous ri en découvrant cette île et le trésor de Joy Boy. Il y a quatre ponéglyphes connus portant le nom de \"Road Ponéglyphes\" qui, lorsqu'ils sont assemblés, conduisent à quatre îles, formant une fois alignés l'emplacement de Laugh Tale. L'un d'eux est situé sur Zou, un autre est à un endroit pour l'heure inconnu; les deux derniers sont respectivement possédés par les empereurs Kaido et Big Mom.",
    "image": "data/img/laugh-tale.webp"
   },
@@ -1459,7 +1459,7 @@
    "episode": null,
    "ruler": null,
    "affiliation": null,
-   "note": "Quatre îles vivantes et carnivores. Usopp y grossit avant d'y devenir fort.",
+   "note": null,
    "summary": "L'Archipel de Boing (ボーイン列島, Bōin Rettō) est constituée de quatre 'îles vivantes en forme de fleurs. Ces véritables îles vivantes sont gigantesques. Le nom scientifique de cette plante est \"La plante carnivore: l'estomac du baron\". Usopp a été envoyé sur une de ces îles par Bartholomew Kuma lors des événements qui ont eu lieu à l'Archipel Sabaody, et a passé deux ans sur l'île de perfectionner ses compétences en terme de combat.",
    "image": "data/img/archipel-boin.webp"
   },
@@ -1491,7 +1491,7 @@
    "episode": 324,
    "ruler": null,
    "affiliation": "Révolutionnaires",
-   "note": "Ancien quartier général de l'Armée Révolutionnaire de Dragon.",
+   "note": null,
    "summary": "Baltigo (バルティゴ, Barutigo), aussi surnommée \"La Terre Blanche\" ou \"Le Pays des Mystères\", est une île située sur Grand Line. Elle abritait depuis des décennies le premier QG des Révolutionnaires. Alors que son localisation était inconnue de tous, l'île et par extension le QG, ont finalement été découverts par Jesus Burgess et mis en ruine durant une confrontation entre l'Armée Révolutionnaire et l'Équipage de Barbe Noire.",
    "image": "data/img/baltigo.webp"
   },
@@ -1618,7 +1618,7 @@
    "episode": 753,
    "ruler": null,
    "affiliation": null,
-   "note": "Cité des Minks, sur le dos de Zunisha.",
+   "note": null,
    "summary": "La Principauté de Mokomo est le nom du pays des minks sur Zo dans le Nouveau Monde. Elle était dirigée par le \"Roi de l'Aurore\" Caborage et le \"Roi du Crépuscule\" Chavipère., avant que ceux-ci ne laissent leur place à [Carrot]].",
    "image": "data/img/duche-de-mokomo.webp"
   },
@@ -1853,7 +1853,7 @@
    "episode": 419,
    "ruler": null,
    "affiliation": "Révolutionnaires",
-   "note": "Royaume de Kamabakka, fief d'Emporio Ivankov. Sanji y apprend le Poing du Diable.",
+   "note": null,
    "summary": "Kedétrav (モモイロ島, Momoiro Airando), Rose Island ou encore \"l'enfer de Sanji\", est une île sur Grand Line. Après la destruction de Baltigo, Kedétrav est devenue le nouveau QG de l'armée Révolutionnaire.",
    "image": "data/img/ile-momoiro.webp"
   },
@@ -1956,7 +1956,7 @@
    "episode": 418,
    "ruler": null,
    "affiliation": null,
-   "note": "Île natale de Franky et de Vegapunk.",
+   "note": null,
    "summary": "L'île de Karakuri (からくり島, Karakuri-jima) est une île hivernale se situant quelque part sur Grand Line sur lequel perdure, entre autres, le pays futuriste de Baldimore (未来国バルジモア, Mirai-koku Barujimoa). Le pays est spécialisé dans la technologie de pointe, comme les cyborgs et des structures mécaniques. En tant que tel, il est considéré comme le \"pays du futur\" et le lieu de naissance du génie, Vegapunk. Bartholomew Kuma a envoyé Franky sur cette île; ce dernier ayant passé deux années à étudier la technologie de Vegapunk. C'est également sur cette île qu'ont été conçus les Spaceys par le Dr. Tsukumi.",
    "image": "data/img/karakuri.webp"
   },
@@ -1994,7 +1994,7 @@
    "episode": 421,
    "ruler": null,
    "affiliation": "Demeure de Mihawk",
-   "note": "Zoro s'y entraîne sous Mihawk. Perona y réside.",
+   "note": null,
    "summary": "L'Île Obscuria (クライガナ島, Kuraigana-tō) est une île de Grand Line. Elle était le territoire du Royaume de Seglock avant la guerre qui l'a entièrement décimé. Elle est la résidence du Capitaine Corsaire Dracule Mihawk, ainsi que le lieu où Roronoa Zoro et Perona ont séjourné pendant l'ellipse.",
    "image": "data/img/kuraigana.webp"
   },
@@ -2123,7 +2123,7 @@
    "episode": 421,
    "ruler": null,
    "affiliation": null,
-   "note": "Brook y est retenu comme attraction de cirque.",
+   "note": null,
    "summary": "L'Île de Namakura (ナマクラ島, Namakura-tō) est une île située dans la première moitié de Grand Line. C'est sur cette île que réside une région très pauvre, Harahettania (ハラヘッターニャ, Harahettānya).",
    "image": "data/img/namakura.webp"
   },
@@ -2312,7 +2312,7 @@
    "episode": 496,
    "ruler": null,
    "affiliation": null,
-   "note": "Enfance de Luffy, Ace et Sabo. Le Gray Terminal y est incendié.",
+   "note": null,
    "summary": "Goa est la capitale du Royaume de Goa situé sur l'île de Dawn. La ville contrôle l'ensemble de l'île. Sa première apparition est dans un flashback.",
    "image": "data/img/royaume-de-goa.webp"
   },
@@ -2533,7 +2533,7 @@
    "episode": 419,
    "ruler": null,
    "affiliation": null,
-   "note": "Chopper y perfectionne sa médecine.",
+   "note": null,
    "summary": "Le Royaume Dézoizo est une île de South Blue que certains appellent l'Île aux trésors. C'est une île relativement petite avec un arbre énorme au milieu. Tony Tony Chopper a été envoyé ici par Bartholomew Kuma lors des événements de l'Arc Archipel Sabaody. Il y a passé deux ans, dans le but de se perfectionner dans la pratique de la médecine.",
    "image": "data/img/royaume-de-torino.webp"
   },
@@ -2683,7 +2683,7 @@
    "episode": 571,
    "ruler": null,
    "affiliation": "Équipage de Big Mom",
-   "note": "Archipel de trente-quatre îles gouverné par Big Mom.",
+   "note": null,
    "summary": "Totto Land (トットランド, Totto Rando; litt. \"Myriade de Pays\") est un archipel situé dans le Nouveau Monde. Il s'agit du territoire principal de l'un des Empereurs, Big Mom, et de son équipage, qui s'étend autour de Whole Cake Island. Il est navigable avec un Log Pose du Nouveau Monde. Selon Pekoms, l'archipel est considéré comme une grande nation puissante, et sa reine Big Mom souhaite qu'elle devienne une utopie unifiant toutes les races du monde.",
    "image": "data/img/totto-land.webp"
   },
@@ -2747,7 +2747,7 @@
    "episode": 2,
    "ruler": null,
    "affiliation": null,
-   "note": "Village natal de Zoro. Kuina y meurt.",
+   "note": null,
    "summary": "Le Village de Shimotsuki (シモツキ村, Shimotsuki Mura) est un village d'East Blue où se situe le dojo dans lequel Zoro Roronoa et Shimotsuki Kuina ont été formés. Le village a été fondé par Shimotsuki Kozaburo, il y a 55 ans.",
    "image": "data/img/village-de-shimotsuki.webp"
   },
@@ -2808,7 +2808,7 @@
    "episode": 418,
    "ruler": null,
    "affiliation": null,
-   "note": "Île du ciel où Nami étudie la météo.",
+   "note": null,
    "summary": "Weatheria (ウェザリア, Wezaria) est un îlot Céleste artificiel spécialisé dans l'étude des climats et de l'atmosphère mais aussi sur la géographie du monde. C'est sur cette île que Nami fut expédiée par Bartholomew Kuma durant l'incident des Sabaody. Cet îlot se déplace à travers le monde entier et récolte beaucoup d'informations sur la météorologie. Les habitants de Weatheria sont tous très vieux et sont des experts dans la matière de la météo. Ils ont même inventé un système de bulle pouvant contenir des nuages de pluie, de foudre... Ce sont les weatherballs.",
    "image": "data/img/weatheria.webp"
   }

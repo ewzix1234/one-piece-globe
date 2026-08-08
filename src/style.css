@@ -326,6 +326,147 @@ body.panel-open .filters {
   font-variant-numeric: tabular-nums;
 }
 
+/* --- Légende de la carte -------------------------------------------------- */
+
+/* Le coin bas-gauche, libéré par les boutons de zoom : c'est là qu'une
+   carte marine range sa légende. */
+.legend-toggle {
+  position: fixed;
+  left: var(--edge);
+  bottom: var(--edge);
+  z-index: 33;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  padding: 0 0.85rem;
+  font-family: var(--data);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--foam-dim);
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  transition: color 0.18s var(--ease), border-color 0.18s var(--ease);
+}
+
+.legend-toggle:hover,
+.legend-toggle[aria-expanded="true"] {
+  color: var(--foam);
+  border-color: var(--straw);
+}
+
+.legend {
+  position: fixed;
+  left: var(--edge);
+  bottom: calc(var(--edge) + 3.4rem);
+  z-index: 33;
+  width: min(21rem, calc(100vw - 2 * var(--edge)));
+  max-height: min(62vh, 34rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.1rem 1.2rem 1.3rem;
+  font-family: var(--data);
+  color: var(--foam);
+  background: color-mix(in srgb, var(--abyss) 93%, transparent);
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+}
+
+.legend[hidden] {
+  display: none;
+}
+
+.legend h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--straw);
+}
+
+.legend h3 {
+  margin: 1.1rem 0 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--foam-dim);
+}
+
+.legend-intro,
+.legend-sizes {
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--foam-dim);
+}
+
+.legend ul {
+  list-style: none;
+  margin: 0.7rem 0 0;
+  padding: 0;
+}
+
+.legend-kinds li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.79rem;
+  line-height: 1.4;
+  color: var(--foam-dim);
+}
+
+.legend-kinds strong {
+  display: block;
+  font-weight: 500;
+  color: var(--foam);
+}
+
+.legend-glyph {
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.05rem;
+}
+
+.legend-glyph svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  display: block;
+}
+
+.legend-terrains {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem 0.6rem;
+}
+
+.legend-terrains li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  color: var(--foam-dim);
+}
+
+.legend-swatch {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+}
+
 /* --- Pictogrammes de nature, posés sur la sphère -------------------------- */
 
 /* Une pastille dit où ; elle ne dit pas quoi. Ces marqueurs distinguent
@@ -480,20 +621,32 @@ body.panel-open .filters {
   display: none;
 }
 
+/* Réglette : on clique dedans pour sauter à une escale, elle est donc
+   assez haute pour être visée au doigt. */
 .cine-track {
-  height: 2px;
-  border-radius: 2px;
-  background: rgba(216, 231, 234, 0.18);
-  overflow: hidden;
+  height: 0.9rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: linear-gradient(
+    to bottom,
+    transparent calc(50% - 1px),
+    rgba(216, 231, 234, 0.18) calc(50% - 1px),
+    rgba(216, 231, 234, 0.18) calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
 }
 
 .cine-track i {
   display: block;
-  height: 100%;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
   background: linear-gradient(to right, var(--vermilion), var(--straw));
   transform-origin: left center;
   transform: scaleX(0);
   transition: transform 0.25s linear;
+  pointer-events: none;
 }
 
 .cine-read {
@@ -520,6 +673,25 @@ body.panel-open .filters {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Le récit de l'escale : deux lignes au plus, sinon le bandeau mange la
+   carte qu'il commente. */
+#cine-deed {
+  margin: 0.4rem 0 0;
+  font-family: var(--prose);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--foam);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#cine-deed[hidden] {
+  display: none;
 }
 
 .cine-actions {
@@ -590,11 +762,112 @@ body.panel-open .filters {
    commande, et deux jeux de contrôles se disputeraient le bas de l'écran. */
 body.cine-on .voyage,
 body.cine-on .filters,
-body.cine-on .masthead {
+body.cine-on .masthead,
+body.cine-on .legend-toggle,
+body.cine-on .legend {
   opacity: 0;
   pointer-events: none;
 }
 
+/* Cliquer une île pendant la lecture emmènerait la caméra ailleurs que le
+   navire : les pictogrammes deviennent inertes le temps du voyage. */
+body.cine-on .badge {
+  pointer-events: none;
+}
+
+
+/* --- Bandeau d'escale : la fiche courte qui ne cache pas le globe --------- */
+
+.stopcard {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--edge) + 3.9rem);
+  transform: translateX(-50%);
+  z-index: 32;
+  width: min(32rem, calc(100vw - 2 * var(--edge)));
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.85rem 0.95rem;
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  border-left: 3px solid var(--straw);
+  border-radius: var(--radius);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+}
+
+.stopcard[hidden] {
+  display: none;
+}
+
+.stopcard-read {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--data);
+}
+
+.stopcard-read strong {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--foam);
+}
+
+.stopcard-read span {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.74rem;
+  color: var(--foam-dim);
+}
+
+#stopcard-deed {
+  margin: 0.45rem 0 0;
+  font-family: var(--prose);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--foam);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#stopcard-deed[hidden] {
+  display: none;
+}
+
+.stopcard-actions {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.stopcard-actions button {
+  min-height: 2.2rem;
+  padding: 0 0.7rem;
+  font-family: var(--data);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: var(--foam-dim);
+  border: 1px solid var(--glass-line);
+  border-radius: calc(var(--radius) - 3px);
+  transition: color 0.18s var(--ease), border-color 0.18s var(--ease);
+}
+
+.stopcard-actions button:hover {
+  color: var(--straw);
+  border-color: var(--straw);
+}
+
+/* Pendant la lecture cinématique, c'est le bandeau du lecteur qui parle. */
+body.cine-on .stopcard {
+  display: none;
+}
 
 /* --- Fiche : la matière papier -------------------------------------------- */
 
@@ -760,6 +1033,28 @@ body.panel-open .record {
   line-height: 1.62;
 }
 
+.record-summary p {
+  margin: 0 0 0.8rem;
+}
+
+.record-summary p[hidden] {
+  display: none;
+}
+
+.record-unfold {
+  padding: 0;
+  font-family: var(--data);
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid currentColor;
+}
+
+.record-unfold:hover {
+  color: var(--ink);
+}
+
 /* Ce que l'équipage a fait sur place : le cœur de la fiche, mis en avant
    comme un encadré et non noyé dans la prose. */
 .record-deed {
@@ -918,9 +1213,33 @@ body.panel-open .voyage {
     margin-left: auto;
   }
 
-  .cine-hud {
+  .cine-hud,
+  .stopcard {
     bottom: calc(var(--bottom-inset) + 3.5rem);
     width: calc(100vw - 2 * var(--edge));
+  }
+
+  /* La rangée des sagas passerait sous le bandeau : elle s'efface. */
+  body.card-open .filters {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .legend-toggle {
+    left: calc(var(--edge) + env(safe-area-inset-left, 0px));
+    bottom: calc(var(--bottom-inset) + 8rem);
+  }
+
+  .legend {
+    left: var(--edge);
+    bottom: calc(var(--bottom-inset) + 11.4rem);
+    max-height: 46vh;
+  }
+
+  body.card-open .legend-toggle,
+  body.card-open .legend {
+    opacity: 0;
+    pointer-events: none;
   }
 
 

@@ -26,8 +26,8 @@ export const ZONES = [
   // « Paradise » seul se lit comme une mer à part, alors que c'est la
   // première moitié de Grand Line. Les deux étiquettes portent donc le nom
   // de la route avant celui de la moitié.
-  { label: "GRAND LINE · PARADISE", lat: 0, lng: PARADISE_LNG, size: 2.7, kind: "route" },
-  { label: "GRAND LINE · NOUVEAU MONDE", lat: 0, lng: NEW_WORLD_LNG, size: 2.7, kind: "route" },
+  { label: "GRAND LINE · PARADISE", lat: 0, lng: PARADISE_LNG, size: 2.3, kind: "route" },
+  { label: "GRAND LINE · NOUVEAU MONDE", lat: 0, lng: NEW_WORLD_LNG, size: 2.3, kind: "route" },
   { label: "CALM BELT", lat: CALM_BELT_MID, lng: 130, size: 2.2, kind: "belt" },
   { label: "CALM BELT", lat: -CALM_BELT_MID, lng: -50, size: 2.2, kind: "belt" },
   // La Red Line fait deux fois le tour du globe par les pôles : une seule
@@ -49,7 +49,7 @@ const PALETTE = {
   shallow: "#12607f",
   paradise: "#1e8fae", // première moitié de Grand Line, plus claire
   newWorld: "#155f80", // seconde moitié, plus profonde
-  calmBelt: "#08293a", // ni vent ni courant : un aplat mat
+  calmBelt: "#0e3446", // ni vent ni courant : un aplat mat, mais lisible
   redLine: "#8c4a35",
   redLineHigh: "#b4674c",
 };
@@ -187,8 +187,8 @@ function paintGrandLine(ctx, w, h) {
     // Aplat opaque : aucun moutonnement ne doit transparaître.
     ctx.fillStyle = PALETTE.calmBelt;
     ctx.fillRect(0, y, w, height);
-    ctx.globalAlpha = 0.34;
-    ctx.strokeStyle = "#1d5570";
+    ctx.globalAlpha = 0.45;
+    ctx.strokeStyle = "#2a6d8c";
     ctx.lineWidth = Math.max(1, h / 1100);
     ctx.beginPath();
     ctx.moveTo(0, y);
@@ -453,67 +453,67 @@ function paintIsland(ctx, x, y, radius, island) {
 }
 
 /**
- * Reverse Mountain : un massif à cheval sur la Red Line, pas une île.
+ * Reverse Mountain, vue du dessus.
  *
- * La montagne appartient au continent-barrière et le déborde de part et
- * d'autre du croisement avec Grand Line. Les quatre courants qui la
- * gravissent — un par Blue — se rejoignent au bassin du sommet, d'où le
- * cinquième redescend dans Grand Line. C'est cette forme-là qu'on peint,
- * dans la matière de la Red Line, et non un pictogramme posé dessus.
+ * Le récit tient en une phrase : quatre canaux montent des quatre Blues,
+ * se rejoignent au bassin du sommet, et un cinquième redescend dans Grand
+ * Line. C'est cette phrase qu'il faut pouvoir lire sur la carte.
+ *
+ * Le relief est donc rendu comme sur une carte d'état-major — des courbes
+ * de niveau concentriques, de plus en plus claires vers le haut — et les
+ * canaux sont peints à la couleur de l'eau, larges, dans les quatre
+ * diagonales. Celui de sortie file vers l'est, dans l'axe de Grand Line, et
+ * il est le seul de cette couleur-là.
  */
 function paintReverseMountain(ctx, x, y, radius) {
-  const paint = TERRAIN.mountain;
   const seed = 5150;
 
-  // Le pied du massif : plus large que la bande de la Red Line.
-  ctx.fillStyle = paint.shore;
-  traceCoast(ctx, x, y, radius * 1.16, 17, makeRandom(seed), 1.05);
-  ctx.fill();
-  ctx.fillStyle = paint.low;
-  traceCoast(ctx, x, y, radius, 17, makeRandom(seed), 1.05);
-  ctx.fill();
+  // Courbes de niveau : cinq gradins, du pied au sommet.
+  const CONTOURS = ["#7d4130", "#93513c", "#a9654b", "#bd7c5e", "#d09675"];
+  CONTOURS.forEach((tint, i) => {
+    ctx.fillStyle = tint;
+    traceCoast(ctx, x, y, radius * (1.16 - i * 0.19), 16, makeRandom(seed + i * 97), 1.02);
+    ctx.fill();
+  });
 
-  ctx.save();
-  traceCoast(ctx, x, y, radius, 15, makeRandom(seed), 1);
-  ctx.clip();
-
-  // Les versants éclairés, en couronne autour du sommet.
-  ctx.globalAlpha = 0.55;
-  ctx.fillStyle = paint.high;
-  traceCoast(ctx, x - radius * 0.1, y - radius * 0.12, radius * 0.64, 13, makeRandom(seed + 7), 1);
-  ctx.fill();
-  ctx.globalAlpha = 1;
-
-  // Les quatre courants. Ils serpentent : un tracé droit donnerait une
-  // croix géométrique là où l'œuvre montre des rivières.
-  ctx.strokeStyle = "rgba(206,234,244,0.6)";
-  ctx.lineWidth = Math.max(1, radius * 0.062);
-  ctx.lineCap = "round";
-  for (let i = 0; i < 4; i++) {
-    const angle = Math.PI / 4 + (i * Math.PI) / 2;
-    const nx = -Math.sin(angle);
-    const ny = Math.cos(angle);
-    const bend = radius * 0.3;
-    ctx.beginPath();
-    ctx.moveTo(x + Math.cos(angle) * radius * 1.1, y + Math.sin(angle) * radius * 1.1);
-    ctx.bezierCurveTo(
-      x + Math.cos(angle) * radius * 0.72 + nx * bend,
-      y + Math.sin(angle) * radius * 0.72 + ny * bend,
-      x + Math.cos(angle) * radius * 0.3 - nx * bend * 0.7,
-      y + Math.sin(angle) * radius * 0.3 - ny * bend * 0.7,
-      x,
-      y,
-    );
+  // Un liseré sombre entre les gradins : sans lui, le dégradé se lit comme
+  // une tache et non comme un relief.
+  ctx.strokeStyle = "rgba(60,28,20,0.4)";
+  ctx.lineWidth = Math.max(0.8, radius * 0.022);
+  for (let i = 1; i < CONTOURS.length; i++) {
+    traceCoast(ctx, x, y, radius * (1.16 - i * 0.19), 16, makeRandom(seed + i * 97), 1.02);
     ctx.stroke();
   }
-  ctx.restore();
 
-  // Le bassin du sommet, où les quatre courants se rencontrent avant que le
-  // cinquième ne redescende dans Grand Line.
-  ctx.fillStyle = "rgba(222,242,249,0.8)";
+  const channel = (angle, length, width, color) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x + Math.cos(angle) * radius * length, y + Math.sin(angle) * radius * length);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  // Les quatre courants d'entrée, un par Blue, dans les diagonales.
+  for (let i = 0; i < 4; i++) {
+    const angle = Math.PI / 4 + (i * Math.PI) / 2;
+    channel(angle, 1.24, Math.max(2, radius * 0.15), "#12607f");
+    channel(angle, 1.2, Math.max(1, radius * 0.07), "#57b6d4");
+  }
+
+  // Le canal de sortie : plus large, plus clair, dans l'axe de Grand Line.
+  channel(0, 1.5, Math.max(2.6, radius * 0.22), "#1e8fae");
+  channel(0, 1.46, Math.max(1.4, radius * 0.11), "#8fe4f5");
+
+  // Le bassin du sommet, où les cinq se rencontrent.
+  ctx.fillStyle = "#8fe4f5";
   ctx.beginPath();
-  ctx.arc(x, y, Math.max(1.5, radius * 0.13), 0, Math.PI * 2);
+  ctx.arc(x, y, Math.max(2, radius * 0.19), 0, Math.PI * 2);
   ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.75)";
+  ctx.lineWidth = Math.max(0.8, radius * 0.035);
+  ctx.stroke();
 }
 
 /** Un archipel : une grappe d'îlots plutôt qu'une seule masse. */
@@ -543,7 +543,7 @@ const islandRadius = (island, w) =>
  * @param {Array<{lat:number,lng:number,scale:number,sea:string}>} islands
  * @param {number} width  largeur en pixels (hauteur = width / 2)
  */
-export function drawWorldTexture(islands, width = 4096) {
+export function drawWorldTexture(islands, width = 4096, dimmed = null) {
   const w = width;
   const h = width / 2;
   const canvas =
@@ -583,6 +583,9 @@ export function drawWorldTexture(islands, width = 4096) {
     const x = lngToX(island.lng, w);
     const y = latToY(island.lat, h);
     const radius = islandRadius(island, w);
+    // Une île écartée par un filtre s'efface sans disparaître : on doit
+    // continuer à lire la géographie pendant qu'on isole une saga.
+    ctx.globalAlpha = dimmed?.has(island.id) ? 0.16 : 1;
     const draw =
       island.terrain === "mountain"
         ? paintReverseMountain
@@ -595,6 +598,7 @@ export function drawWorldTexture(islands, width = 4096) {
         draw(ctx, x + offset, y, radius, island);
       }
     }
+    ctx.globalAlpha = 1;
   }
 
   return canvas;

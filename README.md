@@ -4,14 +4,19 @@ Globe interactif du monde de One Piece. 83 îles posées sur la sphère à leur
 position canon, de Fuchsia à Elbaf.
 
 Tourne à la souris, zoome à la molette ou au pincement — on peut reculer
-jusqu'à voir la planète entière. Clique une île pour ouvrir sa fiche, ou
-suis la route de l'équipage escale par escale avec les flèches.
+jusqu'à voir la planète entière. Clique une île pour ouvrir sa fiche. Les
+flèches suivent la route de l'équipage escale par escale sans recouvrir le
+globe : elles ouvrent un bandeau court, la fiche complète reste à un clic.
+Le bouton « Lire la carte » donne la légende des signes et des terrains.
+L'adresse suit l'île choisie, `…/#alabasta` s'ouvre directement dessus.
 
 **Revivre le voyage** rejoue la traversée de bout en bout : le Vogue Merry
 puis, à partir d'Enies Lobby, le Thousand Sunny suivent la route et laissent
 une trace en pointillés rouges. L'arrêt à chaque escale dure à la mesure du
-temps que l'équipage y a passé, et le bandeau compte les jours depuis le
-départ de Fuchsia. À la fin, les flèches reprennent la main.
+temps que l'équipage y a passé, le bandeau raconte ce qu'il y a fait et
+compte les jours depuis le départ de Fuchsia. On met en pause à l'espace, on
+saute d'escale en escale aux flèches ou en cliquant la réglette, on rejoue à
+la fin. Ensuite, les flèches reprennent la route à la main.
 
 Aucune pastille de couleur n'est posée sur la carte : ce qu'on voit est
 l'île elle-même. Sa taille suit une échelle de huit rangs, du continent

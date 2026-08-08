@@ -19,8 +19,8 @@ la fin. Ensuite, les flèches reprennent la route à la main.
 
 Rien n'est posé sur la carte : ni pastille, ni pictogramme, ni légende. Tout
 est peint. La sphère se lit comme un relevé — graticule tous les quinze
-degrés, hauts-fonds autour des terres, une rose des vents au centre de
-chaque Blue — et chaque lieu prend la forme de ce qu'il est : Zou est un
+degrés, hauts-fonds autour des terres, ombre
+portée sous chaque côte — et chaque lieu prend la forme de ce qu'il est : Zou est un
 éléphant qui porte une forêt, Skypiea un banc de nuages, l'Île des
 Hommes-Poissons une bulle sous la surface, le Baratie une coque avec son
 sillage, Marie-Joie une cité murée, Reverse Mountain un massif en courbes de
@@ -65,6 +65,7 @@ node tools/extract-positions.mjs   # carte source → data/positions.json
 node tools/fetch-wiki.mjs          # wiki Fandom → tools/_wiki-cache.json
 node tools/fetch-images.mjs        # paysages    → data/img/*.webp
 node tools/build-data.mjs          # croisement  → data/islands.json
+node tools/data-audit.mjs          # cohérence du jeu livré
 ```
 
 `fetch-wiki.mjs` et `fetch-images.mjs` gardent un cache : relancés, ils ne
@@ -146,9 +147,13 @@ redistribue le contenu.
   Les textes sont sous CC BY-SA 3.0. Les images d'infobox illustrent l'œuvre
   d'Eiichiro Oda et de la Toei : usage personnel uniquement.
 - **Rendu** — [globe.gl](https://github.com/vasturiano/globe.gl) 2.46.1 (three.js inclus).
-- **Durées et récits d'escale** — reconstitués à partir de la chronologie de
-  l'œuvre. Ce sont des ordres de grandeur, sauf quand le récit les énonce :
-  les deux ans de Rusukaina, les cinquante ans de Laboon.
+- **Durées d'escale** — l'œuvre ne compte presque jamais les jours. Chaque
+  durée déclare son origine : `récit` quand elle est énoncée dans l'œuvre —
+  les deux ans de la séparation, et rien d'autre — et `estimation` quand elle
+  est reconstituée d'après ce que l'arc montre. Huit sont établies,
+  trente-sept estimées, trente-huit lieux n'en portent aucune. L'interface
+  affiche la mention.
+- **Récits d'escale** — écrits à la main, limités à ce que l'œuvre montre.
 
 Projet de fan, sans lien avec Eiichiro Oda ni Shueisha.
 

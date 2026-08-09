@@ -205,9 +205,29 @@ const toUrl = (canvas) =>
     ? canvas.convertToBlob({ type: "image/png" }).then(URL.createObjectURL)
     : Promise.resolve(canvas.toDataURL("image/png"));
 
+/**
+ * Finesse de la texture.
+ *
+ * Le globe se regarde maintenant de près : à 4096 pixels de large, une île
+ * de Grand Line ne faisait plus qu'une poignée de pixels une fois la caméra
+ * approchée, et le trait de côte bavait. On double sur les machines qui
+ * l'acceptent — la limite matérielle se demande au pilote, elle n'est pas
+ * la même partout, et la dépasser rend la sphère noire.
+ */
+function textureWidth(handheld) {
+  const probe = document.createElement("canvas").getContext("webgl2");
+  const max = probe?.getParameter(probe.MAX_TEXTURE_SIZE) ?? 4096;
+  // Le téléphone monte à 4096 depuis que la densité de pixels est
+  // plafonnée : c'est ce plafond, et non la texture, qui faisait lâcher
+  // Safari. Au-delà, on ne gagne plus rien sur un écran de six pouces.
+  if (handheld) return max >= 4096 ? 4096 : 2048;
+  return max >= 8192 ? 8192 : 4096;
+}
+
 function buildGlobe() {
   small = isHandheld();
-  const world = drawWorldTexture(state.islands, small ? 2048 : 4096);
+  const width = textureWidth(small);
+  const world = drawWorldTexture(state.islands, width);
   const bump = drawBumpTexture(state.islands, small ? 1024 : 2048);
 
   globe = new Globe($("scene"), { animateIn: true })
@@ -325,8 +345,10 @@ function buildGlobe() {
   // console ou depuis les tests de bout en bout.
   window.blueStar = { globe, state, cine };
 
-  // Sur un écran étroit, la sphère déborde en largeur : on recule.
-  globe.pointOfView({ lat: 12, lng: 60, altitude: small ? 3.7 : 2.6 }, 0);
+  // Le globe occupe l'écran plutôt que de flotter au milieu : c'est à cette
+  // distance qu'on juge la taille d'une île et l'écart entre deux escales.
+  // Sur un écran étroit, la sphère déborde en largeur : on recule un peu.
+  globe.pointOfView({ lat: 8, lng: 70, altitude: small ? 2.2 : 1.35 }, 0);
 
   // Sur mobile, la densité de pixels native fait tripler le nombre de
   // fragments à calculer pour un gain invisible. On la plafonne à 2.
@@ -368,7 +390,9 @@ function buildGlobe() {
 
 // Molette et pincement suffisent : on garde seulement les bornes, assez
 // larges pour reculer jusqu'à voir la planète entière.
-const MIN_ALTITUDE = 0.32;
+// On peut descendre jusqu'à raser la surface : à 0,12 rayon, une escale
+// occupe l'écran et l'on voit le trait de côte.
+const MIN_ALTITUDE = 0.12;
 const MAX_ALTITUDE = 9;
 
 /* ── Couche HTML : le navire de la lecture ────────────────────────────── */
@@ -432,7 +456,7 @@ function select(island, { fly = false, quiet = false, panel = true } = {}) {
 
   if (island && fly) {
     globe.controls().autoRotate = false;
-    globe.pointOfView({ lat: island.lat, lng: island.lng, altitude: 1.7 }, 900);
+    globe.pointOfView({ lat: island.lat, lng: island.lng, altitude: 0.9 }, 900);
   }
 
   if (panel) {
@@ -1122,7 +1146,7 @@ function startCine() {
   cine.raf = requestAnimationFrame(tickCine);
 }
 
-const FOLLOW_ALT = () => (small ? 2.1 : 1.65);
+const FOLLOW_ALT = () => (small ? 1.5 : 1.05);
 
 /** Total des jours connus sur l'ensemble de la route. */
 const routeDays = () =>

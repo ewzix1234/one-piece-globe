@@ -74,10 +74,17 @@ test("la Red Line coupe Grand Line en deux moitiés opposées", () => {
 test("Paradise et le Nouveau Monde sont de part et d'autre de la Red Line", () => {
   const inParadiseHalf = (i) =>
     i.lng > RED_LINE_LNG[0] && i.lng < RED_LINE_LNG[1];
+  // Un lieu posé sur le croisement lui-même n'est d'aucun côté : Sabaody
+  // est la dernière escale avant la descente, à cheval sur le méridien. On
+  // ne lui demande donc pas de choisir un bord — sa mer est déclarée.
+  const atCrossing = (i) => toRedLine(i) < 5;
+
   for (const island of islands.filter((i) => i.sea === "Paradise")) {
+    if (atCrossing(island)) continue;
     assert.ok(inParadiseHalf(island), `${island.name} donnée en Paradise mais du côté Nouveau Monde`);
   }
   for (const island of islands.filter((i) => i.sea === "Nouveau Monde")) {
+    if (atCrossing(island)) continue;
     assert.ok(!inParadiseHalf(island), `${island.name} donnée en Nouveau Monde mais du côté Paradise`);
   }
 });

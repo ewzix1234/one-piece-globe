@@ -348,7 +348,7 @@ function buildGlobe() {
   // Le globe occupe l'écran plutôt que de flotter au milieu : c'est à cette
   // distance qu'on juge la taille d'une île et l'écart entre deux escales.
   // Sur un écran étroit, la sphère déborde en largeur : on recule un peu.
-  globe.pointOfView({ lat: 8, lng: 70, altitude: small ? 2.2 : 1.35 }, 0);
+  globe.pointOfView({ lat: 6, lng: 70, altitude: small ? 1.95 : 1.12 }, 0);
 
   // Sur mobile, la densité de pixels native fait tripler le nombre de
   // fragments à calculer pour un gain invisible. On la plafonne à 2.
@@ -456,7 +456,7 @@ function select(island, { fly = false, quiet = false, panel = true } = {}) {
 
   if (island && fly) {
     globe.controls().autoRotate = false;
-    globe.pointOfView({ lat: island.lat, lng: island.lng, altitude: 0.9 }, 900);
+    globe.pointOfView({ lat: island.lat, lng: island.lng, altitude: 0.72 }, 900);
   }
 
   if (panel) {
@@ -1146,7 +1146,7 @@ function startCine() {
   cine.raf = requestAnimationFrame(tickCine);
 }
 
-const FOLLOW_ALT = () => (small ? 1.5 : 1.05);
+const FOLLOW_ALT = () => (small ? 1.35 : 0.92);
 
 /** Total des jours connus sur l'ensemble de la route. */
 const routeDays = () =>

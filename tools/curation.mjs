@@ -117,7 +117,10 @@ export const PLACES = [
   { src: "Florian Triangle", fr: "Triangle de Florian", wiki: "Triangle_Florian", saga: "thriller-bark", step: null, tag: "story" },
 
   // ── Guerre au Sommet ─────────────────────────────────────────────────
-  { src: "Sabaody Archipelago", fr: "Archipel Sabaody", wiki: "Archipel_Sabaody", saga: "summit-war", step: 23, tag: "crew", note: "Dernière escale avant l'Île des Hommes-Poissons. Kuma y disperse l'équipage." },
+  // Sa longitude tombe d'un cheveu au-delà du méridien de la Red Line, ce
+  // qui la rangeait dans le Nouveau Monde. Elle est dans Paradise : c'est
+  // la dernière escale avant la descente, et op-maps le dit aussi.
+  { src: "Sabaody Archipelago", fr: "Archipel Sabaody", wiki: "Archipel_Sabaody", sea: "Paradise", saga: "summit-war", step: 23, tag: "crew", note: "Dernière escale avant l'Île des Hommes-Poissons. Kuma y disperse l'équipage." },
   { src: "Amazon Lily Empire", fr: "Amazon Lily", wiki: "Amazon_Lily", saga: "summit-war", step: 24, tag: "crew", note: "Royaume des Kuja, gouverné par Boa Hancock." },
   { src: "Impel Down", fr: "Impel Down", wiki: "Impel_Down", saga: "summit-war", step: 25, tag: "crew", note: "Prison sous-marine à six niveaux." },
   { src: "Marineford", fr: "Marine Ford", wiki: "Marine_Ford", saga: "summit-war", step: 26, tag: "crew", note: "Ace y meurt. Barbe Blanche y tombe." },
@@ -933,12 +936,14 @@ export const ANCHORS = {
   "Shells Town": { of: "Loguetown", dLat: 6, dLng: 9 },
   "Village de Cocoyashi": { of: "Arlong Park", dLat: -0.5, dLng: 0.5 },
   "Village de Shimotsuki": { of: "Loguetown", dLat: 14, dLng: -6 },
-  "Cap des Jumeaux": { of: "Reverse Mountain", dLat: -1.2, dLng: 3 },
+  // Au pied de la montagne, côté Paradise, mais hors de son emprise :
+  // le massif fait cinq degrés et demi de rayon.
+  "Cap des Jumeaux": { of: "Reverse Mountain", dLat: -1.4, dLng: 8 },
   "Mock Town": { of: "Jaya", dLat: -0.8, dLng: 0.7 },
   "Triangle de Florian": { of: "Thriller Bark", dLat: 1.4, dLng: -2.5 },
   "Royaume de Ryugu": { of: "Île des Hommes-Poissons", dLat: -0.7, dLng: 0.8 },
   "Marie-Joie": { of: "Île des Hommes-Poissons", dLat: 2.4, dLng: -0.4 },
-  "Red Port": { of: "Reverse Mountain", dLat: -2, dLng: 1.6 },
+  "Red Port": { of: "Reverse Mountain", dLat: -7.5, dLng: 1.2 },
   "Duché de Mokomo": { of: "Zou", dLat: 0.4, dLng: 0.5 },
   "Royaume Tontatta": { of: "Green Bit", dLat: 0.4, dLng: 0.4 },
   "Totto Land": { of: "Whole Cake Island", dLat: 2.2, dLng: 2.6 },

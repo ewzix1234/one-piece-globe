@@ -284,8 +284,11 @@ for (const place of PLACES) {
     outline: drawn?.outline ?? null,
     radius: drawn?.radius ?? null,
     archipelago: ARCHIPELAGOS.has(place.fr) || undefined,
-    chapter: w?.chapter ?? null,
-    episode: w?.episode ?? null,
+    // Le wiki donne la première mention, op-maps la première apparition du
+    // lieu lui-même. On garde le wiki, qui couvre plus de lieux, et on
+    // complète avec op-maps là où il ne dit rien.
+    chapter: w?.chapter ?? op?.firstAppearance?.chapter ?? null,
+    episode: w?.episode ?? op?.firstAppearance?.episode ?? null,
     ruler: w?.ruler ?? null,
     affiliation: w?.affiliation ?? null,
     // Quand l'escale a son récit, la note d'une ligne le redisait en plus

@@ -122,6 +122,25 @@ export function paintedHalfHeight(scale) {
 const NO_RELIEF = new Set(["zone", "seafloor", "ship", "sky", "settlement"]);
 const HAS_RELIEF = (island) => !NO_RELIEF.has(island.kind);
 
+/**
+ * Exécute un tracé en élargissant l'horizontale autour d'un point.
+ *
+ * C'est la correction de projection : ce qui est peint ici est comprimé
+ * d'un facteur cos(latitude) une fois enroulé sur la sphère. On dessine
+ * donc élargi de l'inverse, et la forme retrouve ses proportions. Un cercle
+ * peint sur le parallèle 60 devient sinon une ellipse deux fois plus large
+ * que haute.
+ */
+function withStretch(ctx, x, y, stretch, draw) {
+  if (!stretch || Math.abs(stretch - 1) < 0.02) return draw();
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(stretch, 1);
+  ctx.translate(-x, -y);
+  draw();
+  ctx.restore();
+}
+
 /** Générateur pseudo-aléatoire déterministe : la carte doit être reproductible. */
 function makeRandom(seed) {
   let s = seed >>> 0;
@@ -480,7 +499,7 @@ function paintShallows(ctx, x, y, radius) {
   ctx.fill();
 }
 
-function paintIsland(ctx, x, y, radius, island) {
+function paintIsland(ctx, x, y, radius, island, env = { stretch: 1, marks: 1 }) {
   const seed = Math.floor(Math.abs(x) * 7919 + Math.abs(y) * 104729) || 7;
   const points = radius > 11 ? 16 : radius > 6 ? 13 : 10;
   const terrain =
@@ -492,7 +511,7 @@ function paintIsland(ctx, x, y, radius, island) {
   const coast = island.outline
     ? (grow) => traceOutline(ctx, x, y, radius, island.outline, grow)
     : null;
-  if (coast) return paintOutlinedIsland(ctx, x, y, radius, island, paint, coast);
+  if (coast) return paintOutlinedIsland(ctx, x, y, radius, island, paint, coast, env);
 
   paintShallows(ctx, x, y, radius);
 
@@ -566,18 +585,27 @@ function paintIsland(ctx, x, y, radius, island) {
 /**
  * Reverse Mountain, vue du dessus.
  *
- * Le récit tient en une phrase : quatre canaux montent des quatre Blues,
- * se rejoignent au bassin du sommet, et un cinquième redescend dans Grand
- * Line. C'est cette phrase qu'il faut pouvoir lire sur la carte.
+ * Le récit tient en une phrase : quatre canaux montent des quatre Blues, se
+ * rejoignent au bassin du sommet, et un cinquième redescend dans Grand
+ * Line. Encore faut-il que la carte la rende possible.
  *
- * Le relief est donc rendu comme sur une carte d'état-major — des courbes
- * de niveau concentriques, de plus en plus claires vers le haut — et les
- * canaux sont peints à la couleur de l'eau, larges, dans les quatre
- * diagonales. Celui de sortie file vers l'est, dans l'axe de Grand Line, et
- * il est le seul de cette couleur-là.
+ * Le dessin précédent faisait converger les quatre canaux en diagonale, à
+ * travers l'eau — donc à travers les Calm Belts. C'était absurde : si l'on
+ * pouvait franchir la ceinture, la montagne ne servirait à rien, et c'est
+ * précisément parce qu'on ne le peut pas qu'elle est la seule entrée.
+ *
+ * Les canaux sont taillés dans la Red Line, qui est un continent : là où
+ * elle traverse les latitudes de la Calm Belt, c'est de la terre et non de
+ * la mer. Ils courent donc le long du méridien, presque à la verticale,
+ * depuis les quatre Blues qui bordent le continent de part et d'autre — et
+ * ils ne touchent jamais l'eau morte de la ceinture. Le cinquième, celui de
+ * sortie, file vers l'est dans l'axe de Grand Line.
  */
-function paintReverseMountain(ctx, x, y, radius) {
+function paintReverseMountain(ctx, x, y, radius, island, env) {
   const seed = 5150;
+  const { w, h } = env;
+  const degLat = (d) => (d / 180) * h;
+  const degLng = (d) => (d / 360) * w;
 
   // Courbes de niveau : cinq gradins, du pied au sommet.
   const CONTOURS = ["#7d4130", "#93513c", "#a9654b", "#bd7c5e", "#d09675"];
@@ -586,9 +614,6 @@ function paintReverseMountain(ctx, x, y, radius) {
     traceCoast(ctx, x, y, radius * (1.16 - i * 0.19), 16, makeRandom(seed + i * 97), 1.02);
     ctx.fill();
   });
-
-  // Un liseré sombre entre les gradins : sans lui, le dégradé se lit comme
-  // une tache et non comme un relief.
   ctx.strokeStyle = "rgba(60,28,20,0.4)";
   ctx.lineWidth = Math.max(0.8, radius * 0.022);
   for (let i = 1; i < CONTOURS.length; i++) {
@@ -596,26 +621,44 @@ function paintReverseMountain(ctx, x, y, radius) {
     ctx.stroke();
   }
 
-  const channel = (angle, length, width, color) => {
+  // Les quatre canaux d'entrée. Ils partent d'au-delà de la Calm Belt —
+  // c'est là que commencent les Blues — et restent dans la largeur du
+  // continent : deux flancs, est et ouest, chacun vers le nord et le sud.
+  const reach = degLat(CALM_BELT_OUTER + 4);
+  const flank = degLng(2.1);
+  const wide = Math.max(2.4, radius * 0.14);
+  const core = Math.max(1.2, radius * 0.07);
+
+  const canal = (dx, dy, width, color) => {
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(x + Math.cos(angle) * radius * length, y + Math.sin(angle) * radius * length);
-    ctx.lineTo(x, y);
+    ctx.moveTo(x + dx, y + dy);
+    ctx.quadraticCurveTo(x + dx * 0.75, y + dy * 0.35, x, y);
     ctx.stroke();
   };
-
-  // Les quatre courants d'entrée, un par Blue, dans les diagonales.
-  for (let i = 0; i < 4; i++) {
-    const angle = Math.PI / 4 + (i * Math.PI) / 2;
-    channel(angle, 1.24, Math.max(2, radius * 0.15), "#12607f");
-    channel(angle, 1.2, Math.max(1, radius * 0.07), "#57b6d4");
+  for (const dx of [-flank, flank]) {
+    for (const dy of [-reach, reach]) {
+      canal(dx, dy, wide, "#12607f");
+      canal(dx, dy, core, "#57b6d4");
+    }
   }
 
-  // Le canal de sortie : plus large, plus clair, dans l'axe de Grand Line.
-  channel(0, 1.5, Math.max(2.6, radius * 0.22), "#1e8fae");
-  channel(0, 1.46, Math.max(1.4, radius * 0.11), "#8fe4f5");
+  // Le canal de sortie : plus large, plus clair, vers l'est dans Grand Line.
+  const out = degLng(5.5);
+  ctx.strokeStyle = "#1e8fae";
+  ctx.lineWidth = Math.max(3, radius * 0.24);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + out, y);
+  ctx.stroke();
+  ctx.strokeStyle = "#8fe4f5";
+  ctx.lineWidth = Math.max(1.6, radius * 0.12);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + out * 0.96, y);
+  ctx.stroke();
 
   // Le bassin du sommet, où les cinq se rencontrent.
   ctx.fillStyle = "#8fe4f5";
@@ -626,7 +669,6 @@ function paintReverseMountain(ctx, x, y, radius) {
   ctx.lineWidth = Math.max(0.8, radius * 0.035);
   ctx.stroke();
 }
-
 
 /**
  * Signatures d'îles : le trait qui fait reconnaître un lieu sans le nommer.
@@ -752,8 +794,8 @@ const ISLAND_SIGNATURE = {
 };
 
 /** Peint une île dont on possède le contour exact. */
-function paintOutlinedIsland(ctx, x, y, radius, island, paint, coast) {
-  paintShallows(ctx, x, y, radius);
+function paintOutlinedIsland(ctx, x, y, radius, island, paint, coast, env) {
+  withStretch(ctx, x, y, env?.marks ?? 1, () => paintShallows(ctx, x, y, radius));
 
   ctx.fillStyle = "rgba(3,22,34,0.32)";
   traceOutline(ctx, x + radius * 0.12, y + radius * 0.16, radius, island.outline, 1.1);
@@ -779,25 +821,29 @@ function paintOutlinedIsland(ctx, x, y, radius, island, paint, coast) {
   ctx.fill();
   ctx.globalAlpha = 1;
   if (radius > 4) {
-    if (ISLAND_SIGNATURE[island.name]) ISLAND_SIGNATURE[island.name](ctx, x, y, radius);
-    else
-      paintTerrainMarks(
-        ctx,
-        x,
-        y,
-        radius,
-        island.terrain === "split" ? "rock" : (island.kind === "sky" ? "sky" : island.terrain),
-        makeRandom(Math.floor(Math.abs(x) * 31 + Math.abs(y) * 17) || 5),
-      );
+    // Le contour porte déjà la déformation de la projection ; ce qu'on
+    // dessine dedans, non. On l'élargit à part.
+    withStretch(ctx, x, y, env?.marks ?? 1, () => {
+      if (ISLAND_SIGNATURE[island.name]) ISLAND_SIGNATURE[island.name](ctx, x, y, radius);
+      else
+        paintTerrainMarks(
+          ctx,
+          x,
+          y,
+          radius,
+          island.terrain === "split" ? "rock" : (island.kind === "sky" ? "sky" : island.terrain),
+          makeRandom(Math.floor(Math.abs(x) * 31 + Math.abs(y) * 17) || 5),
+        );
+    });
   }
   ctx.restore();
 }
 
 /** Un archipel : une grappe d'îlots plutôt qu'une seule masse. */
-function paintCluster(ctx, x, y, radius, island) {
+function paintCluster(ctx, x, y, radius, island, env) {
   const rng = makeRandom(Math.floor(Math.abs(x) * 31 + Math.abs(y) * 17) || 3);
   const count = 5 + Math.floor(rng() * 3);
-  paintIsland(ctx, x, y, radius * 0.52, island);
+  paintIsland(ctx, x, y, radius * 0.52, island, env);
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2 + rng();
     const d = radius * (0.62 + rng() * 0.5);
@@ -807,6 +853,7 @@ function paintCluster(ctx, x, y, radius, island) {
       y + Math.sin(a) * d * 0.8,
       radius * (0.26 + rng() * 0.22),
       island,
+      env,
     );
   }
 }
@@ -1213,10 +1260,25 @@ export function drawWorldTexture(islands, width = 4096) {
     const y = latToY(island.lat, h);
     const radius = islandRadius(island, w);
     const draw = painterFor(island);
+    // La projection écrase l'horizontale à mesure qu'on monte en latitude :
+    // un cercle peint ici devient une ellipse couchée une fois la sphère
+    // enroulée. On l'élargit d'autant, exactement comme pour le lettrage.
+    // Les contours relevés, eux, viennent d'une carte de même projection :
+    // ils portent déjà la déformation, il ne faut pas la leur ajouter.
+    const env = {
+      w,
+      h,
+      stretch: island.outline
+        ? 1
+        : Math.min(4, 1 / Math.max(0.25, Math.cos((island.lat * Math.PI) / 180))),
+      marks: Math.min(4, 1 / Math.max(0.25, Math.cos((island.lat * Math.PI) / 180))),
+    };
     // Enroulement : une île près du méridien 180 doit apparaître des deux côtés.
     for (const offset of [-w, 0, w]) {
-      if (x + offset > -radius * 3 && x + offset < w + radius * 3) {
-        draw(ctx, x + offset, y, radius, island);
+      if (x + offset > -radius * 4 && x + offset < w + radius * 4) {
+        withStretch(ctx, x + offset, y, env.stretch, () =>
+          draw(ctx, x + offset, y, radius, island, env),
+        );
       }
     }
   }

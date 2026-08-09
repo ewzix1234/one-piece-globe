@@ -26,7 +26,9 @@ portée sous chaque côte — et chaque lieu prend la forme de ce qu'il est : Zo
 éléphant qui porte une forêt, Skypiea un banc de nuages, l'Île des
 Hommes-Poissons une bulle sous la surface, le Baratie une coque avec son
 sillage, Marie-Joie une cité murée, Reverse Mountain un massif en courbes de
-niveau que quatre canaux gravissent.
+niveau que quatre canaux gravissent — le long de la Red Line, jamais à
+travers la Calm Belt : c'est parce qu'on ne peut pas franchir la ceinture
+que la montagne est la seule entrée.
 
 Ce qu'on voit est l'île elle-même. Sa taille suit une échelle de huit rangs, du continent
 (Elbaf, Wano) au lieu-dit, et son terrain dit sa nature : désert pour

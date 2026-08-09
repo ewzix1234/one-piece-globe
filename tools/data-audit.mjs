@@ -6,7 +6,7 @@
  * valeurs hors bornes. Il ne dit pas si une donnée est vraie, il dit si le
  * jeu se tient.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync as existsSyncSafe } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -149,3 +149,52 @@ console.log("  estimées :", basis.estimation ?? 0);
 console.log("  sans durée :", islands.filter((i) => !i.days).length);
 
 process.exitCode = problems.length ? 1 : 0;
+
+/* ── Croisement avec le relevé d'op-maps ──────────────────────────────── */
+
+/**
+ * Deux relevés qui se contredisent valent mieux qu'un seul qu'on croit.
+ * Ce croisement ne tranche pas : il signale, et c'est à la lecture de dire
+ * qui a raison. Les divergences connues et assumées sont déclarées ici pour
+ * qu'elles ne noient pas les nouvelles.
+ */
+const { OPMAPS_NAME } = await import("./curation.mjs");
+const opCache = join(HERE, "_opmaps.json");
+if (existsSyncSafe(opCache)) {
+  const op = new Map(
+    JSON.parse(readFileSync(opCache, "utf8")).map((i) => [i.name, i]),
+  );
+  const REGION = {
+    "East Blue": "East Blue",
+    "West Blue": "West Blue",
+    "North Blue": "North Blue",
+    "South Blue": "South Blue",
+    Paradise: "Paradise",
+    "New World": "Nouveau Monde",
+    "Calm Belt": "Calm Belt",
+    "Red Line": "Red Line",
+  };
+  // Divergences tranchées en notre faveur, avec la raison.
+  const SETTLED = {
+    Skypiea: "île céleste ; leur relevé n'a pas de ciel",
+    "Mer Blanche": "mer de nuages ; leur relevé n'a pas de ciel",
+    Weatheria: "île céleste ; leur relevé n'a pas de ciel",
+    "Amazon Lily": "dans la Calm Belt, le récit est formel",
+    "Archipel Boin": "dans la Calm Belt, le récit est formel",
+    "Île Minion": "North Blue, Corazon y meurt",
+    "Germa 66": "royaume itinérant ; North Blue est son origine",
+  };
+  const diverging = [];
+  for (const island of islands) {
+    const target = OPMAPS_NAME[island.name];
+    if (!target) continue;
+    const theirs = REGION[op.get(target)?.region];
+    if (!theirs || theirs === island.sea) continue;
+    if (SETTLED[island.name]) continue;
+    diverging.push(`${island.name} : « ${island.sea} » ici, « ${theirs} » chez op-maps`);
+  }
+  console.log("\nCROISEMENT OP-MAPS");
+  console.log(`  mers divergentes non tranchées : ${diverging.length}`);
+  for (const d of diverging) console.log("  ? " + d);
+  console.log(`  divergences tranchées et documentées : ${Object.keys(SETTLED).length}`);
+}

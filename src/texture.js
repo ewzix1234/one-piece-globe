@@ -676,17 +676,28 @@ const ISLAND_SIGNATURE = {
   // les oasis marquent les rares points d'eau.
   Alabasta(ctx, x, y, r) {
     ctx.save();
-    ctx.strokeStyle = "#3f8fa8";
-    ctx.lineWidth = Math.max(1.4, r * 0.11);
+    // Le Sandora serpente et s'affine vers l'amont, comme un fleuve.
+    ctx.strokeStyle = "rgba(84,142,158,0.85)";
     ctx.lineCap = "round";
+    ctx.lineWidth = Math.max(1, r * 0.085);
     ctx.beginPath();
-    ctx.moveTo(x - r * 0.72, y + r * 0.5);
-    ctx.bezierCurveTo(x - r * 0.2, y + r * 0.18, x + r * 0.1, y - r * 0.1, x + r * 0.68, y - r * 0.42);
+    ctx.moveTo(x - r * 0.66, y + r * 0.46);
+    ctx.bezierCurveTo(
+      x - r * 0.3, y + r * 0.34,
+      x - r * 0.12, y - r * 0.02,
+      x + r * 0.2, y - r * 0.12,
+    );
     ctx.stroke();
-    ctx.fillStyle = "#4f9a53";
-    for (const [dx, dy] of [[-0.42, -0.3], [0.3, 0.42], [0.5, -0.06]]) {
+    ctx.lineWidth = Math.max(0.8, r * 0.05);
+    ctx.beginPath();
+    ctx.moveTo(x + r * 0.2, y - r * 0.12);
+    ctx.quadraticCurveTo(x + r * 0.42, y - r * 0.2, x + r * 0.6, y - r * 0.4);
+    ctx.stroke();
+    // Les rares points d'eau, en vert sur le sable.
+    ctx.fillStyle = "#6f9a52";
+    for (const [dx, dy] of [[-0.36, -0.28], [0.26, 0.38], [0.5, 0.04]]) {
       ctx.beginPath();
-      ctx.arc(x + r * dx, y + r * dy, r * 0.12, 0, Math.PI * 2);
+      ctx.arc(x + r * dx, y + r * dy, r * 0.1, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.restore();
@@ -799,6 +810,20 @@ function paintOutlinedIsland(ctx, x, y, radius, island, paint, coast, env) {
   ctx.fillStyle = paint.low;
   coast(1);
   ctx.fill();
+
+  // Punk Hazard est coupée en deux : le partage se fait à l'intérieur du
+  // contour, jamais à côté.
+  if (island.terrain === "split") {
+    ctx.save();
+    coast(1);
+    ctx.clip();
+    ctx.fillStyle = TERRAIN.ember.low;
+    ctx.fillRect(x - radius * 1.6, y - radius * 1.6, radius * 1.6, radius * 3.2);
+    ctx.fillStyle = TERRAIN.snow.low;
+    ctx.fillRect(x, y - radius * 1.6, radius * 1.6, radius * 3.2);
+    ctx.restore();
+  }
+
   ctx.strokeStyle = "rgba(38,62,46,0.55)";
   ctx.lineWidth = Math.max(0.7, radius * 0.045);
   ctx.stroke();
@@ -807,7 +832,9 @@ function paintOutlinedIsland(ctx, x, y, radius, island, paint, coast, env) {
   coast(1);
   ctx.clip();
   ctx.globalAlpha = 0.5;
-  ctx.fillStyle = paint.high;
+  // Sur une île coupée en deux, une lumière verte reverdirait la moitié
+  // brûlée : on éclaire alors en blanc, qui ne teinte ni l'un ni l'autre.
+  ctx.fillStyle = island.terrain === "split" ? "#ffffff" : paint.high;
   traceOutline(ctx, x - radius * 0.14, y - radius * 0.16, radius, island.outline, 0.82);
   ctx.fill();
   ctx.globalAlpha = 1;
@@ -1181,8 +1208,13 @@ const KIND_PAINTER = {
 function painterFor(island) {
   if (island.name === "Calm Belt") return paintNothing;
   if (island.kind === "zone") return paintFog;
-  if (KIND_PAINTER[island.kind]) return KIND_PAINTER[island.kind];
   if (island.terrain === "mountain") return paintReverseMountain;
+  // Un ouvrage reste une terre : quand on possède son contour relevé, il
+  // vaut mieux que le plan régulier qu'on lui inventait — Enies Lobby et
+  // Egghead y perdaient leur forme au profit d'un heptagone.
+  if (island.kind === "works" && island.outline) return paintIsland;
+  if (KIND_PAINTER[island.kind]) return KIND_PAINTER[island.kind];
+  if (island.outline) return paintIsland;
   return island.archipelago ? paintCluster : paintIsland;
 }
 

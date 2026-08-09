@@ -501,7 +501,11 @@ function paintIsland(ctx, x, y, radius, island) {
   ctx.globalAlpha = 1;
   ctx.restore();
 
-  if (radius > 4) {
+  // La signature du lieu passe après le terrain : c'est elle qu'on doit
+  // voir en premier quand elle existe.
+  if (radius > 4 && ISLAND_SIGNATURE[island.name]) {
+    ISLAND_SIGNATURE[island.name](ctx, x, y, radius);
+  } else if (radius > 4) {
     paintTerrainMarks(
       ctx,
       x,
@@ -576,6 +580,130 @@ function paintReverseMountain(ctx, x, y, radius) {
   ctx.lineWidth = Math.max(0.8, radius * 0.035);
   ctx.stroke();
 }
+
+
+/**
+ * Signatures d'îles : le trait qui fait reconnaître un lieu sans le nommer.
+ *
+ * Un contour irrégulier et un terrain suffisent à dire « une île de sable »,
+ * pas à dire « Alabasta ». Les lieux dont l'œuvre montre une forme propre
+ * la reçoivent : le fleuve Sandora qui coupe le royaume, la couronne d'eau
+ * de Water Seven, les étages du gâteau de Big Mom, le crâne d'Onigashima.
+ * Peu de traits, jamais de détail — à l'échelle du globe, une île tient
+ * dans quelques dizaines de pixels.
+ */
+const ISLAND_SIGNATURE = {
+  // Alabasta : le Sandora traverse le désert du sud-ouest au nord-est, et
+  // les oasis marquent les rares points d'eau.
+  Alabasta(ctx, x, y, r) {
+    ctx.save();
+    ctx.strokeStyle = "#3f8fa8";
+    ctx.lineWidth = Math.max(1.4, r * 0.11);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.72, y + r * 0.5);
+    ctx.bezierCurveTo(x - r * 0.2, y + r * 0.18, x + r * 0.1, y - r * 0.1, x + r * 0.68, y - r * 0.42);
+    ctx.stroke();
+    ctx.fillStyle = "#4f9a53";
+    for (const [dx, dy] of [[-0.42, -0.3], [0.3, 0.42], [0.5, -0.06]]) {
+      ctx.beginPath();
+      ctx.arc(x + r * dx, y + r * dy, r * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  },
+
+  // Water Seven : une cité en couronne autour d'une fontaine centrale, les
+  // canaux rayonnant vers la mer.
+  "Water Seven"(ctx, x, y, r) {
+    ctx.save();
+    ctx.strokeStyle = "#3f8fa8";
+    ctx.lineWidth = Math.max(1.2, r * 0.085);
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.5, 0, Math.PI * 2);
+    ctx.stroke();
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + 0.4;
+      ctx.beginPath();
+      ctx.moveTo(x + Math.cos(a) * r * 0.5, y + Math.sin(a) * r * 0.5 * 0.85);
+      ctx.lineTo(x + Math.cos(a) * r * 0.95, y + Math.sin(a) * r * 0.95 * 0.85);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "#8fe4f5";
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.19, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  },
+
+  // Whole Cake Island : un gâteau à étages, vu du dessus — des cercles
+  // concentriques de plus en plus clairs, et la cerise au sommet.
+  "Whole Cake Island"(ctx, x, y, r) {
+    ctx.save();
+    const tiers = ["#f0b6c8", "#f7cddb", "#fce4ec"];
+    tiers.forEach((tint, i) => {
+      ctx.fillStyle = tint;
+      ctx.beginPath();
+      ctx.ellipse(x, y, r * (0.72 - i * 0.19), r * (0.72 - i * 0.19) * 0.86, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.fillStyle = "#c4506e";
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.13, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  },
+
+  // Onigashima : l'île est un crâne d'oni, cornes comprises.
+  Onigashima(ctx, x, y, r) {
+    ctx.save();
+    ctx.fillStyle = "#2f2b26";
+    // Les deux orbites et la mâchoire, réduites à trois taches.
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.28, y - r * 0.12, r * 0.19, r * 0.24, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + r * 0.28, y - r * 0.12, r * 0.19, r * 0.24, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(x, y + r * 0.42, r * 0.3, r * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Les cornes, qui débordent du contour.
+    ctx.strokeStyle = "#867c6c";
+    ctx.lineWidth = Math.max(1.4, r * 0.13);
+    ctx.lineCap = "round";
+    for (const sign of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(x + sign * r * 0.5, y - r * 0.5);
+      ctx.quadraticCurveTo(x + sign * r * 0.95, y - r * 0.85, x + sign * r * 0.82, y - r * 1.18);
+      ctx.stroke();
+    }
+    ctx.restore();
+  },
+
+  // Punk Hazard : la ligne de partage entre le feu et la glace.
+  "Punk Hazard"(ctx, x, y, r) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    ctx.lineWidth = Math.max(1.2, r * 0.08);
+    ctx.setLineDash([r * 0.16, r * 0.12]);
+    ctx.beginPath();
+    ctx.moveTo(x, y - r * 0.95);
+    ctx.lineTo(x, y + r * 0.95);
+    ctx.stroke();
+    ctx.restore();
+  },
+
+  // Enies Lobby : la tour de justice et sa cour, plan carré au milieu de
+  // l'eau — l'ouvrage se reconnaît à sa géométrie.
+  "Enies Lobby"(ctx, x, y, r) {
+    ctx.save();
+    ctx.fillStyle = "#e8dcc4";
+    ctx.fillRect(x - r * 0.14, y - r * 0.62, r * 0.28, r * 1.05);
+    ctx.strokeStyle = "#6d4f3d";
+    ctx.lineWidth = Math.max(1, r * 0.07);
+    ctx.strokeRect(x - r * 0.5, y - r * 0.36, r, r * 0.85);
+    ctx.restore();
+  },
+};
 
 /** Un archipel : une grappe d'îlots plutôt qu'une seule masse. */
 function paintCluster(ctx, x, y, radius, island) {

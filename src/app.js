@@ -355,7 +355,11 @@ function buildGlobe() {
 
   // Le redimensionnement doit aussi rebasculer entre les deux réglages de
   // densité : passer en paysage sur tablette double la surface à peindre.
-  const resize = () => globe.width(window.innerWidth).height(window.innerHeight);
+  const resize = () => {
+    globe.width(window.innerWidth).height(window.innerHeight);
+    // La largeur de la vue vient de changer : le décalage doit suivre.
+    requestAnimationFrame(applyViewOffset);
+  };
   window.addEventListener("resize", resize);
   window.addEventListener("orientationchange", () => setTimeout(resize, 150));
 }
@@ -376,6 +380,41 @@ const MAX_ALTITUDE = 9;
  */
 function refreshShipLayer() {
   globe.htmlElementsData(cine.ship ? [cine.ship] : []);
+}
+
+/* ── Recentrage sous les panneaux ────────────────────────────────────── */
+
+/**
+ * Décale l'image du globe pour que l'île choisie ne finisse pas derrière
+ * un panneau.
+ *
+ * Chercher une île l'amenait au centre de la fenêtre — c'est-à-dire sous la
+ * fiche, qui occupe la droite sur grand écran et le bas sur téléphone. On
+ * voyait la mer autour d'elle, jamais elle. La caméra vise toujours l'île ;
+ * c'est le cadrage qui se décale de la moitié du panneau, si bien que
+ * l'île retombe au milieu de ce qui reste visible.
+ */
+let offsetTimer = null;
+
+function applyViewOffset() {
+  // globe.gl expose `globeOffset` pour exactement ce cas : décaler la
+  // sphère de quelques pixels sans bouger la caméra. Y toucher soi-même ne
+  // tient pas — le moteur réapplique sa propre valeur à chaque rendu.
+  if (typeof globe?.globeOffset !== "function") return;
+
+  const sheet = document.body.classList.contains("panel-open");
+  const card = document.body.classList.contains("card-open");
+
+  let dx = 0;
+  let dy = 0;
+  if (sheet) {
+    if (small) dy = -$("record").offsetHeight / 2;
+    else dx = -$("record").offsetWidth / 2;
+  } else if (card && small) {
+    // Le bandeau court ne mange que le bas, et seulement sur mobile.
+    dy = -($("stopcard").offsetHeight / 2 + 20);
+  }
+  globe.globeOffset([Math.round(dx), Math.round(dy)]);
 }
 
 /* ── Sélection ────────────────────────────────────────────────────────── */
@@ -403,6 +442,12 @@ function select(island, { fly = false, quiet = false, panel = true } = {}) {
     renderRecord(null);
     renderStopCard(island);
   }
+  // Le cadrage se règle sur la taille réelle du panneau, pas sur celle
+  // qu'on croit qu'il aura : une fois tout de suite, une fois après que la
+  // feuille a fini de monter.
+  applyViewOffset();
+  clearTimeout(offsetTimer);
+  offsetTimer = setTimeout(applyViewOffset, 380);
   updateVoyage();
 }
 
@@ -424,7 +469,7 @@ function renderStopCard(island) {
   const bits = [];
   if (island.step) bits.push(`Escale ${island.step} / ${state.route.length}`);
   bits.push(island.sea);
-  if (island.days) bits.push(shortDays(island.days));
+  if (island.days) bits.push(shortDays(island.days, island.daysBasis));
   $("stopcard-name").textContent = island.name;
   $("stopcard-meta").textContent = bits.filter(Boolean).join(" · ");
   const deed = $("stopcard-deed");
@@ -503,6 +548,21 @@ function toRedLine(island) {
   );
 }
 
+/**
+ * La fiche d'un lieu.
+ *
+ * Elle répondait en une liste plate de douze lignes où « Escale » pesait
+ * autant que « Autres noms », et le récit — ce qu'on vient lire — arrivait
+ * en dernier. Elle est reconstruite en quatre temps :
+ *
+ *   un bandeau de chiffres, pour situer d'un regard ;
+ *   le récit de l'escale, en tête, parce que c'est le sujet ;
+ *   trois relevés groupés — la route, le lieu, l'œuvre ;
+ *   la notice, repliée, pour qui veut le détail.
+ *
+ * Les groupes portent un titre : c'est ce qui remplace la hiérarchie que
+ * douze lignes égales ne pouvaient pas donner.
+ */
 function renderRecord(island) {
   const host = $("record-scroll");
   if (!island) {
@@ -511,66 +571,81 @@ function renderRecord(island) {
   }
 
   const saga = state.bySaga.get(island.saga);
+  const index = state.route.findIndex((i) => i.id === island.id);
+  const before = index > 0 ? state.route[index - 1] : null;
+  const after = index >= 0 && index < state.route.length - 1 ? state.route[index + 1] : null;
+
   const tagLabel = {
     crew: "Escale de l'équipage",
     story: "Lieu de l'histoire",
     character: "Repaire d'un personnage",
   }[island.tag];
 
-  const rows = [];
-  if (island.step) rows.push(["Escale", `n° ${island.step} du voyage`]);
-  if (island.days) {
-    // L'origine de la durée est dite, pas sous-entendue : une estimation
-    // affichée comme un fait est une erreur, même quand elle est juste.
-    const basis = island.daysBasis === "récit" ? "établi par le récit" : "estimation";
-    rows.push(["Temps sur place", `${formatDays(island.days)} — ${basis}`]);
+  /* Bandeau de chiffres : trois au plus, sinon ce n'est plus un repère. */
+  const figures = [];
+  if (island.step) {
+    figures.push([`${island.step}`, `sur ${state.route.length} escales`]);
   }
-  const note = SEA_NOTE[island.sea];
-  rows.push(["Mer", note ? `${island.sea} — ${note}` : island.sea]);
+  if (island.days) {
+    const basis = island.daysBasis === "récit" ? "établi" : "estimé";
+    figures.push([
+      island.days >= 365 ? `${Math.round(island.days / 365)} ans` : `${island.days} j`,
+      `à terre, ${basis}`,
+    ]);
+  }
+  figures.push([`${island.scale}`, "sur 8 d'étendue"]);
+  if (island.chapter) figures.push([`ch. ${island.chapter}`, "première apparition"]);
+
+  /* Trois relevés, chacun sur un sujet. */
+  const route = [];
+  if (before) {
+    route.push([
+      "Venu de",
+      `${before.name} — ${angularDistance(before, island).toFixed(1)}° d'arc, cap au ${Math.round(bearing(before, island))}°`,
+    ]);
+  }
+  if (after) route.push(["Puis vers", after.name]);
+  if (saga) route.push(["Saga", saga.label]);
+  if (island.step && !before) route.push(["Départ", "premier port du voyage"]);
+
+  const place = [];
+  const seaNote = SEA_NOTE[island.sea];
+  place.push(["Mer", seaNote ? `${island.sea} — ${seaNote}` : island.sea]);
   if (island.kind && state.kinds[island.kind]) {
     const { label, hint } = state.kinds[island.kind];
-    rows.push(["Nature", hint ? `${label} — ${hint}` : label]);
+    place.push(["Nature", hint ? `${label} — ${hint}` : label]);
   }
-  if (saga) rows.push(["Saga", saga.label]);
+  const size = SIZE_LABEL[island.scale];
+  const terrain = TERRAIN_LABEL[island.terrain];
+  if (size) place.push(["Étendue", terrain ? `${size}, ${terrain}` : size]);
+  place.push([
+    "Position",
+    `${Math.abs(island.lat).toFixed(1)}° ${island.lat >= 0 ? "N" : "S"} · ${Math.abs(island.lng).toFixed(1)}° ${island.lng >= 0 ? "E" : "O"}`,
+  ]);
+  place.push(["Quadrant", quadrant(island)]);
+  place.push(["De la Red Line", `${toRedLine(island).toFixed(0)}° de longitude`]);
+
+  const lore = [];
   if (island.chapter) {
     const first = [`chapitre ${island.chapter}`];
     if (island.episode) first.push(`épisode ${island.episode}`);
-    rows.push(["Première apparition", first.join(" · ")]);
+    lore.push(["Première apparition", first.join(" · ")]);
   }
-  if (island.ruler) rows.push(["Dirigeant", island.ruler]);
-  if (island.affiliation) rows.push(["Affiliation", island.affiliation]);
-  if (island.people?.length) rows.push(["Figures", island.people.join(", ")]);
-
-  // Ce que la carte montre du lieu, mis en mots.
-  const size = SIZE_LABEL[island.scale];
-  const terrain = TERRAIN_LABEL[island.terrain];
-  if (size) rows.push(["Étendue", terrain ? `${size}, ${terrain}` : size]);
-
-  // Où l'on se trouve dans le monde, et par rapport à ce qui le structure.
-  rows.push([
-    "Coordonnées",
-    `${Math.abs(island.lat).toFixed(1)}° ${island.lat >= 0 ? "N" : "S"} · ${Math.abs(island.lng).toFixed(1)}° ${island.lng >= 0 ? "E" : "O"} — ${quadrant(island)}`,
-  ]);
-  rows.push(["De la Red Line", `${toRedLine(island).toFixed(0)}° de longitude`]);
-
-  // La route : d'où l'on vient, où l'on va, et à quel cap.
-  const index = state.route.findIndex((i) => i.id === island.id);
-  if (index > 0) {
-    const from = state.route[index - 1];
-    rows.push([
-      "Depuis l'escale précédente",
-      `${from.name} — ${angularDistance(from, island).toFixed(1)}° d'arc, cap au ${Math.round(bearing(from, island))}°`,
-    ]);
-  }
-  if (index >= 0 && index < state.route.length - 1) {
-    rows.push(["Escale suivante", state.route[index + 1].name]);
-  }
-
-  // Les autres noms sous lesquels le lieu circule : traduction, translittération, surnom.
+  if (island.ruler) lore.push(["Dirigeant", island.ruler]);
+  if (island.affiliation) lore.push(["Affiliation", island.affiliation]);
+  if (island.people?.length) lore.push(["Figures", island.people.join(", ")]);
   const others = (island.aliases ?? []).filter(
     (a) => a !== island.nameJp && a !== island.nameRomaji,
   );
-  if (others.length) rows.push(["Autres noms", others.slice(0, 6).join(", ")]);
+  if (others.length) lore.push(["Autres noms", others.slice(0, 6).join(", ")]);
+
+  const relevé = (title, rows) =>
+    rows.length
+      ? `<section class="record-group">
+           <h3>${escape(title)}</h3>
+           <dl>${rows.map(([k, v]) => `<dt>${escape(k)}</dt><dd>${escape(v)}</dd>`).join("")}</dl>
+         </section>`
+      : "";
 
   host.innerHTML = `
     ${
@@ -581,12 +656,22 @@ function renderRecord(island) {
         : ""
     }
     <div class="record-body">
-      <p class="record-eyebrow">${escape(tagLabel)}</p>
-      <h2>${escape(island.name)}</h2>
-      ${island.nameJp ? `<p class="record-jp">${escape(island.nameJp)}${island.nameRomaji ? ` · ${escape(island.nameRomaji)}` : ""}</p>` : ""}
-      <dl class="record-meta">
-        ${rows.map(([k, v]) => `<dt>${escape(k)}</dt><dd>${escape(v)}</dd>`).join("")}
-      </dl>
+      <header class="record-head">
+        <p class="record-eyebrow">${escape(tagLabel)}</p>
+        <h2>${escape(island.name)}</h2>
+        ${island.nameJp ? `<p class="record-jp">${escape(island.nameJp)}${island.nameRomaji ? ` · ${escape(island.nameRomaji)}` : ""}</p>` : ""}
+      </header>
+
+      <ul class="record-figures">
+        ${figures
+          .slice(0, 3)
+          .map(
+            ([value, label]) =>
+              `<li><strong>${escape(value)}</strong><span>${escape(label)}</span></li>`,
+          )
+          .join("")}
+      </ul>
+
       ${
         island.deed
           ? `<section class="record-deed">
@@ -596,16 +681,30 @@ function renderRecord(island) {
           : ""
       }
       ${island.note ? `<p class="record-note">${escape(island.note)}</p>` : ""}
-      ${renderSummary(island.summary)}
+
+      ${relevé("La route", route)}
+      ${relevé("Le lieu", place)}
+      ${relevé("Dans l'œuvre", lore)}
+
+      ${
+        island.summary
+          ? `<section class="record-group record-notice">
+               <h3>Notice</h3>
+               ${renderSummary(island.summary)}
+             </section>`
+          : ""
+      }
+
       ${
         island.step
-          ? `<button type="button" class="record-play" data-step="${island.step}">
+          ? `<button type="button" class="record-play">
                Partir d'ici — revivre le voyage à partir de cette escale
              </button>`
           : ""
       }
     </div>
   `;
+
   host.querySelector(".record-play")?.addEventListener("click", () => {
     startCineAt(island);
   });

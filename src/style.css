@@ -630,7 +630,7 @@ body.panel-open .record {
 }
 
 .record-body {
-  padding: 1.4rem var(--edge) 2.5rem;
+  padding: 1.5rem var(--edge) 3rem;
 }
 
 /* Image de paysage en tête de fiche, fondue dans le papier. */
@@ -658,117 +658,143 @@ body.panel-open .record {
   pointer-events: none;
 }
 
+/* Titraille : le rôle du lieu en pavé encré, puis son nom, puis le japonais.
+   Trois niveaux, trois traitements — pas trois tailles de gris. */
+.record-head {
+  margin-bottom: 1.4rem;
+}
+
 .record-eyebrow {
   display: inline-block;
   margin: 0;
-  padding: 0.22rem 0.5rem;
+  padding: 0.24rem 0.55rem;
   font-family: var(--data);
-  font-size: 0.66rem;
+  font-size: 0.64rem;
+  font-weight: 500;
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--paper);
   background: var(--ink);
-  border-radius: 2px;
 }
 
 .record h2 {
-  margin: 0.4rem 0 0;
-  text-wrap: balance;
+  margin: 0.55rem 0 0;
   font-family: var(--display);
-  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  font-size: clamp(1.65rem, 3.4vw, 2.2rem);
   font-weight: 500;
-  letter-spacing: 0.06em;
-  line-height: 1.12;
+  letter-spacing: 0.04em;
+  line-height: 1.08;
+  text-wrap: balance;
 }
 
 .record-jp {
-  font-size: 0.95rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.92rem;
+  letter-spacing: 0.06em;
   color: var(--ink-soft);
-  margin-top: 0.3rem;
-  letter-spacing: 0.08em;
 }
 
-/* Métadonnées : un tableau de bord d'imprimeur, aligné et tabulaire. Une
-   ligne de séparation très pâle entre les entrées tient la colonne sans
-   la quadriller. */
-.record-meta {
+/* Bandeau de chiffres : trois repères qu'on saisit sans lire. Au-delà de
+   trois, ce n'est plus un repère mais un tableau. */
+.record-figures {
   display: grid;
-  grid-template-columns: minmax(7.5rem, auto) 1fr;
-  gap: 0 1.1rem;
-  font-family: var(--data);
-  font-size: 0.9rem;
-  margin: 1.3rem 0 0;
-  padding-top: 1.1rem;
-  border-top: 2px solid var(--ink);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  margin: 0 0 1.6rem;
+  padding: 0;
+  list-style: none;
+  border-block: 2px solid var(--ink);
 }
 
-.record-meta dt,
-.record-meta dd {
-  padding-block: 0.42rem;
-  border-bottom: 1px solid rgba(58, 44, 30, 0.12);
+.record-figures li {
+  padding: 0.75rem 0.7rem;
+  text-align: center;
 }
 
-.record-meta > dt:last-of-type,
-.record-meta > dd:last-of-type {
-  border-bottom: 0;
+.record-figures li + li {
+  border-left: 1px solid rgba(58, 44, 30, 0.18);
 }
 
-.record-meta dt {
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  line-height: 1.35;
-}
-
-.record-meta dd {
-  margin: 0;
+.record-figures strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
-.record-note {
-  margin: 1.2rem 0 0;
-  padding-left: 0.85rem;
-  border-left: 3px solid var(--straw);
-  font-family: var(--prose);
-  font-size: 1rem;
-  line-height: 1.55;
-  font-style: italic;
-}
-
-.record-summary {
-  margin: 1.2rem 0 0;
-  font-family: var(--prose);
-  font-size: 1rem;
-  line-height: 1.62;
-}
-
-.record-summary p {
-  margin: 0 0 0.8rem;
-}
-
-.record-summary p[hidden] {
-  display: none;
-}
-
-.record-unfold {
-  padding: 0;
+.record-figures span {
+  display: block;
+  margin-top: 0.3rem;
   font-family: var(--data);
-  font-size: 0.76rem;
-  letter-spacing: 0.14em;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-soft);
-  border-bottom: 1px solid currentColor;
+  text-wrap: balance;
 }
 
-.record-unfold:hover {
-  color: var(--ink);
+/* Relevés : trois groupes titrés — la route, le lieu, l'œuvre — plutôt
+   qu'une seule liste où tout pèse pareil. */
+.record-group {
+  margin-top: 1.7rem;
+}
+
+.record-group h3 {
+  margin: 0 0 0.6rem;
+  padding-bottom: 0.4rem;
+  font-family: var(--data);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1px solid rgba(58, 44, 30, 0.28);
+}
+
+.record-group dl {
+  display: grid;
+  grid-template-columns: minmax(7rem, 34%) 1fr;
+  gap: 0 1.1rem;
+  margin: 0;
+  font-family: var(--data);
+  font-size: 0.88rem;
+}
+
+.record-group dt,
+.record-group dd {
+  padding-block: 0.4rem;
+  border-bottom: 1px solid rgba(58, 44, 30, 0.1);
+}
+
+.record-group dt {
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.record-group dd {
+  margin: 0;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+.record-group dt:last-of-type,
+.record-group dd:last-of-type {
+  border-bottom: 0;
+}
+
+.record-notice h3 {
+  border-bottom-color: rgba(58, 44, 30, 0.28);
 }
 
 /* Ce que l'équipage a fait sur place : le cœur de la fiche, mis en avant
    comme un encadré et non noyé dans la prose. */
 .record-deed {
-  margin: 1.4rem 0 0;
+  margin: 0;
   padding: 0.9rem 1rem;
   background: rgba(58, 44, 30, 0.06);
   border-left: 3px solid var(--vermilion);
@@ -788,8 +814,10 @@ body.panel-open .record {
 .record-deed p {
   margin: 0;
   font-family: var(--prose);
-  font-size: 1rem;
-  line-height: 1.58;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  /* Une ligne de prose se lit mal au-delà de soixante-dix signes. */
+  max-width: 34em;
 }
 
 /* --- Bandeau du voyage ---------------------------------------------------- */

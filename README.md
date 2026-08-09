@@ -66,7 +66,8 @@ Quatre étapes, à lancer dans l'ordre. Rien n'est nécessaire pour simplement
 consulter le site : `data/islands.json` est livré prêt à l'emploi.
 
 ```sh
-node tools/extract-positions.mjs   # carte source → data/positions.json
+node tools/fetch-opmaps.mjs        # relevé op-maps → tools/_opmaps.json
+node tools/extract-positions.mjs   # carte de repli → data/positions.json
 node tools/fetch-wiki.mjs          # wiki Fandom → tools/_wiki-cache.json
 node tools/fetch-images.mjs        # paysages    → data/img/*.webp
 node tools/build-data.mjs          # croisement  → data/islands.json
@@ -145,9 +146,17 @@ l'interface à la demande. Elles restent consignées ici, parce que la chaîne
 de fabrication en dépend et qu'une licence CC BY-SA les impose à qui
 redistribue le contenu.
 
-- **Positions** — [The Library of Ohara — One Piece World Map](https://thelibraryofohara.com/one-piece-world-map/),
-  par Artur & Ririjuro. Seules les positions sont reprises, converties en
-  coordonnées sphériques. Ni leurs textes ni leurs images.
+- **Positions et contours** — [op-maps.com](https://www.op-maps.com/fr).
+  Leur relevé publie, pour cent quarante-cinq îles, une position et le
+  contour du dessin. Son repère est une projection équirectangulaire tournée
+  d'un quart de tour, et il se vérifie : les deux croisements de la Red Line
+  y tombent à 180,00° l'un de l'autre, Sabaody à six degrés d'arc de l'Île
+  des Hommes-Poissons qu'elle surplombe, et les quatre Blues occupent chacun
+  le bon quadrant. Soixante-quatre de nos lieux en viennent, contour et
+  étendue compris ; les dix-neuf autres — des villes prises dans une île,
+  des étendues de mer — sont rattachés à celui qui les porte.
+- **Positions de repli** — [The Library of Ohara](https://thelibraryofohara.com/one-piece-world-map/),
+  par Artur & Ririjuro, pour les lieux qu'op-maps ne liste pas.
 - **Fiches et images** — [One Piece Encyclopédie](https://onepiece.fandom.com/fr).
   Les textes sont sous CC BY-SA 3.0. Les images d'infobox illustrent l'œuvre
   d'Eiichiro Oda et de la Toei : usage personnel uniquement.

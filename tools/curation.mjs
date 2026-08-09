@@ -800,7 +800,153 @@ export const CREW_STOPS = {
   },
 };
 
+
+/**
+ * Correspondance avec le relevé d'op-maps.
+ *
+ * Ce relevé donne, pour cent quarante-cinq îles, une position dont le
+ * repère se vérifie et le contour du dessin. Ses noms sont anglais et pas
+ * toujours ceux du wiki : la table les rattache aux nôtres. Un lieu absent
+ * du relevé garde la position et la forme qu'il avait — ce sont pour
+ * l'essentiel des villes prises dans une île plus grande, ou des étendues
+ * de mer, que la carte d'op-maps ne liste pas séparément.
+ *
+ * `null` dit « cherché, pas trouvé » : la distinction avec l'oubli compte,
+ * c'est elle qui empêche de repartir en quête à chaque construction.
+ */
+export const OPMAPS_NAME = {
+  "Dawn Island": "Dawn Island",
+  "Royaume de Goa": null, // leur « Goat Island » est un autre lieu
+  "Village de Fuchsia": null,
+  "Shells Town": null,
+  "Orange Town": "Organ Island",
+  "Village de Syrup": "Gecko Islands",
+  Baratie: "Baratie",
+  "Arlong Park": "Conomi Islands",
+  "Village de Cocoyashi": null,
+  Loguetown: "Polestar Islands",
+  "Village de Shimotsuki": null,
+
+  "Reverse Mountain": "Reverse Mountain",
+  "Cap des Jumeaux": null,
+  "Whisky Peak": "Cactus Island",
+  "Little Garden": "Little Garden",
+  "Drum / Royaume de Sakura": "Drum Island",
+  Alabasta: "Kingdom of Alabasta",
+
+  Jaya: "Jaya",
+  "Mock Town": null,
+  Skypiea: "Skypiea",
+  "Mer Blanche": "Angel Island",
+  "Long Ring Long Land": "Long Ring Long Land",
+
+  "Water Seven": "Water 7",
+  "Enies Lobby": "Enies Lobby",
+  "St. Poplar": "St Poplar",
+  "San Faldo": "San Faldo",
+  Ohara: "Ohara",
+
+  "Thriller Bark": "Thriller Bark",
+  "Triangle de Florian": null,
+
+  "Archipel Sabaody": "Sabaody Archipelago",
+  "Amazon Lily": "Amazon Lily",
+  "Impel Down": "Impel Down",
+  "Marine Ford": "Marineford",
+  Rusukaina: "Rusukaina",
+  Kuraigana: "Kuraigana Island",
+  "Archipel Boin": "Boin Archipelago",
+  "Île Momoiro": "Momoiro Island",
+  Karakuri: "Karakuri Island",
+  Weatheria: "Weatheria",
+  "Royaume de Torino": "Kingdom of Turin",
+  Namakura: "Namakura Island",
+  Banaro: "Banaro Island",
+  Baltigo: "Baltigo",
+
+  "Île des Hommes-Poissons": "Fishman Island",
+  "Royaume de Ryugu": null, // le palais, pris dans l'île
+  "Marie-Joie": null,
+
+  "Punk Hazard": "Punk Hazard",
+  Dressrosa: "Dressrosa",
+  "Green Bit": "Green Bit",
+  Zou: "Zou",
+  "Duché de Mokomo": null,
+  "Royaume Tontatta": null,
+
+  "Whole Cake Island": "Whole Cake Island",
+  "Totto Land": null, // l'archipel entier, pas une île
+  "Île Cacao": "Cacao",
+
+  "Pays des Wa": "Wano Country",
+  Onigashima: "Onigashima",
+
+  Egghead: "Egghead",
+  Elbaf: "Elbaf",
+  "Royaume de Lulusia": "Kingdom of Lulusia",
+  Lodestar: "Lodestar Island",
+  Hachinosu: "Hachinosu",
+  Sphinx: "Sphinx Island",
+  "Karai Bari": "Karai Bari Island",
+  "Nouveau Marine Ford": "New Marineford",
+  "Laugh Tale": null, // leur fiche existe mais sans position
+
+  "God Valley": "God Valley",
+  Flevance: "Flevance Kingdom",
+  "Île Minion": "Minion Island",
+  "Germa 66": "Kingdom of Germa",
+  Baterilla: "Baterilla Island",
+  "Royaume de Sorbet": "Kingdom of Sorbet",
+  "Royaume de Lvneel": "Kingdom of Lvneel",
+  "Pays de Kano": "Kano Country",
+  Vira: null,
+  Foodvalten: "Foodvalten Island",
+  "Île Raijin": "Raijin Island",
+  "QG de la Marine": null,
+  "Royaume de Prodence": "Kingdom of Prodence",
+  "Royaume de Mogaro": "Mogaro Kingdom",
+  "Royaume de Standing": null,
+  "Red Port": null,
+  "Calm Belt": null, // une ceinture, pas une île
+};
+
 /** Table src → entrée, pour le croisement avec positions.json. */
 export const BY_SOURCE = new Map(
   PLACES.filter((p) => p.src).map((p) => [p.src, p]),
 );
+
+/**
+ * Lieux que le relevé d'op-maps ne liste pas, et l'île qui les porte.
+ *
+ * Fuchsia est un village de Dawn, Mock Town le port de Jaya, Marie-Joie la
+ * cité au sommet de la Red Line au-dessus de l'Île des Hommes-Poissons. Les
+ * placer d'après leur hôte les garde ensemble quand celui-ci bouge — ce que
+ * des coordonnées figées ne feraient pas.
+ *
+ * Les écarts sont en degrés, et petits par construction : ce qui est sur
+ * une île n'en sort pas.
+ */
+export const ANCHORS = {
+  "Village de Fuchsia": { of: "Dawn Island", dLat: 0.5, dLng: 0.6 },
+  "Royaume de Goa": { of: "Dawn Island", dLat: -0.6, dLng: 0.5 },
+  "Shells Town": { of: "Loguetown", dLat: 6, dLng: 9 },
+  "Village de Cocoyashi": { of: "Arlong Park", dLat: -0.5, dLng: 0.5 },
+  "Village de Shimotsuki": { of: "Loguetown", dLat: 14, dLng: -6 },
+  "Cap des Jumeaux": { of: "Reverse Mountain", dLat: -1.2, dLng: 3 },
+  "Mock Town": { of: "Jaya", dLat: -0.8, dLng: 0.7 },
+  "Triangle de Florian": { of: "Thriller Bark", dLat: 1.4, dLng: -2.5 },
+  "Royaume de Ryugu": { of: "Île des Hommes-Poissons", dLat: -0.7, dLng: 0.8 },
+  "Marie-Joie": { of: "Île des Hommes-Poissons", dLat: 2.4, dLng: -0.4 },
+  "Red Port": { of: "Reverse Mountain", dLat: -2, dLng: 1.6 },
+  "Duché de Mokomo": { of: "Zou", dLat: 0.4, dLng: 0.5 },
+  "Royaume Tontatta": { of: "Green Bit", dLat: 0.4, dLng: 0.4 },
+  "Totto Land": { of: "Whole Cake Island", dLat: 2.2, dLng: 2.6 },
+  "QG de la Marine": { of: "Nouveau Marine Ford", dLat: 0.8, dLng: 0.8 },
+  "Royaume de Standing": { of: "Royaume de Prodence", dLat: 3.2, dLng: 5 },
+  Vira: { of: "Whisky Peak", dLat: 4, dLng: 7 },
+  "Calm Belt": { of: "Amazon Lily", dLat: 1.5, dLng: -22 },
+  // Laugh Tale vient après Lodestar, la dernière île que désigne le Log
+  // Pose : elle se pose donc plus loin sur la route, pas avant.
+  "Laugh Tale": { of: "Lodestar", dLat: -0.6, dLng: 14 },
+};

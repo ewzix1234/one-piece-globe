@@ -93,6 +93,21 @@ const SIZE_RADIUS = { 1: 2.4, 2: 3.4, 3: 4.8, 4: 6.6, 5: 9, 6: 12.2, 7: 16.4, 8:
  * que l'œuvre dit fausse. Le calcul suit exactement celui du tracé — rayon
  * de la taille, frange de littoral, écrasement vertical du contour.
  */
+/**
+ * Encombrement d'un lieu en degrés de latitude.
+ *
+ * Quand le contour vient d'un relevé, c'est lui qui décide — le rayon est
+ * mesuré, plus jugé. On le plafonne tout de même : la source dessine
+ * Reverse Mountain sur dix-huit degrés, ce qui recouvrirait la moitié de
+ * Grand Line et les deux Calm Belts avec.
+ */
+export const MAX_MEASURED_RADIUS = 5.5;
+
+export const measuredHalfHeight = (island) =>
+  island.radius != null
+    ? Math.min(island.radius, MAX_MEASURED_RADIUS)
+    : paintedHalfHeight(island.scale);
+
 export function paintedHalfHeight(scale) {
   const radiusPx = (SIZE_RADIUS[scale] ?? SIZE_RADIUS[3]) * 3.2 * 1.16 * 0.84;
   return (radiusPx / 2048) * 180;
@@ -303,6 +318,30 @@ function paintRedLine(ctx, w, h) {
  * côte. On passe donc une courbe quadratique par les milieux des rayons
  * tirés au sort, ce qui referme le contour sans angle vif.
  */
+/**
+ * Trace un contour relevé sur la carte source.
+ *
+ * Le polygone est stocké centré et à l'échelle 1 ; il suffit de le
+ * multiplier par le rayon voulu. On adoucit les angles par une courbe
+ * passant par les milieux, comme pour les contours tirés au sort : à
+ * l'échelle du globe, un polygone de quarante points reste anguleux.
+ */
+function traceOutline(ctx, x, y, radius, outline, grow = 1) {
+  const pts = outline.map(([dx, dy]) => [
+    x + dx * radius * grow,
+    y + dy * radius * grow,
+  ]);
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  ctx.beginPath();
+  const start = mid(pts[pts.length - 1], pts[0]);
+  ctx.moveTo(start[0], start[1]);
+  for (let i = 0; i < pts.length; i++) {
+    const next = mid(pts[i], pts[(i + 1) % pts.length]);
+    ctx.quadraticCurveTo(pts[i][0], pts[i][1], next[0], next[1]);
+  }
+  ctx.closePath();
+}
+
 function traceCoast(ctx, x, y, radius, points, rng, squash = 0.84) {
   const pts = [];
   for (let i = 0; i < points; i++) {
@@ -447,6 +486,13 @@ function paintIsland(ctx, x, y, radius, island) {
   const terrain =
     island.kind === "sky" ? "sky" : (island.terrain ?? "forest");
   const paint = TERRAIN[terrain] ?? TERRAIN.forest;
+
+  // Un contour relevé est la forme que l'île a vraiment sur la carte
+  // source ; il passe avant tout tracé inventé.
+  const coast = island.outline
+    ? (grow) => traceOutline(ctx, x, y, radius, island.outline, grow)
+    : null;
+  if (coast) return paintOutlinedIsland(ctx, x, y, radius, island, paint, coast);
 
   paintShallows(ctx, x, y, radius);
 
@@ -704,6 +750,48 @@ const ISLAND_SIGNATURE = {
     ctx.restore();
   },
 };
+
+/** Peint une île dont on possède le contour exact. */
+function paintOutlinedIsland(ctx, x, y, radius, island, paint, coast) {
+  paintShallows(ctx, x, y, radius);
+
+  ctx.fillStyle = "rgba(3,22,34,0.32)";
+  traceOutline(ctx, x + radius * 0.12, y + radius * 0.16, radius, island.outline, 1.1);
+  ctx.fill();
+
+  ctx.fillStyle = paint.shore;
+  coast(1.14);
+  ctx.fill();
+
+  ctx.fillStyle = paint.low;
+  coast(1);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(18,44,58,0.45)";
+  ctx.lineWidth = Math.max(0.7, radius * 0.045);
+  ctx.stroke();
+
+  ctx.save();
+  coast(1);
+  ctx.clip();
+  ctx.globalAlpha = 0.5;
+  ctx.fillStyle = paint.high;
+  traceOutline(ctx, x - radius * 0.14, y - radius * 0.16, radius, island.outline, 0.82);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  if (radius > 4) {
+    if (ISLAND_SIGNATURE[island.name]) ISLAND_SIGNATURE[island.name](ctx, x, y, radius);
+    else
+      paintTerrainMarks(
+        ctx,
+        x,
+        y,
+        radius,
+        island.terrain === "split" ? "rock" : (island.kind === "sky" ? "sky" : island.terrain),
+        makeRandom(Math.floor(Math.abs(x) * 31 + Math.abs(y) * 17) || 5),
+      );
+  }
+  ctx.restore();
+}
 
 /** Un archipel : une grappe d'îlots plutôt qu'une seule masse. */
 function paintCluster(ctx, x, y, radius, island) {
@@ -1060,9 +1148,19 @@ function painterFor(island) {
   return island.archipelago ? paintCluster : paintIsland;
 }
 
-/** Rayon d'un lieu en pixels, pour une texture de largeur `w`. */
-const islandRadius = (island, w) =>
-  (SIZE_RADIUS[island.scale] ?? SIZE_RADIUS[3]) * (w / 4096) * 3.2;
+/**
+ * Rayon d'un lieu en pixels de texture.
+ *
+ * Un contour relevé donne son étendue en degrés : on la convertit. Sinon on
+ * retombe sur l'échelle en huit rangs, pour les lieux que la source ne
+ * connaît pas.
+ */
+function islandRadius(island, w) {
+  if (island.radius != null) {
+    return (Math.min(island.radius, MAX_MEASURED_RADIUS) / 180) * (w / 2);
+  }
+  return (SIZE_RADIUS[island.scale] ?? SIZE_RADIUS[3]) * (w / 4096) * 3.2;
+}
 
 /**
  * Peint la texture complète.

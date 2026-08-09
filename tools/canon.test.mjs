@@ -188,8 +188,12 @@ test("la route de l'équipage progresse sans revenir en arrière", () => {
     while (d < 0) d += 360;
     return d;
   };
+  // Totto Land est un détour : l'équipage quitte la route pour aller
+  // chercher Sanji, puis revient. Le récit le dit, la carte doit pouvoir le
+  // montrer — on ne contrôle donc pas la progression sur ces escales-là.
+  const DETOUR = new Set(["Whole Cake Island", "Île Cacao", "Pays des Wa"]);
   const route = islands
-    .filter((i) => i.step && i.step >= 30)
+    .filter((i) => i.step && i.step >= 30 && !DETOUR.has(i.name))
     .sort((a, b) => a.step - b.step);
 
   for (let k = 1; k < route.length; k++) {
@@ -425,7 +429,7 @@ test("aucun alias ne désigne deux lieux à la fois", () => {
 test("aucune terre de Grand Line ne déborde sur la Calm Belt", async () => {
   // La ceinture est réputée infranchissable : une île de la route qui y
   // trempe sa côte affirme le contraire.
-  const { paintedHalfHeight } = await import("../src/texture.js");
+  const { measuredHalfHeight } = await import("../src/texture.js");
   const PAINTS_NO_LAND = ["zone", "seafloor", "ship", "sky", "settlement"];
   const road = islands.filter(
     (i) =>
@@ -434,7 +438,7 @@ test("aucune terre de Grand Line ne déborde sur la Calm Belt", async () => {
   );
   assert.ok(road.length > 30, "trop peu d'îles contrôlées");
   for (const island of road) {
-    const reach = Math.abs(island.lat) + paintedHalfHeight(island.scale);
+    const reach = Math.abs(island.lat) + measuredHalfHeight(island);
     assert.ok(
       reach <= GRAND_LINE_HALF_WIDTH + 0.02,
       `${island.name} atteint ${reach.toFixed(1)}° alors que la route s'arrête à ${GRAND_LINE_HALF_WIDTH}°`,
@@ -443,9 +447,9 @@ test("aucune terre de Grand Line ne déborde sur la Calm Belt", async () => {
 });
 
 test("les îles de la Calm Belt tiennent dans la ceinture", async () => {
-  const { paintedHalfHeight } = await import("../src/texture.js");
+  const { measuredHalfHeight } = await import("../src/texture.js");
   for (const island of islands.filter((i) => i.sea === "Calm Belt" && i.kind !== "zone")) {
-    const half = paintedHalfHeight(island.scale);
+    const half = measuredHalfHeight(island);
     const near = Math.abs(island.lat) - half;
     const far = Math.abs(island.lat) + half;
     assert.ok(near >= GRAND_LINE_HALF_WIDTH - 0.02, `${island.name} mord sur Grand Line`);

@@ -17,18 +17,28 @@ import {
   PLACE_TERRAIN,
   ARCHIPELAGOS,
   CREW_STOPS,
+  OPMAPS_NAME,
+  ANCHORS,
 } from "./curation.mjs";
+import { opPosition, OP_SPAN_X } from "./opmaps.mjs";
 import {
   RED_LINE_LNG,
   GRAND_LINE_HALF_WIDTH,
   CALM_BELT_OUTER,
   paintedHalfHeight,
+  MAX_MEASURED_RADIUS,
 } from "../src/texture.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const read = (p) => JSON.parse(readFileSync(p, "utf8"));
 
 const positions = read(join(HERE, "..", "data", "positions.json"));
+const opPath = join(HERE, "_opmaps.json");
+if (!existsSync(opPath)) {
+  console.error("relevé op-maps absent — lance d'abord : node tools/fetch-opmaps.mjs");
+  process.exit(1);
+}
+const opByName = new Map(read(opPath).map((i) => [i.name, i]));
 const cachePath = join(HERE, "_wiki-cache.json");
 if (!existsSync(cachePath)) {
   console.error("data wiki absente — lance d'abord : node tools/fetch-wiki.mjs");
@@ -91,8 +101,12 @@ function normaliseSea(raw, lat, lng, name) {
  * grandes viennent se poser sur la route, ce qui est d'ailleurs ce que
  * l'œuvre montre.
  */
-function fitToBand(lat, sea, scale) {
-  const half = paintedHalfHeight(scale);
+function fitToBand(lat, sea, scale, measured) {
+  // Quand le contour est relevé, c'est lui qui donne l'encombrement.
+  const half =
+    measured != null
+      ? Math.min(measured, MAX_MEASURED_RADIUS)
+      : paintedHalfHeight(scale);
   const sign = lat < 0 ? -1 : 1;
 
   if (sea === "Paradise" || sea === "Nouveau Monde") {
@@ -105,6 +119,57 @@ function fitToBand(lat, sea, scale) {
     return sign * Math.min(outer, Math.max(inner, Math.abs(lat)));
   }
   return lat;
+}
+
+/**
+ * Contour d'une île, ramené dans notre repère et à l'échelle 1.
+ *
+ * Le relevé d'op-maps est une projection équirectangulaire tournée d'un
+ * quart de tour : leur `x` court le long de nos latitudes, leur `y` le long
+ * de nos longitudes. On remet donc le contour d'aplomb, on le centre sur
+ * son centre de gravité, et on le divise par son rayon moyen — ce qui
+ * permet de le redessiner à n'importe quelle taille.
+ *
+ * `radius` retient l'étendue réelle, en degrés : c'est elle qui dit qu'un
+ * pays fait dix fois un îlot, et elle vient d'une mesure, plus d'un
+ * jugement.
+ */
+const MAX_OUTLINE_POINTS = 40;
+
+function normaliseShape(shape) {
+  if (!Array.isArray(shape) || shape.length < 4) return null;
+  // Un contour de deux cent quatre-vingts points ne se voit pas sur une
+  // sphère : on l'échantillonne régulièrement.
+  const step = Math.ceil(shape.length / MAX_OUTLINE_POINTS);
+  const pts = shape.filter((_, i) => i % step === 0);
+  if (pts.length < 4) return null;
+
+  // Notre x suit la longitude (leur y), notre y suit la latitude, qui
+  // descend quand leur x monte.
+  const xy = pts.map(([px, py]) => [py, -px]);
+  const cx = xy.reduce((a, p) => a + p[0], 0) / xy.length;
+  const cy = xy.reduce((a, p) => a + p[1], 0) / xy.length;
+  const centred = xy.map(([x, y]) => [x - cx, y - cy]);
+  const mean =
+    centred.reduce((a, [x, y]) => a + Math.hypot(x, y), 0) / centred.length;
+  if (!(mean > 0)) return null;
+
+  // Aire du polygone, pour l'étendue réelle du lieu.
+  let area = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [x1, y1] = pts[i];
+    const [x2, y2] = pts[(i + 1) % pts.length];
+    area += x1 * y2 - x2 * y1;
+  }
+  const radius = (Math.sqrt(Math.abs(area) / 2 / Math.PI) / OP_SPAN_X) * 180;
+
+  return {
+    outline: centred.map(([x, y]) => [
+      Number((x / mean).toFixed(3)),
+      Number((y / mean).toFixed(3)),
+    ]),
+    radius: Number(radius.toFixed(3)),
+  };
 }
 
 /** Table inverse du terrain : un lieu → son terrain. */
@@ -127,8 +192,24 @@ for (const place of PLACES) {
   // Une position peut être reprise à la carte source, ou fixée ici quand
   // le récit impose un emplacement que la carte rend approximativement.
   // L'override est toujours motivé en commentaire dans curation.mjs.
-  const lat = place.lat ?? pos?.lat;
-  const lng = place.lng ?? pos?.lng;
+  // Le relevé d'op-maps prime quand il connaît le lieu : son repère se
+  // vérifie sur les invariants de l'œuvre, celui de la carte d'Ohara non.
+  const op = OPMAPS_NAME[place.fr] ? opByName.get(OPMAPS_NAME[place.fr]) : null;
+  const opPos = op ? opPosition(op.coordinates) : null;
+  const drawn = op ? normaliseShape(op.shape) : null;
+
+  // Un lieu absent du relevé — une ville prise dans une île, une étendue de
+  // mer — se raccroche à celui qui le porte, avec l'écart qu'il faut.
+  const anchor = ANCHORS[place.fr];
+  const host = anchor ? opByName.get(OPMAPS_NAME[anchor.of]) : null;
+  const hostPos = host ? opPosition(host.coordinates) : null;
+
+  const lat =
+    opPos?.lat ??
+    (hostPos ? hostPos.lat + (anchor.dLat ?? 0) : (place.lat ?? pos?.lat));
+  const lng =
+    opPos?.lng ??
+    (hostPos ? hostPos.lng + (anchor.dLng ?? 0) : (place.lng ?? pos?.lng));
   if (typeof lat !== "number" || typeof lng !== "number") {
     errors.push(`coordonnées manquantes pour « ${place.fr} »`);
     continue;
@@ -164,7 +245,7 @@ for (const place of PLACES) {
   const painted = !["zone", "seafloor", "ship", "sky", "settlement"].includes(
     PLACE_KIND[place.fr],
   );
-  const fitted = painted ? fitToBand(lat, sea, scale) : lat;
+  const fitted = painted ? fitToBand(lat, sea, scale, drawn?.radius) : lat;
 
   islands.push({
     id: place.fr
@@ -198,6 +279,10 @@ for (const place of PLACES) {
     // la carte source ; à défaut, on retombe sur le rang.
     scale,
     terrain: TERRAIN_BY_PLACE.get(place.fr) ?? "forest",
+    // Contour relevé sur la carte source, à l'échelle 1, et étendue réelle
+    // en degrés. Absents quand la source ne connaît pas le lieu.
+    outline: drawn?.outline ?? null,
+    radius: drawn?.radius ?? null,
     archipelago: ARCHIPELAGOS.has(place.fr) || undefined,
     chapter: w?.chapter ?? null,
     episode: w?.episode ?? null,

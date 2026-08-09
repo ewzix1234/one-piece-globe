@@ -51,14 +51,16 @@
     <!-- Bandeau de la lecture cinématique, visible seulement pendant. -->
     <div class="cine-hud" id="cine-hud" hidden aria-live="polite">
       <div class="cine-track" id="cine-track" role="slider" tabindex="0"
-           aria-label="Avancer dans le voyage" aria-valuemin="1" aria-valuemax="40">
-        <i id="cine-progress"></i>
+           aria-label="Avancer dans le voyage" aria-valuemin="1" aria-valuemax="39">
+        <span class="cine-rail"><i id="cine-progress"></i></span>
+        <span class="cine-ticks" id="cine-ticks" aria-hidden="true"></span>
       </div>
       <div class="cine-read">
         <strong id="cine-place">Village de Fuchsia</strong>
         <span id="cine-sub"></span>
         <p id="cine-deed" hidden></p>
       </div>
+      <p class="cine-saga" id="cine-saga" hidden></p>
       <div class="cine-actions">
         <button id="cine-speed" type="button" aria-label="Vitesse de lecture">×1</button>
         <button id="cine-skip" type="button" aria-label="Escale suivante">⏭</button>
@@ -78,6 +80,7 @@
       </div>
       <div class="stopcard-actions">
         <button id="stopcard-open" type="button">Fiche complète</button>
+        <button id="stopcard-play" type="button" hidden>Partir d'ici</button>
         <button id="stopcard-close" type="button" aria-label="Fermer">✕</button>
       </div>
     </div>

@@ -8,8 +8,8 @@
  */
 
 export const RED_LINE_LNG = [-3.5, 176.5];
-export const GRAND_LINE_HALF_WIDTH = 3.2; // degrés de latitude
-export const CALM_BELT_OUTER = 9.5;
+export const GRAND_LINE_HALF_WIDTH = 6.5; // degrés de latitude
+export const CALM_BELT_OUTER = 15;
 
 /**
  * Zones du monde, pour les étiquettes posées sur la sphère.
@@ -77,13 +77,26 @@ const TERRAIN = {
 };
 
 /**
- * Rayon de base d'un lieu, par taille de 1 à 6.
+ * Rayon de base d'un lieu, par taille de 1 à 8.
  *
  * L'écart doit se voir : un pays comme Elbaf ne peut pas avoir la même
  * empreinte qu'un village de pêcheurs. Le pas est géométrique, pas
  * linéaire, sinon les grandes îles n'écrasent jamais les petites.
  */
 const SIZE_RADIUS = { 1: 2.4, 2: 3.4, 3: 4.8, 4: 6.6, 5: 9, 6: 12.2, 7: 16.4, 8: 22 };
+
+/**
+ * Demi-hauteur peinte d'un lieu, en degrés de latitude.
+ *
+ * Sert à vérifier qu'une île tient dans la bande où elle est censée être :
+ * une terre de Grand Line qui déborde sur la Calm Belt raconte une chose
+ * que l'œuvre dit fausse. Le calcul suit exactement celui du tracé — rayon
+ * de la taille, frange de littoral, écrasement vertical du contour.
+ */
+export function paintedHalfHeight(scale) {
+  const radiusPx = (SIZE_RADIUS[scale] ?? SIZE_RADIUS[3]) * 3.2 * 1.16 * 0.84;
+  return (radiusPx / 2048) * 180;
+}
 
 /**
  * Quels lieux sortent du relief de la sphère.

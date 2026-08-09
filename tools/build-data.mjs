@@ -18,7 +18,12 @@ import {
   ARCHIPELAGOS,
   CREW_STOPS,
 } from "./curation.mjs";
-import { RED_LINE_LNG } from "../src/texture.js";
+import {
+  RED_LINE_LNG,
+  GRAND_LINE_HALF_WIDTH,
+  CALM_BELT_OUTER,
+  paintedHalfHeight,
+} from "../src/texture.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const read = (p) => JSON.parse(readFileSync(p, "utf8"));
@@ -72,6 +77,36 @@ function normaliseSea(raw, lat, lng, name) {
   return east ? "South Blue" : "West Blue";
 }
 
+/**
+ * Ramène un lieu dans la bande qui lui revient.
+ *
+ * La carte source écarte les îles de l'équateur pour qu'on lise leurs noms.
+ * Peintes à leur vraie taille, les plus grandes débordaient alors sur la
+ * Calm Belt — trente-huit sur quarante-neuf — et la carte affirmait qu'on
+ * peut accoster Wano dans une ceinture réputée infranchissable.
+ *
+ * On corrige la latitude, pas la taille : un lieu garde son étendue, et
+ * c'est son centre qui recule assez pour que sa côte reste dans sa bande.
+ * Les petites îles gardent presque tout leur écart ; seules les plus
+ * grandes viennent se poser sur la route, ce qui est d'ailleurs ce que
+ * l'œuvre montre.
+ */
+function fitToBand(lat, sea, scale) {
+  const half = paintedHalfHeight(scale);
+  const sign = lat < 0 ? -1 : 1;
+
+  if (sea === "Paradise" || sea === "Nouveau Monde") {
+    const room = Math.max(0, GRAND_LINE_HALF_WIDTH - half);
+    return sign * Math.min(Math.abs(lat), room);
+  }
+  if (sea === "Calm Belt") {
+    const inner = GRAND_LINE_HALF_WIDTH + half;
+    const outer = Math.max(inner, CALM_BELT_OUTER - half);
+    return sign * Math.min(outer, Math.max(inner, Math.abs(lat)));
+  }
+  return lat;
+}
+
 /** Table inverse du terrain : un lieu → son terrain. */
 const TERRAIN_BY_PLACE = new Map();
 for (const [terrain, names] of Object.entries(PLACE_TERRAIN)) {
@@ -120,6 +155,17 @@ for (const place of PLACES) {
   // est tronqué ou bancal.
   const summary = place.summary ?? (place.ownNoteOnly ? null : (w?.summary ?? null));
 
+  const scale = PLACE_SIZE[place.fr] ?? pos?.scale ?? place.scale ?? 3;
+  const sea =
+    place.sea ??
+    normaliseSea(pos?.location ?? place.location ?? w?.region, lat, lng, place.fr);
+  // Les lieux sans terre peinte n'ont pas à être recadrés : une bulle, un
+  // banc de nuages ou une coque ne prétendent pas être une côte.
+  const painted = !["zone", "seafloor", "ship", "sky", "settlement"].includes(
+    PLACE_KIND[place.fr],
+  );
+  const fitted = painted ? fitToBand(lat, sea, scale) : lat;
+
   islands.push({
     id: place.fr
       .normalize("NFD")
@@ -132,9 +178,9 @@ for (const place of PLACES) {
     people: PEOPLE[place.fr] ?? [],
     nameJp: place.ownNoteOnly ? null : (w?.nameJp ?? null),
     nameRomaji: place.ownNoteOnly ? null : (w?.nameRomaji ?? null),
-    lat: Number(lat.toFixed(4)),
+    lat: Number(fitted.toFixed(4)),
     lng: Number(lng.toFixed(4)),
-    sea: place.sea ?? normaliseSea(pos?.location ?? place.location ?? w?.region, lat, lng, place.fr),
+    sea,
     saga: place.saga,
     step: place.step,
     tag: place.tag,
@@ -150,7 +196,7 @@ for (const place of PLACES) {
       : null,
     // La taille vient de ce que l'œuvre montre, pas du rang de l'arc dans
     // la carte source ; à défaut, on retombe sur le rang.
-    scale: PLACE_SIZE[place.fr] ?? pos?.scale ?? place.scale ?? 3,
+    scale,
     terrain: TERRAIN_BY_PLACE.get(place.fr) ?? "forest",
     archipelago: ARCHIPELAGOS.has(place.fr) || undefined,
     chapter: w?.chapter ?? null,

@@ -170,6 +170,28 @@ const basePaths = () =>
 
 function refreshPaths() {
   const paths = [...basePaths()];
+  // Ce qu'il reste à parcourir, en filigrane : sans lui, le navire avance
+  // dans le noir et on ne sait pas où la route mène.
+  if (cine.active && cine.leg < state.route.length - 1) {
+    const ahead = [];
+    for (let k = cine.leg; k < state.route.length - 1; k++) {
+      const from = state.route[k];
+      const to = state.route[k + 1];
+      const steps = Math.max(2, Math.round(angularDistance(from, to) / 3));
+      for (let n = 0; n <= steps; n++) {
+        const at = along(from, to, n / steps);
+        ahead.push([at.lat, at.lng, 0.012]);
+      }
+    }
+    paths.push({
+      id: "cine-ahead",
+      points: ahead,
+      color: "rgba(214,236,246,0.28)",
+      stroke: 0.3,
+      dashLength: 0.004,
+      dashGap: 0.008,
+    });
+  }
   if (cine.trail.length > 1) paths.push(cine.trailPath());
   globe.pathsData(paths);
 }
@@ -408,6 +430,8 @@ function renderStopCard(island) {
   const deed = $("stopcard-deed");
   deed.textContent = island.deed ?? "";
   deed.hidden = !island.deed;
+  // « Partir d'ici » n'a de sens que sur une escale de la route.
+  $("stopcard-play").hidden = !island.step;
   card.hidden = false;
   document.body.classList.add("card-open");
 }
@@ -573,8 +597,18 @@ function renderRecord(island) {
       }
       ${island.note ? `<p class="record-note">${escape(island.note)}</p>` : ""}
       ${renderSummary(island.summary)}
+      ${
+        island.step
+          ? `<button type="button" class="record-play" data-step="${island.step}">
+               Partir d'ici — revivre le voyage à partir de cette escale
+             </button>`
+          : ""
+      }
     </div>
   `;
+  host.querySelector(".record-play")?.addEventListener("click", () => {
+    startCineAt(island);
+  });
   host.querySelector(".record-unfold")?.addEventListener("click", (event) => {
     event.currentTarget.previousElementSibling.hidden = false;
     event.currentTarget.remove();
@@ -769,6 +803,8 @@ const cine = {
   elapsed: 0,
   raf: null,
   last: 0,
+  saga: null, // dernier arc annoncé
+  from: null, // escale de départ demandée
   trail: [], // [lat, lng, alt] déjà parcourus
   lastTrailPush: 0,
   dayCount: 0, // jours cumulés depuis le départ de Fuchsia
@@ -865,6 +901,7 @@ function jumpToLeg(index) {
   moveShip(stop.lat, stop.lng, 90);
   globe.ringsData([stop]);
   globe.pointOfView({ lat: stop.lat, lng: stop.lng, altitude: FOLLOW_ALT() }, 700);
+  announceSaga(stop);
   cineHud(stop.name, hudStopLine(stop, stop.step), stop.deed);
 }
 
@@ -888,7 +925,28 @@ function hudStopLine(stop, rank) {
   if (stay) parts.push(stay);
   if (cine.dayCount > 0) parts.push(`jour ${cine.dayCount}`);
   else parts.push(stop.sea);
+  if (cine.hull) parts.push(SHIPS[cine.hull].name);
   return parts.join(" · ");
+}
+
+/**
+ * Carton de saga : le nom de l'arc s'affiche quand on y entre.
+ *
+ * Le voyage change de saison sans prévenir ; ce carton dit qu'on vient de
+ * passer d'Alabasta à Skypiea, comme un intertitre.
+ */
+function announceSaga(stop) {
+  if (stop.saga === cine.saga) return;
+  cine.saga = stop.saga;
+  const label = state.bySaga.get(stop.saga)?.label;
+  const card = $("cine-saga");
+  if (!label) return void (card.hidden = true);
+  card.textContent = label;
+  card.hidden = false;
+  card.classList.remove("is-in");
+  // Un souffle avant de relancer l'animation, sinon elle ne rejoue pas.
+  void card.offsetWidth;
+  card.classList.add("is-in");
 }
 
 function cineHud(place, sub, deed = null) {
@@ -901,6 +959,14 @@ function cineHud(place, sub, deed = null) {
   $("cine-progress").style.transform = `scaleX(${clamp(done, 0, 1)})`;
 }
 
+/** Lance la lecture à partir d'une escale choisie plutôt que du départ. */
+function startCineAt(island) {
+  const index = state.route.findIndex((i) => i.id === island?.id);
+  if (index < 0) return;
+  cine.from = index;
+  startCine();
+}
+
 function startCine() {
   if (cine.active) return;
   stopCineDecor(false);
@@ -908,13 +974,12 @@ function startCine() {
   cine.active = true;
   cine.paused = false;
   cine.finished = false;
-  cine.leg = 0;
+  cine.leg = clamp(cine.from ?? 0, 0, state.route.length - 1);
+  cine.from = null;
   cine.phase = "dwell";
   cine.elapsed = 0;
   cine.trail = [];
   cine.trailArc = 0;
-  cine.dayCount = first0Days();
-
   if (!cine.ship) {
     cine.ship = { lat: 0, lng: 0, alt: 0.05, el: makeShipElement() };
   }
@@ -936,14 +1001,17 @@ function startCine() {
   controls.autoRotate = false;
   controls.enabled = false;
 
-  const first = state.route[0];
+  const first = state.route[cine.leg];
+  cine.dayCount = daysUpTo(cine.leg);
   moveShip(first.lat, first.lng, 90);
-  pushTrail(first.lat, first.lng, true);
+  buildTrailTo(cine.leg);
   refreshShipLayer();
   refreshPaths();
   globe.ringsData([first]);
   globe.pointOfView({ lat: first.lat, lng: first.lng, altitude: FOLLOW_ALT() }, 1200);
-  cineHud(first.name, hudStopLine(first, 1), first.deed);
+  cine.saga = null;
+  announceSaga(first);
+  cineHud(first.name, hudStopLine(first, first.step), first.deed);
 
   // Mouvement réduit : on saute d'escale en escale sans animer la mer.
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -956,9 +1024,6 @@ function startCine() {
 }
 
 const FOLLOW_ALT = () => (small ? 2.1 : 1.65);
-
-/** Jours passés à la première escale, comptés dès le départ. */
-const first0Days = () => state.route[0]?.days ?? 0;
 
 /** Total des jours connus sur l'ensemble de la route. */
 const routeDays = () =>
@@ -1014,6 +1079,7 @@ function tickCine(now) {
     cine.elapsed = 0;
     globe.ringsData([to]);
     cine.dayCount += to.days ?? 0;
+    announceSaga(to);
     cineHud(to.name, hudStopLine(to, to.step), to.deed);
   }
 }
@@ -1077,7 +1143,20 @@ function stopCineDecor(restoreArcs = true) {
   }
 }
 
+/** Un repère par escale sur la réglette : la route se lit d'un coup d'œil. */
+function paintTicks() {
+  const host = $("cine-ticks");
+  const last = state.route.length - 1;
+  host.innerHTML = state.route
+    .map((stop, i) => {
+      const strong = stop.days >= 28 ? " cine-tick-long" : "";
+      return `<i class="cine-tick${strong}" style="left:${((i / last) * 100).toFixed(3)}%" title="${escape(stop.name)}"></i>`;
+    })
+    .join("");
+}
+
 function setupCine() {
+  paintTicks();
   $("cine-start").addEventListener("click", startCine);
   $("cine-replay").addEventListener("click", startCine);
 
@@ -1212,6 +1291,7 @@ async function start() {
     $("stopcard-open").addEventListener("click", () => {
       if (state.selected) select(state.selected, { panel: true });
     });
+    $("stopcard-play").addEventListener("click", () => startCineAt(state.selected));
     $("voyage-prev").addEventListener("click", () => stepBy(-1));
     $("voyage-next").addEventListener("click", () => stepBy(1));
     setupSheetDrag();

@@ -421,3 +421,34 @@ test("aucun alias ne désigne deux lieux à la fois", () => {
     }
   }
 });
+
+test("aucune terre de Grand Line ne déborde sur la Calm Belt", async () => {
+  // La ceinture est réputée infranchissable : une île de la route qui y
+  // trempe sa côte affirme le contraire.
+  const { paintedHalfHeight } = await import("../src/texture.js");
+  const PAINTS_NO_LAND = ["zone", "seafloor", "ship", "sky", "settlement"];
+  const road = islands.filter(
+    (i) =>
+      ["Paradise", "Nouveau Monde"].includes(i.sea) &&
+      !PAINTS_NO_LAND.includes(i.kind),
+  );
+  assert.ok(road.length > 30, "trop peu d'îles contrôlées");
+  for (const island of road) {
+    const reach = Math.abs(island.lat) + paintedHalfHeight(island.scale);
+    assert.ok(
+      reach <= GRAND_LINE_HALF_WIDTH + 0.02,
+      `${island.name} atteint ${reach.toFixed(1)}° alors que la route s'arrête à ${GRAND_LINE_HALF_WIDTH}°`,
+    );
+  }
+});
+
+test("les îles de la Calm Belt tiennent dans la ceinture", async () => {
+  const { paintedHalfHeight } = await import("../src/texture.js");
+  for (const island of islands.filter((i) => i.sea === "Calm Belt" && i.kind !== "zone")) {
+    const half = paintedHalfHeight(island.scale);
+    const near = Math.abs(island.lat) - half;
+    const far = Math.abs(island.lat) + half;
+    assert.ok(near >= GRAND_LINE_HALF_WIDTH - 0.02, `${island.name} mord sur Grand Line`);
+    assert.ok(far <= CALM_BELT_OUTER + 0.02, `${island.name} sort de la ceinture`);
+  }
+});

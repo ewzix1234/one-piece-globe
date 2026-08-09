@@ -8,8 +8,27 @@
  */
 
 export const RED_LINE_LNG = [-3.5, 176.5];
-export const GRAND_LINE_HALF_WIDTH = 6.5; // degrés de latitude
-export const CALM_BELT_OUTER = 15;
+
+/**
+ * Largeurs relevées sur la carte de référence d'op-maps.
+ *
+ * Trois choses y sont mesurables, et le projet les avait toutes fausses :
+ *
+ *   — La Red Line n'est pas un trait mais un continent large de quarante-
+ *     quatre degrés de longitude à l'équateur. Elle en faisait six.
+ *   — Grand Line est une bande sombre de vingt-deux degrés de latitude, pas
+ *     treize.
+ *   — Les Calm Belts qui la bordent sont plus CLAIRES que l'océan, et non
+ *     plus sombres. C'est ce contresens qui faisait lire le globe comme un
+ *     ballon rayé de noir.
+ *
+ * La Red Line est ramenée à vingt-huit degrés : à quarante-quatre, elle
+ * avalait Sabaody, Marine Ford et Enies Lobby, qui la bordent sans être
+ * dessus.
+ */
+export const RED_LINE_HALF_WIDTH = 14; // degrés de longitude
+export const GRAND_LINE_HALF_WIDTH = 11; // degrés de latitude
+export const CALM_BELT_OUTER = 18;
 
 /**
  * Zones du monde, pour les étiquettes posées sur la sphère.
@@ -42,15 +61,22 @@ export const ZONES = [
   { label: "WEST BLUE", lat: -46, lng: NEW_WORLD_LNG, size: 4.4, kind: "blue" },
 ];
 
+/**
+ * Couleurs relevées sur la carte de référence, à la pipette.
+ *
+ * L'océan y est un bleu d'ardoise mat, les terres un vert d'olive, la Red
+ * Line une brique sourde. Rien de saturé : c'est un relevé imprimé, pas une
+ * photographie satellite — et c'est ce qui manquait le plus.
+ */
 const PALETTE = {
-  deep: "#093247",
-  ocean: "#11536f",
-  shallow: "#1a6d8d",
-  paradise: "#1e8fae", // première moitié de Grand Line, plus claire
-  newWorld: "#155f80", // seconde moitié, plus profonde
-  calmBelt: "#123c52", // ni vent ni courant : un aplat mat, mais lisible
-  redLine: "#8c4a35",
-  redLineHigh: "#b4674c",
+  deep: "#3f6d7c",
+  ocean: "#528694",
+  shallow: "#5f96a4",
+  paradise: "#41707f", // Grand Line, moitié Paradise : un cran plus claire
+  newWorld: "#3a6475", // moitié Nouveau Monde : un cran plus sombre
+  calmBelt: "#70a9b6", // sans vent ni courant : une eau pâle, pas un abîme
+  redLine: "#8e3d3b",
+  redLineHigh: "#a4514c",
 };
 
 /**
@@ -101,7 +127,7 @@ const SIZE_RADIUS = { 1: 2.4, 2: 3.4, 3: 4.8, 4: 6.6, 5: 9, 6: 12.2, 7: 16.4, 8:
  * Reverse Mountain sur dix-huit degrés, ce qui recouvrirait la moitié de
  * Grand Line et les deux Calm Belts avec.
  */
-export const MAX_MEASURED_RADIUS = 5.5;
+export const MAX_MEASURED_RADIUS = 4.2;
 
 export const measuredHalfHeight = (island) =>
   island.radius != null
@@ -174,8 +200,8 @@ function paintOcean(ctx, w, h) {
     const y = rand() * h;
     const x = rand() * w;
     const length = w * (0.02 + rand() * 0.06);
-    ctx.globalAlpha = 0.012 + rand() * 0.016;
-    ctx.strokeStyle = rand() > 0.45 ? "#9fd6e8" : "#03151f";
+    ctx.globalAlpha = 0.014 + rand() * 0.018;
+    ctx.strokeStyle = rand() > 0.45 ? "#8fbcc7" : "#2f5c68";
     ctx.lineWidth = 1 + rand() * 3;
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -201,7 +227,7 @@ function paintOcean(ctx, w, h) {
  * un cran plus marquées que les autres, comme sur un relevé imprimé.
  */
 function paintGraticule(ctx, w, h) {
-  const ink = (alpha) => `rgba(190,222,236,${alpha})`;
+  const ink = (alpha) => `rgba(240,250,252,${alpha})`;
   ctx.lineWidth = Math.max(1, h / 2200);
 
   for (let lat = -75; lat <= 75; lat += 15) {
@@ -249,11 +275,12 @@ function paintGrandLine(ctx, w, h) {
     [-CALM_BELT_OUTER, -GRAND_LINE_HALF_WIDTH],
   ]) {
     const [y, height] = belt(from, to);
-    // Aplat opaque : aucun moutonnement ne doit transparaître.
+    // Aplat opaque et pâle : sans vent ni courant, l'eau y est lisse et
+    // claire. Aucun moutonnement ne doit transparaître.
     ctx.fillStyle = PALETTE.calmBelt;
     ctx.fillRect(0, y, w, height);
-    ctx.globalAlpha = 0.45;
-    ctx.strokeStyle = "#2a6d8c";
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = "#3d7f92";
     ctx.lineWidth = Math.max(1, h / 1100);
     ctx.beginPath();
     ctx.moveTo(0, y);
@@ -270,17 +297,15 @@ function paintGrandLine(ctx, w, h) {
   const xA = lngToX(RED_LINE_LNG[0], w);
   const xB = lngToX(RED_LINE_LNG[1], w);
 
-  ctx.globalAlpha = 0.88;
   ctx.fillStyle = PALETTE.newWorld;
   ctx.fillRect(0, gy, w, gh);
   ctx.fillStyle = PALETTE.paradise;
   ctx.fillRect(xA, gy, xB - xA, gh);
-  ctx.globalAlpha = 1;
 
   // Fil de courant au centre exact de Grand Line.
-  ctx.globalAlpha = 0.55;
-  ctx.strokeStyle = "#7fe0f2";
-  ctx.lineWidth = Math.max(1, h / 850);
+  ctx.globalAlpha = 0.4;
+  ctx.strokeStyle = "#a9dbe6";
+  ctx.lineWidth = Math.max(1, h / 900);
   ctx.beginPath();
   ctx.moveTo(0, yOf(0));
   ctx.lineTo(w, yOf(0));
@@ -294,25 +319,35 @@ function paintGrandLine(ctx, w, h) {
  */
 function paintRedLine(ctx, w, h) {
   const rand = makeRandom(1522);
-  const halfWidth = (w / 360) * 3.1;
+  const halfWidth = (w / 360) * RED_LINE_HALF_WIDTH;
 
   for (const lng of RED_LINE_LNG) {
     const cx = lngToX(lng, w);
     // La bande peut déborder du canvas : on la dessine aussi décalée d'une
     // largeur de monde pour que l'enroulement soit continu.
     for (const offset of [-w, 0, w]) {
+      // Une côte de continent : des golfes larges et arrondis, comme sur
+      // la carte de référence. Un tirage par pas donnait une scie ; on
+      // tire moins de points et on passe une courbe entre eux.
+      const steps = 22;
+      const side = (sign) => {
+        const pts = [];
+        for (let i = 0; i <= steps; i++) {
+          const y = (i / steps) * h;
+          const wobble = (rand() - 0.5) * halfWidth * 0.5;
+          pts.push([cx + offset + sign * halfWidth + wobble, y]);
+        }
+        return pts;
+      };
+      const left = side(-1);
+      const right = side(1).reverse();
+      const all = [...left, ...right];
       ctx.beginPath();
-      const steps = 90;
-      for (let i = 0; i <= steps; i++) {
-        const y = (i / steps) * h;
-        const wobble = (rand() - 0.5) * halfWidth * 0.5;
-        const x = cx + offset - halfWidth + wobble;
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      for (let i = steps; i >= 0; i--) {
-        const y = (i / steps) * h;
-        const wobble = (rand() - 0.5) * halfWidth * 0.5;
-        ctx.lineTo(cx + offset + halfWidth + wobble, y);
+      ctx.moveTo(all[0][0], all[0][1]);
+      for (let i = 1; i < all.length - 1; i++) {
+        const [x1, y1] = all[i];
+        const [x2, y2] = all[i + 1];
+        ctx.quadraticCurveTo(x1, y1, (x1 + x2) / 2, (y1 + y2) / 2);
       }
       ctx.closePath();
       ctx.fillStyle = PALETTE.redLine;
@@ -322,8 +357,8 @@ function paintRedLine(ctx, w, h) {
       ctx.save();
       ctx.clip();
       ctx.fillStyle = PALETTE.redLineHigh;
-      ctx.globalAlpha = 0.55;
-      ctx.fillRect(cx + offset - halfWidth, 0, halfWidth * 0.55, h);
+      ctx.globalAlpha = 0.32;
+      ctx.fillRect(cx + offset - halfWidth, 0, halfWidth * 0.5, h);
       ctx.restore();
       ctx.globalAlpha = 1;
     }
@@ -490,9 +525,9 @@ function paintTerrainMarks(ctx, x, y, radius, terrain, rng) {
  */
 function paintShallows(ctx, x, y, radius) {
   const shelf = ctx.createRadialGradient(x, y, radius * 0.9, x, y, radius * 2.2);
-  shelf.addColorStop(0, "rgba(96,196,222,0.34)");
-  shelf.addColorStop(0.45, "rgba(60,150,186,0.16)");
-  shelf.addColorStop(1, "rgba(30,110,150,0)");
+  shelf.addColorStop(0, "rgba(126,177,190,0.42)");
+  shelf.addColorStop(0.45, "rgba(104,158,172,0.2)");
+  shelf.addColorStop(1, "rgba(82,134,148,0)");
   ctx.fillStyle = shelf;
   ctx.beginPath();
   ctx.ellipse(x, y, radius * 2.2, radius * 2.2 * 0.86, 0, 0, Math.PI * 2);
@@ -517,7 +552,7 @@ function paintIsland(ctx, x, y, radius, island, env = { stretch: 1, marks: 1 }) 
 
   // Ombre portée : sans elle, la terre est peinte sur la mer ; avec elle,
   // elle est posée dessus.
-  ctx.fillStyle = "rgba(3,22,34,0.32)";
+  ctx.fillStyle = "rgba(30,58,66,0.22)";
   traceCoast(ctx, x + radius * 0.12, y + radius * 0.16, radius * 1.14, points, makeRandom(seed));
   ctx.fill();
 
@@ -531,7 +566,7 @@ function paintIsland(ctx, x, y, radius, island, env = { stretch: 1, marks: 1 }) 
   ctx.fillStyle = paint.low;
   traceCoast(ctx, x, y, radius, points, makeRandom(seed));
   ctx.fill();
-  ctx.strokeStyle = "rgba(18,44,58,0.45)";
+  ctx.strokeStyle = "rgba(38,62,46,0.55)";
   ctx.lineWidth = Math.max(0.7, radius * 0.045);
   ctx.stroke();
 
@@ -583,91 +618,47 @@ function paintIsland(ctx, x, y, radius, island, env = { stretch: 1, marks: 1 }) 
 }
 
 /**
- * Reverse Mountain, vue du dessus.
+ * Reverse Mountain, telle que la carte de référence la dessine.
  *
- * Le récit tient en une phrase : quatre canaux montent des quatre Blues, se
- * rejoignent au bassin du sommet, et un cinquième redescend dans Grand
- * Line. Encore faut-il que la carte la rende possible.
+ * J'en avais fait un massif à courbes de niveau avec de gros canaux bleus.
+ * La carte source est infiniment plus sobre : un point sur le continent, et
+ * quatre traits fins qui en partent en diagonale jusqu'au bord des Calm
+ * Belts — les quatre courants, tracés comme des routes maritimes et non
+ * comme des fleuves.
  *
- * Le dessin précédent faisait converger les quatre canaux en diagonale, à
- * travers l'eau — donc à travers les Calm Belts. C'était absurde : si l'on
- * pouvait franchir la ceinture, la montagne ne servirait à rien, et c'est
- * précisément parce qu'on ne le peut pas qu'elle est la seule entrée.
- *
- * Les canaux sont taillés dans la Red Line, qui est un continent : là où
- * elle traverse les latitudes de la Calm Belt, c'est de la terre et non de
- * la mer. Ils courent donc le long du méridien, presque à la verticale,
- * depuis les quatre Blues qui bordent le continent de part et d'autre — et
- * ils ne touchent jamais l'eau morte de la ceinture. Le cinquième, celui de
- * sortie, file vers l'est dans l'axe de Grand Line.
+ * Ces traits courent dans la Red Line, qui est de la terre à ces
+ * latitudes : ils ne franchissent jamais l'eau morte de la ceinture. C'est
+ * tout l'intérêt de la montagne, et c'est ce que la sobriété du trait rend
+ * enfin lisible.
  */
 function paintReverseMountain(ctx, x, y, radius, island, env) {
-  const seed = 5150;
   const { w, h } = env;
-  const degLat = (d) => (d / 180) * h;
-  const degLng = (d) => (d / 360) * w;
+  const reachY = (CALM_BELT_OUTER / 180) * h;
+  const reachX = (RED_LINE_HALF_WIDTH * 0.62 / 360) * w;
 
-  // Courbes de niveau : cinq gradins, du pied au sommet.
-  const CONTOURS = ["#7d4130", "#93513c", "#a9654b", "#bd7c5e", "#d09675"];
-  CONTOURS.forEach((tint, i) => {
-    ctx.fillStyle = tint;
-    traceCoast(ctx, x, y, radius * (1.16 - i * 0.19), 16, makeRandom(seed + i * 97), 1.02);
-    ctx.fill();
-  });
-  ctx.strokeStyle = "rgba(60,28,20,0.4)";
-  ctx.lineWidth = Math.max(0.8, radius * 0.022);
-  for (let i = 1; i < CONTOURS.length; i++) {
-    traceCoast(ctx, x, y, radius * (1.16 - i * 0.19), 16, makeRandom(seed + i * 97), 1.02);
-    ctx.stroke();
-  }
-
-  // Les quatre canaux d'entrée. Ils partent d'au-delà de la Calm Belt —
-  // c'est là que commencent les Blues — et restent dans la largeur du
-  // continent : deux flancs, est et ouest, chacun vers le nord et le sud.
-  const reach = degLat(CALM_BELT_OUTER + 4);
-  const flank = degLng(2.1);
-  const wide = Math.max(2.4, radius * 0.14);
-  const core = Math.max(1.2, radius * 0.07);
-
-  const canal = (dx, dy, width, color) => {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(x + dx, y + dy);
-    ctx.quadraticCurveTo(x + dx * 0.75, y + dy * 0.35, x, y);
-    ctx.stroke();
-  };
-  for (const dx of [-flank, flank]) {
-    for (const dy of [-reach, reach]) {
-      canal(dx, dy, wide, "#12607f");
-      canal(dx, dy, core, "#57b6d4");
+  // Les quatre courants, en trait fin.
+  ctx.strokeStyle = "rgba(226,240,244,0.5)";
+  ctx.lineWidth = Math.max(1, h / 1400);
+  ctx.lineCap = "round";
+  for (const dx of [-reachX, reachX]) {
+    for (const dy of [-reachY, reachY]) {
+      ctx.beginPath();
+      ctx.moveTo(x + dx, y + dy);
+      ctx.lineTo(x, y);
+      ctx.stroke();
     }
   }
 
-  // Le canal de sortie : plus large, plus clair, vers l'est dans Grand Line.
-  const out = degLng(5.5);
-  ctx.strokeStyle = "#1e8fae";
-  ctx.lineWidth = Math.max(3, radius * 0.24);
+  // Le sommet : un petit relief clair, à peine plus large que le trait.
+  const r = Math.max(3, radius * 0.55);
+  ctx.fillStyle = "#c0705f";
   ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.lineTo(x + out, y);
-  ctx.stroke();
-  ctx.strokeStyle = "#8fe4f5";
-  ctx.lineWidth = Math.max(1.6, radius * 0.12);
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.lineTo(x + out * 0.96, y);
-  ctx.stroke();
-
-  // Le bassin du sommet, où les cinq se rencontrent.
-  ctx.fillStyle = "#8fe4f5";
-  ctx.beginPath();
-  ctx.arc(x, y, Math.max(2, radius * 0.19), 0, Math.PI * 2);
+  ctx.arc(x, y, r * 1.5, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = "rgba(255,255,255,0.75)";
-  ctx.lineWidth = Math.max(0.8, radius * 0.035);
-  ctx.stroke();
+  ctx.fillStyle = "#e8f4f7";
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.8, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 /**
@@ -797,7 +788,7 @@ const ISLAND_SIGNATURE = {
 function paintOutlinedIsland(ctx, x, y, radius, island, paint, coast, env) {
   withStretch(ctx, x, y, env?.marks ?? 1, () => paintShallows(ctx, x, y, radius));
 
-  ctx.fillStyle = "rgba(3,22,34,0.32)";
+  ctx.fillStyle = "rgba(30,58,66,0.22)";
   traceOutline(ctx, x + radius * 0.12, y + radius * 0.16, radius, island.outline, 1.1);
   ctx.fill();
 
@@ -808,7 +799,7 @@ function paintOutlinedIsland(ctx, x, y, radius, island, paint, coast, env) {
   ctx.fillStyle = paint.low;
   coast(1);
   ctx.fill();
-  ctx.strokeStyle = "rgba(18,44,58,0.45)";
+  ctx.strokeStyle = "rgba(38,62,46,0.55)";
   ctx.lineWidth = Math.max(0.7, radius * 0.045);
   ctx.stroke();
 
@@ -1239,8 +1230,8 @@ export function drawWorldTexture(islands, width = 4096) {
     const y2 = latToY(Math.min(from, to), h);
     const g = ctx.createLinearGradient(0, y1, 0, y2);
     const edge = from > 0 ? 0 : 1;
-    g.addColorStop(edge, "rgba(207,227,234,0.55)");
-    g.addColorStop(1 - edge, "rgba(207,227,234,0)");
+    g.addColorStop(edge, "rgba(226,238,242,0.4)");
+    g.addColorStop(1 - edge, "rgba(226,238,242,0)");
     ctx.fillStyle = g;
     ctx.fillRect(0, y1, w, y2 - y1);
   }
@@ -1299,7 +1290,7 @@ export function drawBumpTexture(islands, width = 2048) {
   ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, w, h);
 
-  const halfWidth = (w / 360) * 3.1;
+  const halfWidth = (w / 360) * RED_LINE_HALF_WIDTH;
   ctx.fillStyle = "#ffffff";
   for (const lng of RED_LINE_LNG) {
     const cx = lngToX(lng, w);

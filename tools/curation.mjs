@@ -938,7 +938,9 @@ export const ANCHORS = {
   "Village de Shimotsuki": { of: "Loguetown", dLat: 14, dLng: -6 },
   // Au pied de la montagne, côté Paradise, mais hors de son emprise :
   // le massif fait cinq degrés et demi de rayon.
-  "Cap des Jumeaux": { of: "Reverse Mountain", dLat: -1.4, dLng: 8 },
+  // Au pied de la montagne côté Paradise, donc au-delà de la côte du
+  // continent, qui fait quatorze degrés de part et d'autre du méridien.
+  "Cap des Jumeaux": { of: "Reverse Mountain", dLat: -1.4, dLng: 19 },
   "Mock Town": { of: "Jaya", dLat: -0.8, dLng: 0.7 },
   "Triangle de Florian": { of: "Thriller Bark", dLat: 1.4, dLng: -2.5 },
   "Royaume de Ryugu": { of: "Île des Hommes-Poissons", dLat: -0.7, dLng: 0.8 },
@@ -946,12 +948,14 @@ export const ANCHORS = {
   "Red Port": { of: "Reverse Mountain", dLat: -7.5, dLng: 1.2 },
   "Duché de Mokomo": { of: "Zou", dLat: 0.4, dLng: 0.5 },
   "Royaume Tontatta": { of: "Green Bit", dLat: 0.4, dLng: 0.4 },
-  "Totto Land": { of: "Whole Cake Island", dLat: 2.2, dLng: 2.6 },
-  "QG de la Marine": { of: "Nouveau Marine Ford", dLat: 0.8, dLng: 0.8 },
+  "Totto Land": { of: "Whole Cake Island", dLat: 4.2, dLng: 5.2 },
+  "QG de la Marine": { of: "Nouveau Marine Ford", dLat: 2.6, dLng: 3.4 },
   "Royaume de Standing": { of: "Royaume de Prodence", dLat: 3.2, dLng: 5 },
   Vira: { of: "Whisky Peak", dLat: 4, dLng: 7 },
   "Calm Belt": { of: "Amazon Lily", dLat: 1.5, dLng: -22 },
   // Laugh Tale vient après Lodestar, la dernière île que désigne le Log
   // Pose : elle se pose donc plus loin sur la route, pas avant.
-  "Laugh Tale": { of: "Lodestar", dLat: -0.6, dLng: 14 },
+  // Après Lodestar, mais assez loin pour ne pas tomber sur Reverse
+  // Mountain, qui occupe le croisement suivant.
+  "Laugh Tale": { of: "Lodestar", dLat: -1.5, dLng: 9 },
 };

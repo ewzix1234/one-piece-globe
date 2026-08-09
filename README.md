@@ -148,6 +148,12 @@ l'interface à la demande. Elles restent consignées ici, parce que la chaîne
 de fabrication en dépend et qu'une licence CC BY-SA les impose à qui
 redistribue le contenu.
 
+- **Carte de référence** — [op-maps.com](https://www.op-maps.com/fr). Ses
+  tuiles ont servi à relever la palette à la pipette et les largeurs au
+  pixel : océan `#528694`, Calm Belt `#70a9b6` — plus **claire** que
+  l'océan — Grand Line `#3d6a7b` plus sombre, Red Line `#8e3d3b`, terres
+  `#63914d`. La Red Line y fait quarante-quatre degrés de longitude à
+  l'équateur : c'est un continent, pas un trait.
 - **Positions et contours** — [op-maps.com](https://www.op-maps.com/fr).
   Leur relevé publie, pour cent quarante-cinq îles, une position et le
   contour du dessin. Son repère est une projection équirectangulaire tournée

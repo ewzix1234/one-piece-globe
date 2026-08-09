@@ -14,7 +14,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { RED_LINE_LNG, GRAND_LINE_HALF_WIDTH, CALM_BELT_OUTER } from "../src/texture.js";
+import {
+  RED_LINE_LNG,
+  RED_LINE_HALF_WIDTH,
+  GRAND_LINE_HALF_WIDTH,
+  CALM_BELT_OUTER,
+} from "../src/texture.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const { islands } = JSON.parse(
@@ -122,10 +127,13 @@ test("Reverse Mountain est au croisement opposé", () => {
 });
 
 test("le Cap des Jumeaux est au pied de Reverse Mountain", () => {
-  assert.ok(
-    arc(get("Cap des Jumeaux"), get("Reverse Mountain")) < 12,
-    "Laboon attend à l'entrée de Grand Line, contre la montagne",
-  );
+  // « Au pied » se mesure depuis la côte, pas depuis le sommet : la Red
+  // Line fait quatorze degrés de part et d'autre du méridien, et le cap est
+  // dans l'eau, côté Paradise. La tolérance couvre donc la traversée du
+  // continent — au-delà, ce ne serait plus son pied.
+  const d = arc(get("Cap des Jumeaux"), get("Reverse Mountain"));
+  assert.ok(d < RED_LINE_HALF_WIDTH + 6, `${d.toFixed(1)}° d'arc : trop loin de la montagne`);
+  assert.ok(d > RED_LINE_HALF_WIDTH - 2, `${d.toFixed(1)}° d'arc : le cap serait sur le continent`);
 });
 
 /* ── Lieux imbriqués ──────────────────────────────────────────────────── */
@@ -457,6 +465,17 @@ test("les îles de la Calm Belt tiennent dans la ceinture", async () => {
   const { measuredHalfHeight } = await import("../src/texture.js");
   for (const island of islands.filter((i) => i.sea === "Calm Belt" && i.kind !== "zone")) {
     const half = measuredHalfHeight(island);
+    // Une île plus large que la ceinture ne peut pas y tenir : on lui
+    // demande seulement d'être centrée dessus.
+    const room = (CALM_BELT_OUTER - GRAND_LINE_HALF_WIDTH) / 2;
+    if (half >= room) {
+      const middle = (CALM_BELT_OUTER + GRAND_LINE_HALF_WIDTH) / 2;
+      assert.ok(
+        Math.abs(Math.abs(island.lat) - middle) < 0.05,
+        `${island.name} est trop large pour la ceinture sans y être centrée`,
+      );
+      continue;
+    }
     const near = Math.abs(island.lat) - half;
     const far = Math.abs(island.lat) + half;
     assert.ok(near >= GRAND_LINE_HALF_WIDTH - 0.02, `${island.name} mord sur Grand Line`);

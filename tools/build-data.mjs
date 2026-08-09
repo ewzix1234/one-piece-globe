@@ -114,8 +114,13 @@ function fitToBand(lat, sea, scale, measured) {
     return sign * Math.min(Math.abs(lat), room);
   }
   if (sea === "Calm Belt") {
+    // La ceinture est étroite : une île trop large pour y tenir se centre
+    // dedans plutôt que d'en déborder d'un côté.
+    const room = (CALM_BELT_OUTER - GRAND_LINE_HALF_WIDTH) / 2;
+    const middle = (CALM_BELT_OUTER + GRAND_LINE_HALF_WIDTH) / 2;
+    if (half >= room) return sign * middle;
     const inner = GRAND_LINE_HALF_WIDTH + half;
-    const outer = Math.max(inner, CALM_BELT_OUTER - half);
+    const outer = CALM_BELT_OUTER - half;
     return sign * Math.min(outer, Math.max(inner, Math.abs(lat)));
   }
   return lat;
@@ -207,9 +212,18 @@ for (const place of PLACES) {
   const lat =
     opPos?.lat ??
     (hostPos ? hostPos.lat + (anchor.dLat ?? 0) : (place.lat ?? pos?.lat));
-  const lng =
+  // Un écart appliqué près du méridien 180 peut sortir de l'intervalle :
+  // la longitude s'y enroule, elle ne s'y arrête pas.
+  const wrapLng = (v) => {
+    let x = v;
+    while (x > 180) x -= 360;
+    while (x <= -180) x += 360;
+    return x;
+  };
+  const lng = wrapLng(
     opPos?.lng ??
-    (hostPos ? hostPos.lng + (anchor.dLng ?? 0) : (place.lng ?? pos?.lng));
+      (hostPos ? hostPos.lng + (anchor.dLng ?? 0) : (place.lng ?? pos?.lng)),
+  );
   if (typeof lat !== "number" || typeof lng !== "number") {
     errors.push(`coordonnées manquantes pour « ${place.fr} »`);
     continue;

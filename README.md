@@ -17,8 +17,10 @@ compte les jours depuis le départ de Fuchsia. On met en pause à l'espace, on
 saute d'escale en escale aux flèches ou en cliquant la réglette, on rejoue à
 la fin. Ensuite, les flèches reprennent la route à la main.
 
-Rien n'est posé sur la carte : ni pastille, ni pictogramme, ni légende. Tout
-est peint. La sphère se lit comme un relevé — graticule tous les quinze
+Rien n'est posé sur la carte : ni pastille, ni pictogramme, ni légende, ni
+filtre. Tout est peint, jusqu'aux noms — leurs lettres tombent toutes sur le
+même parallèle, si bien qu'un nom d'océan épouse la courbure du globe au
+lieu de le barrer. La sphère se lit comme un relevé — graticule tous les quinze
 degrés, hauts-fonds autour des terres, ombre
 portée sous chaque côte — et chaque lieu prend la forme de ce qu'il est : Zou est un
 éléphant qui porte une forêt, Skypiea un banc de nuages, l'Île des
@@ -37,8 +39,11 @@ Red Port une ancre, la Calm Belt deux vagues. Les villes posées sur une île
 plus grande — Fuchsia sur Dawn, Mock Town sur Jaya, Mokomo sur le dos de
 Zunisha — sont des toits, pas une seconde côte.
 
-Chaque île porte une image de paysage, sa fiche, ses personnages, sa position
-exacte, ce que l'équipage y a fait et le temps qu'il y a passé — d'un jour à
+Chaque fiche dit tout ce qu'on sait du lieu : son image, son nom japonais et
+ses autres noms, sa mer et ce qu'elle est, son étendue et son terrain, son
+quadrant et son écart à la Red Line, l'escale d'où l'on vient avec la
+distance et le cap, celle où l'on va, ses figures, sa première apparition,
+ce que l'équipage y a fait et le temps qu'il y a passé — d'un jour à
 Loguetown aux deux ans de Rusukaina. Grand Line est nommée pour ce qu'elle est : une seule route,
 coupée en deux par la Red Line, Paradise d'un côté et le Nouveau Monde de
 l'autre. Les Calm Belts la bordent. Les lieux qui ne sont pas des îles de

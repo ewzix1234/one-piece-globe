@@ -26,20 +26,20 @@ export const ZONES = [
   // « Paradise » seul se lit comme une mer à part, alors que c'est la
   // première moitié de Grand Line. Les deux étiquettes portent donc le nom
   // de la route avant celui de la moitié.
-  { label: "GRAND LINE · PARADISE", lat: 0, lng: PARADISE_LNG, size: 2.3, kind: "route" },
-  { label: "GRAND LINE · NOUVEAU MONDE", lat: 0, lng: NEW_WORLD_LNG, size: 2.3, kind: "route" },
-  { label: "CALM BELT", lat: CALM_BELT_MID, lng: 130, size: 2.2, kind: "belt" },
-  { label: "CALM BELT", lat: -CALM_BELT_MID, lng: -50, size: 2.2, kind: "belt" },
+  { label: "GRAND LINE · PARADISE", lat: 0, lng: PARADISE_LNG, size: 3.6, kind: "route" },
+  { label: "GRAND LINE · NOUVEAU MONDE", lat: 0, lng: NEW_WORLD_LNG, size: 3.6, kind: "route" },
+  { label: "CALM BELT", lat: CALM_BELT_MID, lng: 130, size: 3.2, kind: "belt" },
+  { label: "CALM BELT", lat: -CALM_BELT_MID, lng: -50, size: 3.2, kind: "belt" },
   // La Red Line fait deux fois le tour du globe par les pôles : une seule
   // étiquette en laisserait la moitié anonyme.
-  { label: "RED LINE", lat: 44, lng: RED_LINE_LNG[0], size: 2.6, kind: "land" },
-  { label: "RED LINE", lat: -44, lng: RED_LINE_LNG[1], size: 2.6, kind: "land" },
+  { label: "RED LINE", lat: 30, lng: RED_LINE_LNG[0], size: 3, kind: "land" },
+  { label: "RED LINE", lat: -30, lng: RED_LINE_LNG[1], size: 3, kind: "land" },
   // Les quatre Blues sont les quadrants découpés par Grand Line et la Red
   // Line : leurs étiquettes sont posées au centre géométrique de chacun.
-  { label: "EAST BLUE", lat: 48, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
-  { label: "SOUTH BLUE", lat: -48, lng: PARADISE_LNG, size: 3.2, kind: "blue" },
-  { label: "NORTH BLUE", lat: 48, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
-  { label: "WEST BLUE", lat: -48, lng: NEW_WORLD_LNG, size: 3.2, kind: "blue" },
+  { label: "EAST BLUE", lat: 46, lng: PARADISE_LNG, size: 4.4, kind: "blue" },
+  { label: "SOUTH BLUE", lat: -46, lng: PARADISE_LNG, size: 4.4, kind: "blue" },
+  { label: "NORTH BLUE", lat: 46, lng: NEW_WORLD_LNG, size: 4.4, kind: "blue" },
+  { label: "WEST BLUE", lat: -46, lng: NEW_WORLD_LNG, size: 4.4, kind: "blue" },
 ];
 
 const PALETTE = {
@@ -448,10 +448,14 @@ function paintIsland(ctx, x, y, radius, island) {
   traceCoast(ctx, x, y, radius * 1.17, points, makeRandom(seed));
   ctx.fill();
 
-  // Masse de terre.
+  // Masse de terre, cernée d'un trait d'encre : c'est ce qui donne à une
+  // carte gravée sa netteté, et ce qui manque à un aplat.
   ctx.fillStyle = paint.low;
   traceCoast(ctx, x, y, radius, points, makeRandom(seed));
   ctx.fill();
+  ctx.strokeStyle = "rgba(18,44,58,0.45)";
+  ctx.lineWidth = Math.max(0.7, radius * 0.045);
+  ctx.stroke();
 
   // Punk Hazard est coupée en deux : brûlée d'un côté, gelée de l'autre.
   // Le partage se fait à l'intérieur du contour, pas à côté.
@@ -578,6 +582,73 @@ function paintCluster(ctx, x, y, radius, island) {
   }
 }
 
+
+
+/* ── Lettrage de la carte ─────────────────────────────────────────────── */
+
+/**
+ * Les noms de zone, peints à même la texture.
+ *
+ * Posés en relief par le moteur 3D, ils restaient droits : un nom d'océan
+ * barrait la sphère comme une réglette. Peints sur la texture, tous leurs
+ * caractères tombent sur le même parallèle — le nom épouse alors la
+ * courbure du globe, comme sur une carte gravée.
+ *
+ * La projection équirectangulaire étire l'horizontale à mesure qu'on monte
+ * en latitude : sans correction, « NORTH BLUE » se lirait comprimé sur la
+ * sphère. On dessine donc le texte élargi de 1/cos(latitude), ce qui le
+ * rétablit exactement une fois enroulé.
+ */
+const LABEL_STYLE = {
+  route: { fill: "rgba(222,246,253,0.66)", track: 0.3, weight: 500 },
+  belt: { fill: "rgba(163,198,215,0.6)", track: 0.4, weight: 500 },
+  land: { fill: "rgba(248,206,180,0.68)", track: 0.36, weight: 500 },
+  blue: { fill: "rgba(200,228,241,0.56)", track: 0.46, weight: 400 },
+};
+
+const LABEL_FONT =
+  'Futura, "Avenir Next", "Century Gothic", "Trebuchet MS", sans-serif';
+
+function paintZoneLabel(ctx, w, h, zone) {
+  const style = LABEL_STYLE[zone.kind] ?? LABEL_STYLE.blue;
+  const stretch = 1 / Math.max(0.25, Math.cos((zone.lat * Math.PI) / 180));
+  // `size` est une hauteur de lettre en degrés de latitude : le nom garde
+  // la même présence quel que soit le format de la texture.
+  const fontPx = (zone.size / 180) * h;
+  const track = fontPx * style.track;
+
+  ctx.save();
+  ctx.font = `${style.weight} ${fontPx}px ${LABEL_FONT}`;
+  ctx.textBaseline = "middle";
+
+  const letters = [...zone.label];
+  const widths = letters.map((c) => ctx.measureText(c).width);
+  const total = widths.reduce((a, b) => a + b, 0) + track * (letters.length - 1);
+
+  // Le nom est peint trois fois, décalé d'un tour de monde : celui qui
+  // chevauche le méridien 180 ne doit pas être coupé en deux.
+  for (const offset of [-w, 0, w]) {
+    let x = lngToX(zone.lng, w) + offset - (total * stretch) / 2;
+    if (x > w + total * stretch || x + total * stretch < -total * stretch) continue;
+    const y = latToY(zone.lat, h);
+    for (let i = 0; i < letters.length; i++) {
+      ctx.save();
+      ctx.translate(x + (widths[i] * stretch) / 2, y);
+      ctx.scale(stretch, 1);
+      // Un liseré sombre décolle la lettre du fond sans l'alourdir.
+      ctx.strokeStyle = "rgba(4,26,38,0.5)";
+      ctx.lineWidth = fontPx * 0.055;
+      ctx.lineJoin = "round";
+      ctx.textAlign = "center";
+      ctx.strokeText(letters[i], 0, 0);
+      ctx.fillStyle = style.fill;
+      ctx.fillText(letters[i], 0, 0);
+      ctx.restore();
+      x += (widths[i] + track) * stretch;
+    }
+  }
+  ctx.restore();
+}
 
 /* ── Lieux qui ne sont pas des îles, peints à même la carte ───────────── */
 
@@ -887,6 +958,10 @@ export function drawWorldTexture(islands, width = 4096) {
     ctx.fillStyle = g;
     ctx.fillRect(0, y1, w, y2 - y1);
   }
+
+  // Le lettrage passe sous les terres : un nom d'océan qui court derrière
+  // une côte se lit encore, un nom qui la barre ne se lit plus.
+  for (const zone of ZONES) paintZoneLabel(ctx, w, h, zone);
 
   // Les grandes îles en premier : une petite posée dessus doit rester
   // lisible, l'inverse la ferait disparaître.

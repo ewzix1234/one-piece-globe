@@ -1,9 +1,4 @@
-import {
-  drawWorldTexture,
-  drawBumpTexture,
-  RED_LINE_LNG,
-  ZONES,
-} from "./texture.js";
+import { drawWorldTexture, drawBumpTexture, RED_LINE_LNG } from "./texture.js";
 
 const GLOBE_RADIUS = 100; // unité interne de globe.gl
 const $ = (id) => document.getElementById(id);
@@ -93,6 +88,32 @@ async function loadData() {
  * « Paradise » sonne comme une mer à part, alors que c'est la première
  * moitié de Grand Line : la route est une, la Red Line la coupe en deux.
  */
+/** Ce que dit la taille, du continent au lieu-dit. */
+const SIZE_LABEL = {
+  8: "un continent",
+  7: "un grand royaume",
+  6: "une très grande île",
+  5: "une grande île",
+  4: "une île",
+  3: "une petite île",
+  2: "un îlot",
+  1: "un lieu-dit",
+};
+
+/** Ce que dit le terrain, tel qu'il est peint sur la carte. */
+const TERRAIN_LABEL = {
+  forest: "boisé",
+  jungle: "jungle",
+  desert: "désert",
+  snow: "neige et glace",
+  city: "urbanisé",
+  rock: "roche nue",
+  cake: "sucre et pâtisserie",
+  ash: "cendres",
+  split: "feu d'un côté, glace de l'autre",
+  mountain: "massif de la Red Line",
+};
+
 const SEA_NOTE = {
   Paradise: "première moitié de Grand Line",
   "Nouveau Monde": "seconde moitié de Grand Line",
@@ -254,22 +275,6 @@ function buildGlobe() {
     });
   refreshShipLayer();
 
-  // Étiquettes de zone : elles nomment les deux moitiés de Grand Line, les
-  // Calm Belts, la Red Line et les quatre Blues directement sur la sphère.
-  // Posées en filigrane, comme sur une carte marine : elles nomment le fond
-  // sans masquer ce qui s'y trouve.
-  globe
-    .labelsData(ZONES)
-    .labelLat("lat")
-    .labelLng("lng")
-    .labelText("label")
-    .labelColor(zoneColor)
-    .labelSize((z) => z.size * (small ? 1.25 : 1))
-    .labelDotRadius(0)
-    .labelResolution(3)
-    .labelAltitude(0.011)
-    .labelIncludeDot(false);
-
   // Anneau de sélection.
   globe
     .ringsData([])
@@ -293,8 +298,6 @@ function buildGlobe() {
   controls.addEventListener("start", () => {
     if (!cine.active) controls.autoRotate = false;
   });
-
-  watchZoneFade();
 
   // Poignée de mise au point : permet de piloter la caméra depuis la
   // console ou depuis les tests de bout en bout.
@@ -333,42 +336,6 @@ function buildGlobe() {
   const resize = () => globe.width(window.innerWidth).height(window.innerHeight);
   window.addEventListener("resize", resize);
   window.addEventListener("orientationchange", () => setTimeout(resize, 150));
-}
-
-/* ── Étiquettes de zone ───────────────────────────────────────────────── */
-
-const ZONE_ALPHA = { route: 0.42, belt: 0.45, land: 0.5, blue: 0.4 };
-const ZONE_RGB = {
-  route: "198,238,248",
-  belt: "128,166,186",
-  land: "232,176,146",
-  blue: "168,202,216",
-};
-
-/**
- * De près, les noms de zone barrent les îles qu'ils survolent — « GRAND
- * LINE · PARADISE » traversait Alabasta. Ils s'effacent donc à mesure qu'on
- * se rapproche : ils servent à s'orienter de loin, pas à lire une côte.
- */
-let zoneFade = 1;
-
-function zoneColor(zone) {
-  return `rgba(${ZONE_RGB[zone.kind]},${(ZONE_ALPHA[zone.kind] * zoneFade).toFixed(3)})`;
-}
-
-function watchZoneFade() {
-  let last = -1;
-  // On relève l'altitude à intervalle plutôt qu'à l'événement de zoom :
-  // une caméra déplacée par le code — une escale, le voyage rejoué — ne
-  // déclenche pas ce dernier, et les noms restaient en travers des îles.
-  setInterval(() => {
-    // Pleine intensité au-delà de deux rayons, effacement complet sous un.
-    const fade = clamp((globe.pointOfView().altitude - 0.85) / 1.15, 0, 1);
-    if (Math.abs(fade - last) < 0.06) return;
-    last = fade;
-    zoneFade = fade;
-    globe.labelColor(zoneColor);
-  }, 260);
 }
 
 /* ── Éloignement ──────────────────────────────────────────────────────── */
@@ -495,6 +462,23 @@ function renderSummary(summary) {
   </div>`;
 }
 
+/** Le quadrant du monde où tombe un lieu. */
+function quadrant(island) {
+  const east = island.lng > RED_LINE_LNG[0] && island.lng < RED_LINE_LNG[1];
+  const north = island.lat >= 0;
+  return `hémisphère ${east ? "est" : "ouest"}, ${north ? "nord" : "sud"}`;
+}
+
+/** Écart de longitude au méridien de Red Line le plus proche, en degrés. */
+function toRedLine(island) {
+  return Math.min(
+    ...RED_LINE_LNG.map((lng) => {
+      const d = Math.abs(island.lng - lng);
+      return d > 180 ? 360 - d : d;
+    }),
+  );
+}
+
 function renderRecord(island) {
   const host = $("record-scroll");
   if (!island) {
@@ -532,10 +516,37 @@ function renderRecord(island) {
   if (island.ruler) rows.push(["Dirigeant", island.ruler]);
   if (island.affiliation) rows.push(["Affiliation", island.affiliation]);
   if (island.people?.length) rows.push(["Figures", island.people.join(", ")]);
+
+  // Ce que la carte montre du lieu, mis en mots.
+  const size = SIZE_LABEL[island.scale];
+  const terrain = TERRAIN_LABEL[island.terrain];
+  if (size) rows.push(["Étendue", terrain ? `${size}, ${terrain}` : size]);
+
+  // Où l'on se trouve dans le monde, et par rapport à ce qui le structure.
   rows.push([
     "Coordonnées",
-    `${Math.abs(island.lat).toFixed(1)}° ${island.lat >= 0 ? "N" : "S"} · ${Math.abs(island.lng).toFixed(1)}° ${island.lng >= 0 ? "E" : "O"}`,
+    `${Math.abs(island.lat).toFixed(1)}° ${island.lat >= 0 ? "N" : "S"} · ${Math.abs(island.lng).toFixed(1)}° ${island.lng >= 0 ? "E" : "O"} — ${quadrant(island)}`,
   ]);
+  rows.push(["De la Red Line", `${toRedLine(island).toFixed(0)}° de longitude`]);
+
+  // La route : d'où l'on vient, où l'on va, et à quel cap.
+  const index = state.route.findIndex((i) => i.id === island.id);
+  if (index > 0) {
+    const from = state.route[index - 1];
+    rows.push([
+      "Depuis l'escale précédente",
+      `${from.name} — ${angularDistance(from, island).toFixed(1)}° d'arc, cap au ${Math.round(bearing(from, island))}°`,
+    ]);
+  }
+  if (index >= 0 && index < state.route.length - 1) {
+    rows.push(["Escale suivante", state.route[index + 1].name]);
+  }
+
+  // Les autres noms sous lesquels le lieu circule : traduction, translittération, surnom.
+  const others = (island.aliases ?? []).filter(
+    (a) => a !== island.nameJp && a !== island.nameRomaji,
+  );
+  if (others.length) rows.push(["Autres noms", others.slice(0, 6).join(", ")]);
 
   host.innerHTML = `
     ${

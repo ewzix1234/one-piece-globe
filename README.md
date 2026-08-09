@@ -1,6 +1,6 @@
 # Blue Star
 
-Globe interactif du monde de One Piece. 83 îles posées sur la sphère à leur
+Globe interactif du monde de One Piece. 83 lieux posés sur la sphère à leur
 position canon, de Fuchsia à Elbaf.
 
 Tourne à la souris, zoome à la molette ou au pincement — on peut reculer

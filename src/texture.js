@@ -857,7 +857,7 @@ const islandRadius = (island, w) =>
  * @param {Array<{lat:number,lng:number,scale:number,sea:string}>} islands
  * @param {number} width  largeur en pixels (hauteur = width / 2)
  */
-export function drawWorldTexture(islands, width = 4096, dimmed = null) {
+export function drawWorldTexture(islands, width = 4096) {
   const w = width;
   const h = width / 2;
   const canvas =
@@ -898,9 +898,6 @@ export function drawWorldTexture(islands, width = 4096, dimmed = null) {
     const x = lngToX(island.lng, w);
     const y = latToY(island.lat, h);
     const radius = islandRadius(island, w);
-    // Une île écartée par un filtre s'efface sans disparaître : on doit
-    // continuer à lire la géographie pendant qu'on isole une saga.
-    ctx.globalAlpha = dimmed?.has(island.id) ? 0.16 : 1;
     const draw = painterFor(island);
     // Enroulement : une île près du méridien 180 doit apparaître des deux côtés.
     for (const offset of [-w, 0, w]) {
@@ -908,7 +905,6 @@ export function drawWorldTexture(islands, width = 4096, dimmed = null) {
         draw(ctx, x + offset, y, radius, island);
       }
     }
-    ctx.globalAlpha = 1;
   }
 
   return canvas;

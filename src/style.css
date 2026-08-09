@@ -246,86 +246,6 @@ button {
   white-space: nowrap;
 }
 
-/* --- Filtres -------------------------------------------------------------- */
-
-.filters {
-  position: fixed;
-  top: var(--edge);
-  right: var(--edge);
-  z-index: 20;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.4rem;
-  transition: right 0.36s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-body.panel-open .filters {
-  right: calc(var(--panel-width) + var(--edge));
-}
-
-.filters-title {
-  font-family: var(--data);
-  font-size: 0.7rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--foam-dim);
-  margin-bottom: 0.15rem;
-}
-
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 2.25rem;
-  padding: 0.35rem 0.7rem;
-  font-family: var(--data);
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
-  color: var(--foam-dim);
-  background: var(--glass);
-  border: 1px solid transparent;
-  border-radius: 999px;
-  backdrop-filter: blur(14px) saturate(1.3);
-  -webkit-backdrop-filter: blur(14px) saturate(1.3);
-  transition:
-    color 0.18s var(--ease),
-    border-color 0.18s var(--ease),
-    transform 0.18s var(--ease);
-}
-
-.chip:active {
-  transform: scale(0.96);
-}
-
-.chip:hover {
-  color: var(--foam);
-}
-
-.chip[aria-pressed="true"] {
-  color: var(--foam);
-  border-color: rgba(216, 231, 234, 0.35);
-}
-
-.chip-dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.35;
-  transition: opacity 0.18s ease;
-}
-
-.chip[aria-pressed="true"] .chip-dot {
-  opacity: 1;
-}
-
-.chip-count {
-  font-size: 0.72rem;
-  opacity: 0.6;
-  font-variant-numeric: tabular-nums;
-}
-
 /* --- Le navire de la lecture cinématique ---------------------------------- */
 
 .ship {
@@ -533,7 +453,6 @@ body.panel-open .filters {
 /* Pendant la lecture, la barre du voyage s'efface : c'est le bandeau qui
    commande, et deux jeux de contrôles se disputeraient le bas de l'écran. */
 body.cine-on .voyage,
-body.cine-on .filters,
 body.cine-on .masthead {
   opacity: 0;
   pointer-events: none;
@@ -929,38 +848,9 @@ body.panel-open .voyage {
     width: calc(100vw - 2 * var(--edge) - 3.5rem);
   }
 
-  /* Rangée défilante : les douze sagas ne tiennent pas sur un écran. */
-  .filters {
-    top: auto;
-    left: 0;
-    right: 0;
-    bottom: calc(var(--bottom-inset) + 4.6rem);
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 0.4rem;
-    max-width: none;
-    padding: 0 var(--edge);
-    overflow-x: auto;
-    scrollbar-width: none;
-    scroll-padding: var(--edge);
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .filters::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Cibles tactiles : au doigt, 36 px est trop court. */
-  .chip {
-    flex: none;
-    min-height: 2.5rem;
-    padding-inline: 0.85rem;
-  }
 
 
-  .filters-title,
-  .chip-count,
+
   .voyage-step {
     display: none;
   }
@@ -984,11 +874,6 @@ body.panel-open .voyage {
     width: calc(100vw - 2 * var(--edge));
   }
 
-  /* La rangée des sagas passerait sous le bandeau : elle s'efface. */
-  body.card-open .filters {
-    opacity: 0;
-    pointer-events: none;
-  }
 
 
 
@@ -1007,11 +892,6 @@ body.panel-open .voyage {
 
 
 
-  /* Les sagas, elles, n'ont rien à faire par-dessus la fiche. */
-  body.panel-open .filters {
-    opacity: 0;
-    pointer-events: none;
-  }
 
   /* La fiche devient une feuille qui monte du bas, refermable au geste. */
   .record {
@@ -1085,10 +965,6 @@ body.panel-open .voyage {
   .record {
     height: 100dvh;
     border-radius: 0;
-  }
-
-  .filters {
-    display: none;
   }
 
   /* La feuille couvre l'écran entier : rien ne peut flotter au-dessus, on

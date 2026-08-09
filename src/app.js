@@ -13,7 +13,6 @@ const state = {
   sagas: [],
   kinds: {},
   bySaga: new Map(),
-  hiddenSagas: new Set(),
   selected: null,
   route: [],
 };
@@ -87,8 +86,6 @@ async function loadData() {
     .sort((a, b) => a.step - b.step);
 }
 
-const isVisible = (island) => !state.hiddenSagas.has(island.saga);
-const visibleIslands = () => state.islands.filter(isVisible);
 
 /**
  * Ce que la mer d'appartenance veut dire.
@@ -165,41 +162,6 @@ const toUrl = (canvas) =>
     ? canvas.convertToBlob({ type: "image/png" }).then(URL.createObjectURL)
     : Promise.resolve(canvas.toDataURL("image/png"));
 
-let worldUrl = null;
-let repaintTimer = null;
-
-/**
- * Repeint la sphère en tenant compte des sagas masquées.
- *
- * Depuis que les pastilles ont disparu, filtrer une saga ne changeait plus
- * rien à l'écran : l'île restait peinte sur la texture. Elle s'efface
- * maintenant pour de bon — en fondu, pour qu'on continue de lire la
- * géographie pendant qu'on isole une saga.
- */
-let paintedFilter = "";
-
-function repaintWorld() {
-  // Chaque flèche du voyage rouvre les filtres pour révéler l'escale :
-  // repeindre à chaque fois coûterait deux cents millisecondes pour une
-  // texture identique. On ne repeint que si le jeu masqué a bougé.
-  const signature = [...state.hiddenSagas].sort().join("|");
-  if (signature === paintedFilter) return;
-  paintedFilter = signature;
-
-  clearTimeout(repaintTimer);
-  repaintTimer = setTimeout(() => {
-    const dimmed = new Set(
-      state.islands.filter((i) => !isVisible(i)).map((i) => i.id),
-    );
-    const world = drawWorldTexture(state.islands, small ? 2048 : 4096, dimmed);
-    toUrl(world).then((url) => {
-      globe.globeImageUrl(url);
-      if (worldUrl?.startsWith("blob:")) URL.revokeObjectURL(worldUrl);
-      worldUrl = url;
-    });
-  }, 140);
-}
-
 function buildGlobe() {
   small = isHandheld();
   const world = drawWorldTexture(state.islands, small ? 2048 : 4096);
@@ -214,9 +176,8 @@ function buildGlobe() {
     .width(window.innerWidth)
     .height(window.innerHeight);
 
-  Promise.all([toUrl(world), toUrl(bump)]).then(([world0, bumpUrl]) => {
-    worldUrl = world0;
-    globe.globeImageUrl(world0).bumpImageUrl(bumpUrl);
+  Promise.all([toUrl(world), toUrl(bump)]).then(([worldUrl, bumpUrl]) => {
+    globe.globeImageUrl(worldUrl).bumpImageUrl(bumpUrl);
   });
 
   // Red Line et Grand Line : deux grands cercles perpendiculaires, en relief.
@@ -260,7 +221,7 @@ function buildGlobe() {
   // pointeur — une pastille de couleur par-dessus chaque terre encombrerait
   // la carte sans rien dire de plus.
   globe
-    .pointsData(visibleIslands())
+    .pointsData(state.islands)
     .pointLat("lat")
     .pointLng("lng")
     .pointColor(() => "rgba(0,0,0,0)")
@@ -678,9 +639,6 @@ function setupSearch() {
     if (!button) return;
     const island = state.islands.find((i) => i.id === button.dataset.id);
     if (island) {
-      // Une île masquée par un filtre doit redevenir visible si on la choisit.
-      state.hiddenSagas.delete(island.saga);
-      refreshFilters();
       select(island, { fly: true });
     }
     input.value = "";
@@ -700,43 +658,6 @@ function setupSearch() {
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".search")) close();
   });
-}
-
-/* ── Filtres ──────────────────────────────────────────────────────────── */
-
-function setupFilters() {
-  const host = $("filters");
-  for (const saga of state.sagas) {
-    const count = state.islands.filter((i) => i.saga === saga.id).length;
-    if (!count) continue;
-    const chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = "chip";
-    chip.dataset.saga = saga.id;
-    chip.setAttribute("aria-pressed", "true");
-    chip.style.color = saga.color;
-    chip.innerHTML = `<span class="chip-dot"></span><span>${escape(saga.label)}</span><span class="chip-count">${count}</span>`;
-    chip.addEventListener("click", () => {
-      state.hiddenSagas.has(saga.id)
-        ? state.hiddenSagas.delete(saga.id)
-        : state.hiddenSagas.add(saga.id);
-      refreshFilters();
-    });
-    host.appendChild(chip);
-  }
-}
-
-function refreshFilters() {
-  for (const chip of document.querySelectorAll(".chip[data-saga]")) {
-    chip.setAttribute(
-      "aria-pressed",
-      String(!state.hiddenSagas.has(chip.dataset.saga)),
-    );
-  }
-  globe.pointsData(visibleIslands());
-  refreshShipLayer();
-  repaintWorld();
-  if (state.selected && !isVisible(state.selected)) select(null);
 }
 
 /* ── Route de l'équipage, à la main ───────────────────────────────────── */
@@ -774,8 +695,6 @@ function stepBy(delta) {
   const next = index === -1 ? (delta > 0 ? 0 : state.route.length - 1) : index + delta;
   const island = state.route[clamp(next, 0, state.route.length - 1)];
   if (!island) return;
-  state.hiddenSagas.delete(island.saga);
-  refreshFilters();
   select(island, { fly: true, panel: false });
 }
 
@@ -991,9 +910,6 @@ function startCine() {
   cine.hull = null;
   setHull(shipAtStep(1));
 
-  // Tous les filtres reviennent : une escale masquée couperait la route.
-  state.hiddenSagas.clear();
-  refreshFilters();
   select(null);
 
   document.body.classList.add("cine-on");
@@ -1211,8 +1127,6 @@ function openFromHash({ fly = true } = {}) {
   if (!id) return false;
   const island = state.islands.find((i) => i.id === id);
   if (!island) return false;
-  state.hiddenSagas.delete(island.saga);
-  refreshFilters();
   select(island, { fly, quiet: true });
   return true;
 }
@@ -1279,7 +1193,6 @@ async function start() {
     await new Promise((r) => setTimeout(r, 30));
     buildGlobe();
     setupSearch();
-    setupFilters();
     setupCine();
     updateVoyage();
 
